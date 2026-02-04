@@ -6,6 +6,22 @@ Alle wesentlichen Änderungen am Projekt werden hier dokumentiert.
 
 ## [Unreleased]
 
+### 🎨 Resizable Panels (Februar 2026 - Session 29)
+
+**Feature:** Sidebar und Queue können jetzt in der Breite verstellt werden!
+
+- **Neue Komponente: `ResizeHandle.svelte`**
+  - Drag-to-resize mit Mouse und Touch
+  - Doppelklick zum Ein-/Ausklappen
+  - Keyboard-Navigation (Pfeiltasten, Enter/Space)
+  - Breiten werden in localStorage gespeichert
+
+- **Sidebar:** 180-400px (Desktop only)
+- **Queue:** 250-500px (Desktop only)
+- **Mobile:** Verhalten unverändert
+
+---
+
 ### 📚 AI Bootstrap Dokumentation erweitert (Februar 2026 - Session 29)
 
 **Ziel:** Bessere Dokumentation für AI-Agent wie Tools und Umgebung funktionieren.
