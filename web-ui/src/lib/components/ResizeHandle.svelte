@@ -189,7 +189,9 @@
 <style>
   .resize-handle {
     position: relative;
-    width: 8px;
+    width: 12px;
+    height: 100%;
+    min-height: 100vh;
     cursor: col-resize;
     display: flex;
     align-items: center;
@@ -197,12 +199,24 @@
     flex-shrink: 0;
     z-index: 10;
     touch-action: none;
+    background: transparent;
   }
 
   .resize-handle:hover .handle-line,
   .resize-handle.dragging .handle-line {
     background-color: var(--color-accent, #cba6f7);
-    width: 3px;
+    width: 4px;
+    opacity: 1;
+  }
+
+  .resize-handle:hover,
+  .resize-handle.dragging {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(203, 166, 247, 0.1) 50%,
+      transparent 100%
+    );
   }
 
   .resize-handle:focus {
@@ -216,17 +230,21 @@
   }
 
   .handle-line {
-    width: 1px;
+    width: 2px;
     height: 100%;
-    background-color: var(--color-border, #45475a);
+    min-height: 100%;
+    background-color: var(--color-overlay-0, #6c7086);
+    opacity: 0.6;
     transition:
       background-color 0.15s ease,
-      width 0.15s ease;
+      width 0.15s ease,
+      opacity 0.15s ease;
     border-radius: 2px;
   }
 
   .resize-handle.dragging .handle-line {
     background-color: var(--color-accent, #cba6f7);
+    opacity: 1;
   }
 
   /* Hover area extends beyond visible line */

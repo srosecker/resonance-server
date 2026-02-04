@@ -252,7 +252,7 @@
   {/if}
 
   <!-- Sidebar Resize Handle (Desktop only) -->
-  <div class="hidden lg:block">
+  <div class="hidden lg:flex h-full">
     <ResizeHandle
       position="left"
       minSize={180}
@@ -550,7 +550,7 @@
 
       <!-- Queue Resize Handle (Desktop only) -->
       {#if !queueCollapsed}
-        <div class="hidden 2xl:block">
+        <div class="hidden 2xl:flex h-full">
           <ResizeHandle
             position="right"
             minSize={250}

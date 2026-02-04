@@ -6,6 +6,70 @@ Alle wesentlichen Änderungen am Projekt werden hier dokumentiert.
 
 ## [Unreleased]
 
+### 🎵 Cadence — Session 31 (Februar 2026)
+
+**Großer Fortschritt!** Library Browser und Playback funktionieren jetzt.
+
+**Neue Features:**
+- ✅ **Server-Verbindung Dialog** — URL eingeben, testen, speichern
+- ✅ **Settings Persistierung** — `SharedPreferences` via `SettingsRepository`
+- ✅ **Auto-Connect on Startup** — Verbindet automatisch zum letzten Server
+- ✅ **Player-Auswahl Dropdown** — Zeigt alle Player, speichert Auswahl
+- ✅ **Library Browser komplett neu** — Inline-Navigation statt Dialoge:
+  - Breadcrumb-Leiste: `Library > Artists > [Name] > [Album]`
+  - Artists-Grid mit runden Avataren + Hover-Effekte
+  - Albums-Grid mit Cover-Art, Schatten, Play-Overlay bei Hover
+  - Album-Detail-View mit großem Cover + Track-Liste
+  - Track-Zeilen: Nummer wird Play-Icon bei Hover
+- ✅ **JSON-RPC Integration** — API-Client nutzt `/jsonrpc` für Playback
+- ✅ **Now Playing Bar** — Echte Controls verbunden:
+  - Play/Pause/Next/Previous funktionieren
+  - Volume-Slider mit Live-Update
+  - Shuffle/Repeat Toggle mit visueller Anzeige
+  - Track-Info wird angezeigt (Polling alle 2s)
+
+**Neue Dateien:**
+- `lib/models/settings.dart` — Settings + SettingsRepository
+- `lib/models/library.dart` — Artist, Album, SearchResults Models
+- `lib/providers/providers.dart` — Alle Riverpod Provider inkl. `nowPlayingProvider`
+- `lib/widgets/server_connection_dialog.dart` — Verbindungs-Dialog
+- `lib/screens/library_screen.dart` — Kompletter Library Browser
+
+**API-Client Update:**
+- Alle Playback-Befehle nutzen jetzt JSON-RPC (`slim.request`)
+- Neue Methode: `getPlayerStatusDetailed()` für Now Playing Info
+
+**Nächste Schritte:**
+- [ ] Queue-View implementieren
+- [ ] Seek-Slider in Now Playing Bar
+- [ ] Keyboard-Shortcuts (Space=Play/Pause, etc.)
+- [ ] Album-Cover in Now Playing Bar
+
+---
+
+### 🎵 Cadence Flutter App gestartet (Februar 2026 - Session 30)
+
+**Neues Projekt:** Eine moderne Desktop-App als Controller für Resonance!
+
+- **Projekt erstellt:** `C:\Users\stephan\Desktop\cadence`
+- **Stack:** Flutter 3.x, Riverpod, Dart
+- **Plattformen:** Windows, macOS, Linux (Desktop-First)
+- **Lizenz:** BSD-3-Clause (wie JiveLite)
+
+**Features implementiert:**
+- Catppuccin Mocha Theme (konsistent mit Web-UI)
+- NavigationRail mit Home, Library, Queue, Settings
+- Now Playing Bar mit Playback Controls (UI)
+- Resonance API Client (`lib/api/resonance_client.dart`)
+- Player & Track Models mit JSON-Serialisierung
+- JiveLite HD Icons kopiert (BSD-lizenziert, mit Attribution)
+
+**Lizenz-Entscheidungen:**
+- **Resonance:** GPL v2 (Kompatibilität mit LMS-Community)
+- **Cadence:** BSD-3-Clause (wie JiveLite, dessen Assets wir nutzen)
+
+---
+
 ### 🎨 Resizable Panels (Februar 2026 - Session 29)
 
 **Feature:** Sidebar und Queue können jetzt in der Breite verstellt werden!

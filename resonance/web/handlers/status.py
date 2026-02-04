@@ -195,7 +195,11 @@ async def cmd_status(
     result["mode"] = state_to_mode.get(state_name, "stop")
 
     # Playback position and volume
-    result["time"] = status.elapsed_seconds
+    # Use elapsed_milliseconds for more precise progress bar updates
+    if hasattr(status, "elapsed_milliseconds") and status.elapsed_milliseconds > 0:
+        result["time"] = status.elapsed_milliseconds / 1000.0
+    else:
+        result["time"] = status.elapsed_seconds
     result["duration"] = status.duration_seconds if hasattr(status, "duration_seconds") else 0
     result["mixer volume"] = status.volume
     result["rate"] = 1 if result["mode"] == "play" else 0
