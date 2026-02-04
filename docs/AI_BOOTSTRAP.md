@@ -44,13 +44,116 @@ Diese Datei ist dein einziges "externes Gehirn" — dein Langzeitgedächtnis.
 **Tests:** 293/293 bestanden ✅  
 **LOC:** ~16.200 Python + ~6.000 Tests + ~900 Svelte/TS
 
+### 🆕 Cadence — Flutter Desktop App (Session 30-32)
+
+**Desktop-App für Resonance** — Voll funktionsfähig!
+
+| Was | Details |
+|-----|---------|
+| **Name** | Cadence |
+| **Pfad** | `C:\Users\stephan\Desktop\cadence` |
+| **Stack** | Flutter 3.x, Riverpod, Catppuccin Mocha Theme |
+| **Plattformen** | Windows, macOS, Linux |
+| **Lizenz** | BSD-3-Clause (wie JiveLite) |
+| **Status** | Library + Queue + Playback funktioniert! ✅ |
+| **Git** | Initialisiert ✅ |
+
+**Fertig (Session 30):**
+- ✅ Projekt-Skeleton mit Flutter
+- ✅ Catppuccin Mocha Theme
+- ✅ JiveLite HD Icons kopiert (BSD-lizenziert)
+- ✅ NavigationRail + Home Screen
+- ✅ Now Playing Bar (UI)
+- ✅ API Client für Resonance
+- ✅ Player & Track Models mit JSON-Serialisierung
+- ✅ App kompiliert und startet
+
+**Fertig (Session 31):**
+- ✅ **Server-Verbindung Dialog** — URL eingeben, testen, speichern (SharedPreferences)
+- ✅ **Settings Persistierung** — `lib/models/settings.dart` + `SettingsRepository`
+- ✅ **Riverpod Providers** — `lib/providers/providers.dart`:
+  - `settingsProvider`, `connectionProvider`, `playersProvider`
+  - `selectedPlayerProvider`, `nowPlayingProvider` (mit Polling)
+  - `artistsProvider`, `albumsProvider`, `tracksByAlbumProvider`
+- ✅ **Player-Auswahl Dropdown** — Zeigt alle verbundenen Player, speichert Auswahl
+- ✅ **Auto-Connect on Startup** — Verbindet automatisch zum gespeicherten Server
+- ✅ **Library Browser komplett überarbeitet** — `lib/screens/library_screen.dart`:
+  - Inline-Navigation statt modale Dialoge
+  - Breadcrumb-Leiste: `Library > Artists > [Name] > [Album]`
+  - Artists-Grid (runde Avatare, Hover-Effekte)
+  - Albums-Grid (Cover-Art, Schatten, Hover mit Play-Overlay)
+  - Album-Detail-View (großes Cover, Track-Liste, Play All Button)
+  - Track-Zeilen mit Hover-Effekten (Nummer → Play-Icon)
+- ✅ **JSON-RPC statt REST** — API-Client nutzt `/jsonrpc` für Playback-Befehle
+- ✅ **Now Playing Bar (halb fertig)** — Playback-Controls verbunden, Volume-Slider funktioniert
+
+**Fertig (Session 32):**
+- ✅ **Now Playing Bar komplett** — Cover-Art, Seek-Slider, Zeit-Anzeige
+- ✅ **Queue-View** — `lib/screens/queue_screen.dart`:
+  - Aktuelle Playlist anzeigen
+  - Track auswählen, entfernen, Drag & Drop Reorder
+  - Clear Queue mit Bestätigung
+- ✅ **Smooth Progress Bar** — Anchor+Slew Interpolation ohne Zappeln
+- ✅ **Track-Highlighting** — Aktueller Track in Album-Liste gehighlightet (Mauve + Volume-Icon)
+- ✅ **Track-Sortierung** — Nach `discNumber` → `trackNumber`
+- ✅ **Bugfix: `resonanceClientProvider`** — Watch auf ConnectionState statt Notifier
+- ✅ **Bugfix: `playTrack`** — Korrektes JSON-RPC Format (clear → add → index → play)
+- ✅ **Git initialisiert** — 2 Commits
+
 ### 🔜 Nächste Schritte
 
-| Aufgabe | Priorität |
-|---------|-----------|
-| View Transitions API | 🔥 Hoch |
-| Fullscreen Now Playing | 🔥 Hoch |
-| Virtual Scrolling | 🟡 Mittel |
+| Aufgabe | Projekt | Priorität |
+|---------|---------|-----------|
+| Keyboard-Shortcuts (Space=Play/Pause) | Cadence | 🟡 Mittel |
+| Search in Library | Cadence | 🟡 Mittel |
+| Fullscreen Now Playing View | Cadence | 🟢 Nice-to-have |
+| Drag & Drop von Library zur Queue | Cadence | 🟢 Nice-to-have |
+| View Transitions API | Web-UI | 🟡 Mittel |
+| Fullscreen Now Playing | Web-UI | 🟡 Mittel |
+
+### 📁 Wichtige Cadence-Dateien
+
+```
+cadence/
+├── lib/
+│   ├── main.dart                    # Entry, SharedPreferences init
+│   ├── api/
+│   │   └── resonance_client.dart    # HTTP + JSON-RPC Client
+│   ├── models/
+│   │   ├── models.dart              # Barrel file
+│   │   ├── player.dart              # Player model (robust JSON parsing)
+│   │   ├── track.dart               # Track model
+│   │   ├── library.dart             # Artist, Album, SearchResults
+│   │   └── settings.dart            # Settings + SettingsRepository
+│   ├── providers/
+│   │   └── providers.dart           # Alle Riverpod Providers
+│   ├── screens/
+│   │   ├── home_screen.dart         # Hauptscreen mit Navigation
+│   │   └── library_screen.dart      # Library Browser (komplett)
+│   ├── widgets/
+│   │   ├── widgets.dart             # Barrel file
+│   │   └── server_connection_dialog.dart
+│   └── theme/
+│       └── catppuccin.dart          # Catppuccin Mocha Theme
+└── pubspec.yaml                     # Dependencies
+```
+
+### 🛠️ Cadence Build-Befehle
+
+```powershell
+cd C:\Users\stephan\Desktop\cadence
+
+# Dependencies + Code-Gen
+flutter pub get
+flutter pub run build_runner build --delete-conflicting-outputs
+
+# Analyze
+flutter analyze
+
+# Build + Run
+flutter build windows --debug
+start build/windows/x64/runner/Debug/cadence.exe
+```
 
 ---
 
@@ -76,6 +179,22 @@ micromamba run -p ".build/mamba/envs/resonance-env" python -m resonance --verbos
 cd web-ui && npm run dev
 ```
 Dann öffne: http://localhost:5173/
+
+### Cadence (Flutter App) starten
+
+```powershell
+cd C:\Users\stephan\Desktop\cadence
+
+# Dependencies holen
+flutter pub get
+
+# App starten (Windows)
+flutter run -d windows
+
+# Oder Build ausführen und starten
+flutter build windows --debug
+start build/windows/x64/runner/Debug/cadence.exe
+```
 
 ---
 
@@ -111,6 +230,8 @@ git --no-pager diff
 | Was | Pfad |
 |-----|------|
 | **Resonance Projekt** | `resonance-server/` |
+| **Cadence (Flutter App)** | `C:\Users\stephan\Desktop\cadence` |
+| **JiveLite (Referenz)** | `jivelite-master/` |
 | **Original SlimServer** | `slimserver-public-9.1/` (Perl-Referenz) |
 | **micromamba Environment** | `resonance-server/.build/mamba/envs/resonance-env` |
 
@@ -779,6 +900,11 @@ Warum wir Dinge so machen wie wir sie machen:
 | **Svelte 5 statt React** | Weniger Boilerplate, Runes sind elegant |
 | **LMS-API-Kompatibilität** | Bestehende Apps (iPeng, Squeezer) sollen funktionieren |
 | **Kein Plugin-System (noch)** | Erst Core stabil, dann erweiterbar |
+| **Resonance: GPL v2** | Kompatibilität mit LMS-Community, respektvoller Umgang |
+| **Cadence: BSD-3-Clause** | Wie JiveLite, dessen Icons wir nutzen |
+| **Flutter für Cadence** | Cross-Platform Desktop, schöne UI, Dart ist produktiv |
+| **Riverpod statt Provider** | Moderner, besser testbar, keine BuildContext-Abhängigkeit |
+| **Catppuccin Theme** | Konsistent mit Web-UI, schön, gut dokumentiert |
 
 ---
 
