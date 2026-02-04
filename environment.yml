@@ -1,0 +1,18 @@
+name: resonance-env
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.11
+  - pip
+  - pip:
+    - pytest>=8.0
+    - pytest-asyncio>=0.23
+    - pytest-cov>=4.0
+    - mypy>=1.8
+    - ruff>=0.2
+    - aiofiles>=23.0
+    - mutagen>=1.47
+    - aiosqlite>=0.19
+    - fastapi>=0.109
+    - uvicorn>=0.27
+    - httpx>=0.26

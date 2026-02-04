@@ -1,0 +1,67 @@
+{
+    // === Python Language Servers (built-in) ===
+    "languages": {
+        "Python": {
+            "language_servers": ["pyright", "ruff"],
+            "format_on_save": "on",
+            "formatter": "language_server",
+            "tab_size": 4,
+        },
+        "TypeScript": {
+            "format_on_save": "on",
+            "tab_size": 2,
+        },
+        "Svelte": {
+            "format_on_save": "on",
+            "tab_size": 2,
+        },
+    },
+
+    // === LSP Settings ===
+    "lsp": {
+        "pyright": {
+            "settings": {
+                "python": {
+                    "pythonPath": ".build/mamba/envs/resonance-env/python.exe",
+                    "venvPath": ".build/mamba/envs",
+                    "venv": "resonance-env",
+                },
+                "pyright": {
+                    "typeCheckingMode": "standard",
+                },
+            },
+        },
+        "ruff": {
+            "initialization_options": {
+                "settings": {
+                    "lineLength": 100,
+                    "configurationPreference": "filesystemFirst",
+                },
+            },
+        },
+    },
+
+    // === Editor Settings ===
+    "tab_size": 4,
+    "hard_tabs": false,
+    "ensure_final_newline_on_save": true,
+    "remove_trailing_whitespace_on_save": true,
+
+    // === Diagnostics ===
+    "diagnostics": {
+        "include_warnings": true,
+    },
+
+    // === Exclude from Search/Indexing ===
+    "file_scan_exclusions": [
+        "**/.git",
+        "**/__pycache__",
+        "**/node_modules",
+        "**/.build",
+        "**/cache",
+        "**/*.sqlite3",
+        "**/*.sqlite3-wal",
+        "**/*.sqlite3-shm",
+        "**/web-ui/.svelte-kit",
+    ],
+}

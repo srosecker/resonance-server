@@ -1,0 +1,86 @@
+[
+    // === Python Tests ===
+    {
+        "label": "Test: Alle",
+        "command": "micromamba",
+        "args": ["run", "-p", ".build/mamba/envs/resonance-env", "python", "-m", "pytest", "-v"],
+        "use_new_terminal": false,
+        "allow_concurrent_runs": false,
+        "reveal": "always"
+    },
+    {
+        "label": "Test: Aktuelle Datei",
+        "command": "micromamba",
+        "args": ["run", "-p", ".build/mamba/envs/resonance-env", "python", "-m", "pytest", "$ZED_FILE", "-v"],
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "Test: Schnell (ohne slow)",
+        "command": "micromamba",
+        "args": ["run", "-p", ".build/mamba/envs/resonance-env", "python", "-m", "pytest", "-v", "-m", "not slow"],
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+
+    // === Linting & Formatting ===
+    {
+        "label": "Ruff: Check + Fix",
+        "command": "micromamba",
+        "args": ["run", "-p", ".build/mamba/envs/resonance-env", "ruff", "check", "--fix", "resonance/"],
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "Ruff: Check Only",
+        "command": "micromamba",
+        "args": ["run", "-p", ".build/mamba/envs/resonance-env", "ruff", "check", "resonance/"],
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+
+    // === Web-UI (Svelte) ===
+    {
+        "label": "Web-UI: Type Check",
+        "command": "npm",
+        "args": ["run", "check"],
+        "cwd": "$ZED_WORKTREE_ROOT/web-ui",
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "Web-UI: Build",
+        "command": "npm",
+        "args": ["run", "build"],
+        "cwd": "$ZED_WORKTREE_ROOT/web-ui",
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+    {
+        "label": "Web-UI: Install Dependencies",
+        "command": "npm",
+        "args": ["install"],
+        "cwd": "$ZED_WORKTREE_ROOT/web-ui",
+        "use_new_terminal": false,
+        "reveal": "always"
+    },
+
+    // === Server (ACHTUNG: blockiert!) ===
+    {
+        "label": "⚠️ Server starten (blockiert!)",
+        "command": "micromamba",
+        "args": ["run", "-p", ".build/mamba/envs/resonance-env", "python", "-m", "resonance", "--verbose"],
+        "use_new_terminal": true,
+        "allow_concurrent_runs": false,
+        "reveal": "always"
+    },
+
+    // === Kombiniert ===
+    {
+        "label": "CI: Tests + Ruff",
+        "command": "micromamba",
+        "args": ["run", "-p", ".build/mamba/envs/resonance-env", "python", "-m", "pytest", "-v"],
+        "use_new_terminal": false,
+        "reveal": "always"
+    }
+]
