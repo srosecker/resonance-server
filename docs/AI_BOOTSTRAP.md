@@ -79,6 +79,33 @@ Dann öffne: http://localhost:5173/
 
 ---
 
+## 🔒 Git — Versionskontrolle
+
+Das Projekt ist unter Git-Versionskontrolle. Falls etwas schief geht:
+
+```powershell
+# Status prüfen
+git status
+
+# Änderungen verwerfen (einzelne Datei)
+git checkout -- path/to/file.py
+
+# ALLE Änderungen verwerfen (Vorsicht!)
+git restore .
+
+# Letzten Commit anzeigen
+git --no-pager log --oneline -5
+
+# Diff anzeigen (was hat sich geändert?)
+git --no-pager diff
+```
+
+**⚠️ Wichtig für AI:** Vor größeren Refactorings oder wenn unsicher:
+1. `git status` prüfen ob alles committet ist
+2. Bei Fehler: User fragen ob `git restore` gewünscht
+
+---
+
 ## 📂 Wichtige Pfade
 
 | Was | Pfad |
