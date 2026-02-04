@@ -114,6 +114,34 @@ git --no-pager diff
 | **Original SlimServer** | `slimserver-public-9.1/` (Perl-Referenz) |
 | **micromamba Environment** | `resonance-server/.build/mamba/envs/resonance-env` |
 
+### 🔍 SlimServer-Referenz (Perl Original)
+
+**Wichtig:** Die AI hat vollen Lesezugriff auf `slimserver-public-9.1/`!
+
+Das ist der **Original Logitech Media Server** (Perl) — unsere Referenz für:
+- Slimproto-Protokoll Implementierung
+- JSON-RPC API Kompatibilität
+- CLI-Befehle und Parameter
+
+**Typische Verzeichnisse:**
+```
+slimserver-public-9.1/
+├── Slim/                    # Haupt-Perl-Module
+│   ├── Player/              # Player-Logik
+│   ├── Control/             # CLI/JSON-RPC Handler
+│   ├── Web/                 # Web-Interface
+│   └── Networking/          # Slimproto
+├── HTML/                    # Web-Assets
+└── Bin/                     # Binaries
+```
+
+**Beispiel — Perl-Code nachschlagen:**
+```
+# Wie macht LMS das?
+grep(regex="sub pause", include_pattern="slimserver-public-9.1/**/*.pm")
+read_file(path="slimserver-public-9.1/Slim/Player/Client.pm")
+```
+
 ---
 
 ## 📁 Dokumentations-Übersicht
