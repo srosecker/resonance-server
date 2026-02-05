@@ -309,6 +309,7 @@ class StreamingServer:
         player_mac: str,
         file_path: Path,
         byte_offset: int,
+        start_seconds: float = 0.0,
     ) -> None:
         """
         Queue an audio file with a byte offset for direct streaming.
@@ -320,6 +321,8 @@ class StreamingServer:
             player_mac: MAC address of the player.
             file_path: Path to the audio file to stream.
             byte_offset: Starting byte offset in the file.
+            start_seconds: The seek target time in seconds (for LMS-style elapsed calculation).
+                          After seek, elapsed = start_seconds + raw_elapsed from player.
         """
         # Cancel any existing stream first (LMS-style closeStream)
         self.cancel_stream(player_mac)
@@ -333,16 +336,20 @@ class StreamingServer:
         self._byte_offsets[player_mac] = byte_offset
         self._seek_positions.pop(player_mac, None)  # Clear time-based seek
 
-        # Byte-offset seek is also a seek: expected elapsed is unknown here unless
-        # the caller computes it. Clear any previous start offset to avoid
-        # reporting stale seek targets.
-        self._start_offset.pop(player_mac, None)
+        # Record start offset (LMS-style) so status can calculate correct position.
+        # After seek, player reports elapsed relative to stream start (0, 1, 2...).
+        # Real position = start_offset + raw_elapsed (same as time-based seeks).
+        if start_seconds > 0:
+            self._start_offset[player_mac] = float(start_seconds)
+        else:
+            self._start_offset.pop(player_mac, None)
 
         logger.info(
-            "Queued %s for player %s with byte offset: %d (generation %d)",
+            "Queued %s for player %s with byte offset: %d, start_offset=%.1fs (generation %d)",
             file_path.name,
             player_mac,
             byte_offset,
+            start_seconds,
             gen,
         )
 

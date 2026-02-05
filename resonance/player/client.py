@@ -93,6 +93,10 @@ class PlayerStatus:
     elapsed_milliseconds: int = 0
 
     # Sticky elapsed (last good non-zero progress) to mask transient zeros.
+    # NOTE: Currently tracked but not actively consumed. The primary mechanism
+    # for correct elapsed reporting is start_offset in StreamingServer.
+    # This is kept as a safety net for future use (e.g., if a status handler
+    # wants to avoid showing 0 during brief stop/flush windows).
     last_nonzero_elapsed_seconds: float = 0.0
     last_nonzero_elapsed_milliseconds: int = 0
     last_nonzero_elapsed_at: float = 0.0

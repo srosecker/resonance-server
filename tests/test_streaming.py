@@ -117,6 +117,36 @@ class TestStreamingServerSeek:
         byte_offset = server.get_byte_offset(player_mac)
         assert byte_offset == 1024000
 
+    def test_queue_file_with_byte_offset_sets_start_offset(self) -> None:
+        """queue_file_with_byte_offset sets start_offset for LMS-style elapsed calculation."""
+        server = StreamingServer()
+        file_path = Path("/music/song.mp3")
+        player_mac = "aa:bb:cc:dd:ee:ff"
+
+        # Queue with byte offset AND start_seconds for elapsed calculation
+        server.queue_file_with_byte_offset(
+            player_mac, file_path, byte_offset=1024000, start_seconds=60.0
+        )
+
+        # start_offset should be set (for elapsed = start_offset + raw_elapsed)
+        assert server.get_start_offset(player_mac) == 60.0
+
+    def test_queue_file_with_byte_offset_without_start_seconds(self) -> None:
+        """queue_file_with_byte_offset without start_seconds clears start_offset."""
+        server = StreamingServer()
+        file_path = Path("/music/song.mp3")
+        player_mac = "aa:bb:cc:dd:ee:ff"
+
+        # First set a start_offset via time-based seek
+        server.queue_file_with_seek(player_mac, file_path, start_seconds=120.0)
+        assert server.get_start_offset(player_mac) == 120.0
+
+        # Queue with byte offset but no start_seconds (e.g., start from beginning)
+        server.queue_file_with_byte_offset(player_mac, file_path, byte_offset=0)
+
+        # start_offset should be cleared (0.0)
+        assert server.get_start_offset(player_mac) == 0.0
+
     def test_queue_file_with_byte_offset_clears_seek_position(self) -> None:
         """queue_file_with_byte_offset clears any time-based seek position."""
         server = StreamingServer()

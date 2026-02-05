@@ -220,9 +220,6 @@ async def _execute_seek_internal(
     file_path = Path(current_track.path)
     suffix = file_path.suffix.lower()
 
-    # Cancel existing stream (this also increments generation in StreamingServer)
-    ctx.streaming_server.cancel_stream(ctx.player_id)
-
     # Stop and flush player
     await player.stop()
     if hasattr(player, "flush"):
@@ -250,10 +247,13 @@ async def _execute_seek_internal(
             duration_ms=duration_ms,
         )
 
+        # Byte-offset seeking: pass start_seconds for LMS-style elapsed calculation.
+        # After seek, elapsed = start_seconds + raw_elapsed (same as time-based seeks).
         ctx.streaming_server.queue_file_with_byte_offset(
             ctx.player_id,
             file_path,
             byte_offset=byte_offset,
+            start_seconds=target_seconds,
         )
 
     # Get server IP for player

@@ -37,11 +37,12 @@ class ResonanceServer:
     - Web server for HTTP/JSON-RPC API
 
     NOTE ON TRACK ADVANCEMENT:
-    - We auto-advance the playlist on Slimproto STAT "STMd" (decode ready / track finished).
-    - When the user manually starts a new track (e.g. via Web-UI), a late STMd from the
+    - We auto-advance the playlist on Slimproto STAT "STMu" (underrun / buffer empty).
+    - This matches LMS behavior: only STMu triggers playerStopped(), not STMd.
+    - When the user manually starts a new track (e.g. via Web-UI), a late STMu from the
       previous stream can arrive after the manual switch and incorrectly advance to the
-      next track. To prevent this, we suppress STMd-based auto-advance for a short
-      window immediately after a manual track start.
+      next track. To prevent this, we use stream generation checks and a short
+      suppression window immediately after a manual track start.
     """
 
     def __init__(
@@ -88,7 +89,7 @@ class ResonanceServer:
         self.slimproto._resonance_server = self
 
         # Expose StreamingServer on SlimprotoServer so the STAT handler can attach
-        # the current stream generation to track-finished events (STMd) and ignore stale events.
+        # the current stream generation to track-finished events (STMu) and ignore stale events.
         self.slimproto.streaming_server = self.streaming_server
 
         # Keep DB near the working directory by default; can be overridden.
@@ -111,8 +112,8 @@ class ResonanceServer:
         self._running = False
         self._shutdown_event: asyncio.Event | None = None
 
-        # Per-player suppression window for STMd-based auto-advance (race protection).
-        # Key: player MAC, Value: event-loop time() until which STMd should be ignored.
+        # Per-player suppression window for STMu-based auto-advance (race protection).
+        # Key: player MAC, Value: event-loop time() until which track-finished should be ignored.
         self._suppress_track_finished_until: dict[str, float] = {}
 
         # SeekCoordinator for latest-wins seek semantics (initialized on start)
@@ -260,8 +261,8 @@ class ResonanceServer:
         """Handle track finished event by playing the next track in the playlist."""
         player_id = event.player_id
 
-        # Suppress late STMd from a previous stream right after a manual track start.
-        # This prevents: user clicks track A -> server starts A -> late STMd arrives -> server jumps to next.
+        # Suppress late STMu from a previous stream right after a manual track start.
+        # This prevents: user clicks track A -> server starts A -> late STMu arrives -> server jumps to next.
         now = asyncio.get_running_loop().time()
         suppress_until = self._suppress_track_finished_until.get(player_id)
         if suppress_until is not None and now < suppress_until:
@@ -274,9 +275,9 @@ class ResonanceServer:
 
         # Ignore stale track-finished events by stream generation.
         #
-        # We attach a per-player stream generation to STMd events (see slimproto STAT handler).
+        # We attach a per-player stream generation to STMu events (see slimproto STAT handler).
         # When the user manually switches tracks, the streaming server increments generation.
-        # A late STMd from the previous stream must NOT advance the playlist to track +1.
+        # A late STMu from the previous stream must NOT advance the playlist to track +1.
         if event.stream_generation is not None:
             current_gen = self.streaming_server.get_stream_generation(player_id)
             if current_gen is not None and current_gen != event.stream_generation:
@@ -313,10 +314,10 @@ class ResonanceServer:
 
     def suppress_track_finished_for_player(self, player_mac: str, seconds: float = 1.0) -> None:
         """
-        Temporarily suppress STMd-based auto-advance for a player.
+        Temporarily suppress STMu-based auto-advance for a player.
 
         Call this right before/after starting a new track explicitly (manual user action),
-        so a late STMd from the previous stream can't advance the playlist.
+        so a late STMu from the previous stream can't advance the playlist.
 
         Args:
             player_mac: Player MAC address.
