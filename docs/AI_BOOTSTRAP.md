@@ -65,6 +65,9 @@
 
 | Aufgabe | Projekt | Priorität |
 |---------|---------|-----------|
+| JiveLite JSON-RPC Verbindung testen | Server | 🟡 Mittel |
+| Shipping: pip/PyPI Setup | Server | 🟡 Mittel |
+| Shipping: Docker Image | Server | 🟡 Mittel |
 | grfe/grfb Display-Grafiken (Cover auf Hardware-Display) | Server | 🟢 Niedrig |
 | IR-Fernbedienung Support | Server | 🟢 Niedrig |
 | mDNS/Avahi Discovery (`_slimdevices._tcp`) | Server | 🟢 Niedrig |
@@ -76,6 +79,13 @@
 | Multi-Room Sync | Server | 🟢 Niedrig |
 
 ### Zuletzt erledigt
+
+**Session: JiveLite Discovery Investigation**
+- ✅ Debug-Logging für TLV Discovery Response hinzugefügt
+- ✅ Alle TLVs werden korrekt gesendet: IPAD, NAME, JSON, VERS, UUID
+- ✅ Squeezelite verbindet sich erfolgreich via Slimproto
+- 🔍 JiveLite pollt Discovery (normales Verhalten), JSON-RPC Verbindung offen
+- 📝 JiveLite = Lua/SDL Touch-UI für piCorePlayer/Squeezebox Touch
 
 **Session: Branding Polish & Cleanup**
 - ✅ **Orbitron Font**: Sci-Fi/Synthwave Typografie für beide Apps
@@ -417,6 +427,7 @@ Wichtige LMS-Dateien:
 | Orbitron Font | Sci-Fi/Synthwave Typografie für Brand-Namen |
 | Self-hosted Fonts | DSGVO-konform, keine Google-Server-Anfragen |
 | JiveLite Assets entfernt | Ungenutzte hdskin/toolbar/nowplaying PNGs gelöscht |
+| Kein ffmpeg nötig | Nur faad, lame, flac, sox (~3MB vs ~100MB) |
 
 ---
 

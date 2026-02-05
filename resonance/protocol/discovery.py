@@ -178,6 +178,7 @@ class UDPDiscoveryProtocol(asyncio.DatagramProtocol):
 
         # Build response TLVs based on what was requested
         response = b'E'
+        response_debug = []
 
         for tag in request_tlvs:
             value = self._get_tlv_value(tag, request_tlvs.get(tag), local_ip)
@@ -190,6 +191,13 @@ class UDPDiscoveryProtocol(asyncio.DatagramProtocol):
                 response += tag.encode('ascii')
                 response += struct.pack('B', len(value))
                 response += value
+                value_str = value.decode('utf-8', errors='replace')
+                logger.info("  TLV %s = %s", tag, value_str)
+                response_debug.append(tag)
+
+        # Log summary
+        if response_debug:
+            logger.info("TLV Response to %s: sent %s", client_ip, ", ".join(response_debug))
 
         # Safety check - don't send oversized packets
         if len(response) > 1450:
