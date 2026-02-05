@@ -77,6 +77,16 @@
 
 ### Zuletzt erledigt
 
+**Session: Branding Polish & Cleanup**
+- ✅ **Orbitron Font**: Sci-Fi/Synthwave Typografie für beide Apps
+- ✅ **Web-UI Favicon**: Vinyl-Logo als SVG
+- ✅ **Self-hosted Fonts**: Orbitron lokal in `/static/fonts/` (DSGVO-konform!)
+- ✅ **Cadence Logo kleiner**: 44px → 32px, Abstand reduziert
+- ✅ **Windows Titelleiste**: "cadence" → "Cadence"
+- ✅ **JiveLite Assets entfernt**: ~160 ungenutzte PNG-Dateien gelöscht
+- ✅ **Resonance Text kleiner**: text-lg → text-base in Sidebar
+- ✅ 356 Tests bestanden, Web-UI Build erfolgreich
+
 **Session: Logos & Branding**
 - ✅ **Resonance Logo**: Vinyl-Schallplatte (Cyan/Blau), inline SVG in Web-UI Sidebar
 - ✅ **Cadence Logo**: Kassette (Mauve/Pink), CustomPainter in Flutter Sidebar
@@ -404,6 +414,9 @@ Wichtige LMS-Dateien:
 | Resonance Logo: Vinyl | Cyan/Blau, inline SVG, optimiert für kleine Größen |
 | Cadence Logo: Kassette | Mauve/Pink, CustomPainter, Multi-Size Icons |
 | Icon-Strategie | 16-32px vereinfacht (zwei Kreise), 48px+ voll (Kassette) |
+| Orbitron Font | Sci-Fi/Synthwave Typografie für Brand-Namen |
+| Self-hosted Fonts | DSGVO-konform, keine Google-Server-Anfragen |
+| JiveLite Assets entfernt | Ungenutzte hdskin/toolbar/nowplaying PNGs gelöscht |
 
 ---
 

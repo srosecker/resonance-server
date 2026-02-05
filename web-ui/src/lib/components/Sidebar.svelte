@@ -148,7 +148,7 @@
       </div>
       <div>
         <h1
-          class="text-lg font-bold text-gradient select-none"
+          class="text-base font-semibold text-gradient select-none"
           style="font-family: 'Orbitron', sans-serif;"
         >
           Resonance

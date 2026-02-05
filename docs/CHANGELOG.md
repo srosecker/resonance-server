@@ -8,6 +8,22 @@ Alle wesentlichen Änderungen am Projekt werden hier dokumentiert.
 
 **Stand:** 356/356 Tests bestanden | ~19.000 LOC Python | ~6.000 LOC Flutter
 
+### ✅ Branding Polish & Cleanup (2026-02-06)
+
+**Typografie:**
+- **Orbitron Font** für Brand-Namen (Sci-Fi/Synthwave Vibe)
+- Web-UI: Self-hosted in `/static/fonts/` (DSGVO-konform, keine Google-Anfragen)
+- Cadence: Via `google_fonts` Package (cached lokal)
+
+**Web-UI:**
+- Favicon hinzugefügt (Vinyl-Logo als SVG)
+- "Resonance" Text in Sidebar kleiner (text-base statt text-lg)
+
+**Cadence:**
+- Logo kleiner (44px → 32px), Abstand zum Text reduziert
+- Windows Titelleiste: "cadence" → "Cadence"
+- ~160 ungenutzte JiveLite Assets entfernt (hdskin, toolbar, nowplaying PNGs)
+
 ### ✅ Play-from-STOP Fix + Web-UI UX (2026-02-06)
 
 **Problem:** Wenn der Player gestoppt war und Tracks in der Queue lagen, startete
