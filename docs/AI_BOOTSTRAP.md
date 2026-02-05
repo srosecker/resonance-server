@@ -32,7 +32,6 @@
 | **Tests** | ~6.400 LOC |
 | **Web-UI (Svelte/TS)** | ~900 LOC |
 | **Cadence (Flutter)** | ~6.000 LOC |
-| **Stream-Lock Bug** | ✅ Behoben (LMS-Style) |
 
 ### Was funktioniert
 
@@ -44,7 +43,7 @@
 - ✅ Web-UI (Svelte 5 + Tailwind v4)
 - ✅ Cadence Desktop App (Flutter)
 - ✅ Playlist/Queue mit Shuffle/Repeat
-- ✅ Seeking mit LMS-konformer Elapsed-Berechnung
+- ✅ **Seeking mit LMS-konformer Elapsed-Berechnung** (stabil!)
 - ✅ Cover Art mit BlurHash Placeholders
 
 ### Cadence — Flutter Desktop App
@@ -54,7 +53,7 @@
 | **Pfad** | `C:\Users\stephan\Desktop\cadence` |
 | **Stack** | Flutter 3.x, Riverpod, Catppuccin Mocha Theme |
 | **Plattformen** | Windows, macOS, Linux |
-| **Status** | Library + Queue + Playback funktioniert ✅ |
+| **Status** | Library + Queue + Playback + Seeking funktioniert ✅ |
 
 ---
 
@@ -62,22 +61,12 @@
 
 | Aufgabe | Projekt | Priorität |
 |---------|---------|-----------|
-| Seeking End-to-End testen | Server+Cadence | 🔴 Hoch |
-| Keyboard-Shortcuts (Space=Play/Pause) | Cadence | 🟢 Niedrig |
-| Search in Library | Cadence | 🟢 Niedrig |
+| Keyboard-Shortcuts (Space=Play/Pause) | Cadence | 🟡 Mittel |
+| Search in Library | Cadence | 🟡 Mittel |
 | Fullscreen Now Playing View | Cadence | 🟢 Niedrig |
 | View Transitions API | Web-UI | 🟢 Niedrig |
 | Multi-Room Sync | Server | 🟢 Niedrig |
 | UDP Discovery | Server | 🟢 Niedrig |
-
-### Nächste Session
-
-**Server und Cadence neu starten, Seeking testen!**
-
-Die Fixes sind implementiert aber noch nicht live getestet:
-- Slider sendet jetzt nur bei Mouse-Release
-- Pipeline-Cleanup ist synchron und blockiert nicht mehr
-- SeekCoordinator hat Timeout auf Lock-Acquisition
 
 ---
 
@@ -322,7 +311,7 @@ Wichtige LMS-Dateien:
 | Cadence: BSD-3-Clause | Wie JiveLite (dessen Icons wir nutzen) |
 | `playlist jump` statt `index` | LMS-konform, zuverlässiger für Next/Previous |
 | `loadtracks` ohne extra play | Server startet automatisch nach loadtracks |
-| ~~Stream-Lock per Player~~ | **Entfernt!** LMS-Style: Kein Lock, cancel_token bricht alte Streams ab |
+| LMS-Style cancel_token | Kein Stream-Lock, cancel_token bricht alte Streams ab |
 | Sync Pipeline Cleanup | `_cleanup_popen_pipeline_sync()` - kein await im finally-Block |
 | Slider: onChangeEnd | Seek nur bei Release, nicht bei jeder Mausbewegung |
 
