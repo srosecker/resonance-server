@@ -27,9 +27,9 @@
 | Metrik | Wert |
 |--------|------|
 | **Phase** | 3 von 4 (LMS-Kompatibilität) ✅ |
-| **Tests** | 316/316 bestanden ✅ |
+| **Tests** | 318/318 bestanden ✅ |
 | **Server (Python)** | ~18.500 LOC |
-| **Tests** | ~6.400 LOC |
+| **Tests** | ~6.500 LOC |
 | **Web-UI (Svelte/TS)** | ~900 LOC |
 | **Cadence (Flutter)** | ~6.000 LOC |
 
@@ -67,6 +67,13 @@
 | View Transitions API | Web-UI | 🟢 Niedrig |
 | Multi-Room Sync | Server | 🟢 Niedrig |
 | UDP Discovery | Server | 🟢 Niedrig |
+
+### Zuletzt erledigt (ChatGPT Code Review)
+
+- ✅ Byte-Offset-Seeks setzen jetzt `start_offset` für korrektes Elapsed-Reporting
+- ✅ Redundantes `cancel_stream()` in seeking.py entfernt
+- ✅ Alle STMd-Kommentare auf STMu korrigiert (Code war bereits korrekt)
+- ✅ Sticky-elapsed als "future safety net" dokumentiert
 
 ---
 
@@ -314,6 +321,7 @@ Wichtige LMS-Dateien:
 | LMS-Style cancel_token | Kein Stream-Lock, cancel_token bricht alte Streams ab |
 | Sync Pipeline Cleanup | `_cleanup_popen_pipeline_sync()` - kein await im finally-Block |
 | Slider: onChangeEnd | Seek nur bei Release, nicht bei jeder Mausbewegung |
+| Byte-Offset + start_offset | Auch MP3/FLAC/OGG Seeks setzen start_offset für korrektes elapsed |
 
 ---
 
