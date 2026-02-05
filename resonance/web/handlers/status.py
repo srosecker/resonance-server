@@ -9,6 +9,16 @@ Handles server and player status commands:
 - pref: Server preferences
 - rescan: Trigger library rescan
 - wipecache: Clear library cache
+
+PERF / RELIABILITY NOTE:
+`status` is polled frequently by clients (e.g. Cadence ~1 Hz). It MUST remain fast.
+
+In particular, generating BlurHash placeholders on-demand can be expensive (artwork extraction,
+image decoding, hashing) and must NOT block the status response, otherwise clients will hit
+HTTP timeouts during seeks/track transitions.
+
+Therefore, we only include a BlurHash if it is already cached or cheaply accessible; otherwise
+we skip it (and optionally let other background mechanisms populate caches).
 """
 
 from __future__ import annotations
@@ -172,6 +182,17 @@ async def cmd_status(
         "power": 1 if player else 0,
     }
 
+    # Attach stream generation for discontinuity detection on polling clients.
+    # This increments whenever a new stream is queued and allows clients to
+    # ignore stale/foreign status samples.
+    if ctx.streaming_server is not None:
+        try:
+            gen = ctx.streaming_server.get_stream_generation(ctx.player_id)
+        except Exception:
+            gen = None
+        if gen is not None:
+            result["stream_generation"] = gen
+
     if player is None:
         result["mode"] = "stop"
         result["time"] = 0
@@ -195,11 +216,46 @@ async def cmd_status(
     result["mode"] = state_to_mode.get(state_name, "stop")
 
     # Playback position and volume
-    # Use elapsed_milliseconds for more precise progress bar updates
+    #
+    # LMS-style elapsed calculation (from StreamingController.pm):
+    #   songtime = startOffset + songElapsedSeconds
+    #
+    # After a seek to position X, the player reports elapsed time relative to
+    # the NEW stream start (0, 1, 2, 3...). The real track position is:
+    #   actual_elapsed = start_offset + raw_elapsed
+    #
+    # Example: Seek to 30s → player reports 0,1,2,3... → we return 30,31,32,33...
+    #
+    # NO HEURISTICS needed - this is exactly how LMS does it.
+    # The start_offset is set when queuing a seek and cleared when a new track starts.
+
+    # Get raw elapsed from player (relative to stream start after seek)
+    # Prefer elapsed_milliseconds for precision when available.
+    raw_elapsed_sec: float
     if hasattr(status, "elapsed_milliseconds") and status.elapsed_milliseconds > 0:
-        result["time"] = status.elapsed_milliseconds / 1000.0
+        raw_elapsed_sec = status.elapsed_milliseconds / 1000.0
     else:
-        result["time"] = status.elapsed_seconds
+        raw_elapsed_sec = float(getattr(status, "elapsed_seconds", 0.0) or 0.0)
+
+    # Get start offset from streaming server (LMS-style startOffset)
+    start_offset: float = 0.0
+    if ctx.streaming_server is not None:
+        try:
+            start_offset = ctx.streaming_server.get_start_offset(ctx.player_id)
+        except Exception:
+            start_offset = 0.0
+
+    # Get duration for capping
+    duration_sec = status.duration_seconds if hasattr(status, "duration_seconds") else 0.0
+
+    # Calculate actual elapsed: start_offset + raw_elapsed (LMS formula)
+    elapsed_sec = start_offset + raw_elapsed_sec
+
+    # Cap elapsed to duration (never show more than 100% progress)
+    if duration_sec > 0 and elapsed_sec > duration_sec:
+        elapsed_sec = duration_sec
+
+    result["time"] = elapsed_sec
     result["duration"] = status.duration_seconds if hasattr(status, "duration_seconds") else 0
     result["mixer volume"] = status.volume
     result["rate"] = 1 if result["mode"] == "play" else 0
@@ -233,6 +289,10 @@ async def cmd_status(
                 duration_ms = getattr(current, "duration_ms", 0)
                 path = getattr(current, "path", "")
 
+                # Also expose a top-level track id so polling clients can detect
+                # track changes even if `currentTrack` is missing/partial temporarily.
+                result["track_id"] = track_id
+
                 result["currentTrack"] = {
                     "id": track_id,
                     "title": getattr(current, "title", ""),
@@ -243,12 +303,26 @@ async def cmd_status(
                     "coverArt": f"{server_url}/artwork/{album_id}" if album_id else "",
                 }
 
-                # Add BlurHash if available
+                # Add BlurHash if available — MUST NOT BLOCK status polling.
+                #
+                # Important: get_blurhash() may extract artwork + decode images + compute hash.
+                # That can exceed client HTTP timeouts (especially around seeks/stream restarts).
+                #
+                # We therefore only include blurhash if it can be obtained without expensive
+                # on-demand generation. If the ArtworkManager doesn't provide a cheap path,
+                # we skip blurhash here.
                 if ctx.artwork_manager and path:
                     try:
-                        result["currentTrack"]["blurhash"] = await ctx.artwork_manager.get_blurhash(
-                            path
-                        )
+                        # Prefer a non-blocking / cache-only method if available.
+                        # Use the fast cached-only method when available.
+                        # Call it directly so type-checkers see an awaitable coroutine.
+                        if hasattr(ctx.artwork_manager, "get_blurhash_if_cached"):
+                            blurhash = await ctx.artwork_manager.get_blurhash_if_cached(path)
+                            if blurhash:
+                                result["currentTrack"]["blurhash"] = blurhash
+                        else:
+                            # Fallback: do NOT call get_blurhash() here (can be slow).
+                            pass
                     except Exception:
                         pass
 
@@ -260,6 +334,8 @@ async def cmd_status(
                 # Check for "-" which means current track only
                 if len(params) >= 2:
                     if params[1] == "-":
+                        # "-" means start from current track
+                        start = playlist.current_index
                         items = 1
                     else:
                         start, items = parse_start_items(["status", params[1]] + list(params[2:]))

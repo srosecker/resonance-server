@@ -18,6 +18,7 @@ import ipaddress
 import logging
 import socket
 import struct
+import time
 from collections.abc import Callable, Coroutine
 from typing import Any
 
@@ -46,6 +47,13 @@ logger = logging.getLogger(__name__)
 # When enabled, outgoing frames include a compact hexdump for easier debugging.
 OUTGOING_FRAME_DEBUG = True
 OUTGOING_FRAME_HEXDUMP_BYTES = 64
+
+# NOTE (SlimServer semantics):
+# - STMd = DECODE_READY (decoder has no more input data) -> NOT "track finished"
+# - STMu = UNDERRUN     (output buffer empty)            -> playerStopped / track finished
+#
+# Therefore, Resonance must NEVER auto-advance on STMd.
+# Track-finished is handled on STMu only.
 
 
 def _hexdump(data: bytes, limit: int = OUTGOING_FRAME_HEXDUMP_BYTES) -> str:
@@ -202,6 +210,12 @@ class SlimprotoServer:
         self._client_tasks: dict[str, asyncio.Task[None]] = {}
         self._heartbeat_task: asyncio.Task[None] | None = None
 
+        # Deferred track-finished tasks per player.
+        #
+        # Kept for backward compatibility with existing code paths, but with
+        # SlimServer semantics we no longer defer STMd-based track-finished.
+        self._deferred_finish_tasks: dict[str, asyncio.Task[None]] = {}
+
         # Message handlers indexed by 4-byte command
         self._handlers: dict[str, MessageHandler] = {
             "STAT": self._handle_stat,
@@ -313,6 +327,14 @@ class SlimprotoServer:
             await asyncio.gather(*self._client_tasks.values(), return_exceptions=True)
             self._client_tasks.clear()
 
+        # Cancel all deferred track-finished tasks
+        for task in self._deferred_finish_tasks.values():
+            task.cancel()
+
+        if self._deferred_finish_tasks:
+            await asyncio.gather(*self._deferred_finish_tasks.values(), return_exceptions=True)
+            self._deferred_finish_tasks.clear()
+
         # Close server
         if self._server:
             self._server.close()
@@ -320,6 +342,31 @@ class SlimprotoServer:
             self._server = None
 
         logger.info("Slimproto server stopped")
+
+    def cancel_deferred_track_finished(self, player_mac: str) -> bool:
+        """
+        Cancel any pending deferred STMd-based track-finished task for a player.
+
+        Why:
+        - We may defer STMd-based "track finished" to avoid early auto-advance
+          while the output buffer still plays.
+        - Manual user actions (seek/manual track start/skip) restart streams.
+          A late deferred callback must NOT be allowed to fire after such an
+          action, otherwise it can incorrectly auto-advance to the next track.
+
+        Args:
+            player_mac: Player MAC address.
+
+        Returns:
+            True if there was an active deferred task and we cancelled it, else False.
+        """
+        task = self._deferred_finish_tasks.pop(player_mac, None)
+        if task is None:
+            return False
+
+        if not task.done():
+            task.cancel()
+        return True
 
     async def _handle_connection(
         self,
@@ -671,7 +718,9 @@ class SlimprotoServer:
         buffer_fullness = struct.unpack(">I", data[11:15])[0] if len(data) >= 15 else 0
 
         # Parse bytes received (bytes 15-23)
-        bytes_received = struct.unpack(">Q", data[15:23])[0] if len(data) >= 23 else 0
+        # bytes_received is currently not used, but keep the computation around for debugging
+        # (parity with Slimproto status struct) without tripping "unused variable" diagnostics.
+        _bytes_received = struct.unpack(">Q", data[15:23])[0] if len(data) >= 23 else 0
 
         # Parse signal strength (bytes 23-25)
         signal_strength = struct.unpack(">H", data[23:25])[0] if len(data) >= 25 else 0
@@ -689,18 +738,63 @@ class SlimprotoServer:
         # Update client status
         client.status.buffer_fullness = buffer_fullness
         client.status.signal_strength = signal_strength
+
+        # Always accept the raw elapsed from the player.
+        # After a seek, the player reports elapsed relative to the NEW stream start (0, 1, 2...).
+        # The seek offset is added in the status handler (cmd_status / get_player_status).
+        # We must NOT filter or reject low/regressing values here, or the offset math breaks.
         client.status.elapsed_seconds = elapsed_seconds
         client.status.elapsed_milliseconds = elapsed_ms
 
+        # Maintain "sticky" last-nonzero elapsed to mask transient 0s during
+        # stop/flush/stream restarts (common around seeks).
+        #
+        # Some clients poll status (e.g. 1 Hz). If the player reports elapsed=0
+        # for a short window, the UI can jump backwards to 0 and then snap again.
+        # Tracking the last good non-zero value lets status handlers avoid that
+        # regression during a brief restart window.
+        try:
+            has_nonzero_s = (elapsed_seconds is not None) and (elapsed_seconds > 0)
+            has_nonzero_ms = (elapsed_ms is not None) and (elapsed_ms > 0)
+
+            if has_nonzero_ms:
+                client.status.last_nonzero_elapsed_milliseconds = int(elapsed_ms)
+                client.status.last_nonzero_elapsed_seconds = float(elapsed_ms) / 1000.0
+                client.status.last_nonzero_elapsed_at = time.time()
+            elif has_nonzero_s:
+                client.status.last_nonzero_elapsed_seconds = float(elapsed_seconds)
+                client.status.last_nonzero_elapsed_milliseconds = int(
+                    float(elapsed_seconds) * 1000.0
+                )
+                client.status.last_nonzero_elapsed_at = time.time()
+        except Exception:
+            # Defensive: never let sticky-elapsed bookkeeping break STAT handling.
+            pass
+
         # Update player state based on event code
+        # LMS event codes:
+        #   STMp = pause
+        #   STMr = resume/play
+        #   STMs = track Started (PLAYING!)
+        #   STMt = timer/heartbeat
+        #   STMd = decode ready (finished)
+        #   STMu = underrun (buffer empty - triggers playerStopped in LMS)
+        #   STMf = Flush/close (does NOT trigger playerStopped in LMS!)
+        #   STMc = connect
+        #   STMn = not supported
+        #
+        # IMPORTANT: LMS only calls playerStopped() on STMu, NOT on STMf!
+        # STMf occurs during normal track transitions when the old stream is flushed.
+        # Setting state to STOPPED on STMf causes false "stop" status during track changes.
         if event_code.startswith("STM"):
             state_code = event_code[3] if len(event_code) > 3 else ""
             if state_code == "p":  # Paused
                 client.status.state = PlayerState.PAUSED
-            elif state_code == "r":  # Playing/resumed
+            elif state_code in ("r", "s"):  # Playing/resumed or track Started
                 client.status.state = PlayerState.PLAYING
-            elif state_code == "s":  # Stopped
+            elif state_code == "u":  # Underrun - this triggers playerStopped in LMS
                 client.status.state = PlayerState.STOPPED
+            # NOTE: STMf (flush) does NOT set STOPPED - it's a normal part of track transitions
             elif state_code == "t":  # Timer/heartbeat
                 # If buffer has data and we're not already PLAYING/PAUSED, set to PLAYING
                 # This fixes the case where start_stream() was called but no STMr was received
@@ -722,44 +816,53 @@ class SlimprotoServer:
             elapsed_seconds,
         )
 
-        # Fire PlayerTrackFinishedEvent on STMd (DECODE_READY):
-        # This means the decoder has no more data to decode - the track is finished.
-        # For HTTP streaming with Squeezelite, this is commonly the end-of-track signal.
-        #
-        # IMPORTANT: Some clients can emit STMd immediately on early stream disconnect / startup hiccups.
-        # If we treat that as "finished", we can incorrectly auto-advance to track +1 right after
-        # the user clicks play. To avoid this, require at least some playback progress.
-        if event_code == "STMd":
-            # Guard: ignore "finished" when the player reports no playback progress.
-            # Be robust when elapsed_ms is missing/None: elapsed_seconds==0 is already enough
-            # to consider this a startup hiccup rather than a real track completion.
-            no_progress_seconds = (elapsed_seconds is None) or (elapsed_seconds <= 0)
-            no_progress_ms = (elapsed_ms is None) or (elapsed_ms <= 0)
-
-            if no_progress_seconds and no_progress_ms:
-                logger.info(
-                    "Ignoring STMd from player %s (no playback progress: elapsed=%ss/%sms)",
-                    client.mac_address,
-                    elapsed_seconds,
-                    elapsed_ms,
-                )
-                return
-
-            logger.info(
-                "Track finished (STMd) from player %s - advancing playlist", client.mac_address
-            )
-
-            # Attach current streaming generation so consumers can ignore stale STMd events
-            # that arrive after a manual track switch / stream cancellation.
-            stream_generation = None
+        # Helper to get start_offset for LMS-style elapsed correction.
+        # After a seek to position X, the player reports elapsed relative to stream start.
+        # Real position = start_offset + raw_elapsed (same formula as in status.py/api.py).
+        def _get_start_offset() -> float:
             try:
                 streaming_server = getattr(self, "streaming_server", None)
                 if streaming_server is not None:
-                    stream_generation = getattr(streaming_server, "_stream_generation", {}).get(
-                        client.mac_address
-                    )
+                    get_offset = getattr(streaming_server, "get_start_offset", None)
+                    if get_offset is not None:
+                        return get_offset(client.mac_address)
             except Exception:
-                stream_generation = None
+                pass
+            return 0.0
+
+        # SlimServer semantics:
+        # - STMd = DECODE_READY (decoder has no more input data) -> NOT track finished
+        # - STMu = UNDERRUN (output buffer empty)                -> track finished / playerStopped
+        #
+        # Therefore, we NEVER auto-advance the playlist on STMd.
+        if event_code == "STMd":
+            return
+
+        # Fire PlayerTrackFinishedEvent on STMu (UNDERRUN) to match SlimServer's
+        # playerStopped() semantics.
+        if event_code == "STMu":
+            # Helper to get stream generation via public API
+            def _get_stream_generation() -> int | None:
+                try:
+                    streaming_server = getattr(self, "streaming_server", None)
+                    if streaming_server is not None:
+                        get_gen = getattr(streaming_server, "get_stream_generation", None)
+                        if get_gen is not None:
+                            return get_gen(client.mac_address)
+                except Exception:
+                    logger.debug(
+                        "Failed to get stream generation for player %s",
+                        client.mac_address,
+                        exc_info=True,
+                    )
+                return None
+
+            stream_generation = _get_stream_generation()
+
+            logger.info(
+                "Track finished (STMu/UNDERRUN) from player %s - advancing playlist",
+                client.mac_address,
+            )
 
             event_bus.publish_sync(
                 PlayerTrackFinishedEvent(
@@ -771,14 +874,19 @@ class SlimprotoServer:
         # Publish status event for Cometd subscribers
         # Only publish on significant state changes or periodically
         if event_code.startswith("STM") and event_code[3:4] in ("p", "r", "s"):
+            # Apply LMS-style start_offset correction for consistent elapsed time.
+            start_offset = _get_start_offset()
+            corrected_elapsed_sec = (elapsed_seconds or 0) + start_offset
+            corrected_elapsed_ms = (elapsed_ms or 0) + int(start_offset * 1000)
+
             event_bus.publish_sync(
                 PlayerStatusEvent(
                     player_id=client.mac_address,
                     state=client.status.state.value,
                     volume=client.status.volume,
                     muted=client.status.muted,
-                    elapsed_seconds=elapsed_seconds,
-                    elapsed_milliseconds=elapsed_ms,
+                    elapsed_seconds=corrected_elapsed_sec,
+                    elapsed_milliseconds=corrected_elapsed_ms,
                 )
             )
 

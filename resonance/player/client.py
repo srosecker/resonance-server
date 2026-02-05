@@ -72,13 +72,31 @@ class PlayerInfo:
 
 @dataclass
 class PlayerStatus:
-    """Dynamic status of a player, updated via STAT messages."""
+    """Dynamic status of a player, updated via STAT messages.
+
+    Note on "sticky elapsed":
+    Some players (notably during stop/flush/stream restart around seeks) will
+    transiently report elapsed=0 for a short period even though playback is
+    effectively continuing from a non-zero position. Clients that poll status
+    (e.g., 1 Hz) can interpret this as a hard jump back to zero.
+
+    To make status more stable across these transient restarts, we track the
+    last non-zero elapsed reported by the player, along with its timestamp.
+    Web/status handlers can use this to avoid regressing to 0 during a brief
+    restart window.
+    """
 
     state: PlayerState = PlayerState.DISCONNECTED
     volume: int = 50
     muted: bool = False
     elapsed_seconds: float = 0.0
     elapsed_milliseconds: int = 0
+
+    # Sticky elapsed (last good non-zero progress) to mask transient zeros.
+    last_nonzero_elapsed_seconds: float = 0.0
+    last_nonzero_elapsed_milliseconds: int = 0
+    last_nonzero_elapsed_at: float = 0.0
+
     buffer_fullness: int = 0
     output_buffer_fullness: int = 0
     signal_strength: int = 0

@@ -1,15 +1,15 @@
-# 🔄 Feature-Vergleich: LMS (SlimServer) vs Resonance
+# 🔄 Feature-Vergleich: LMS vs Resonance
 
-Dieser Vergleich zeigt den aktuellen Implementierungsstand von Resonance gegenüber dem Original Logitech Media Server (LMS/Lyrion).
+Aktueller Implementierungsstand von Resonance gegenüber dem Original Logitech Media Server (LMS/Lyrion).
 
 ---
 
 ## 📊 Übersicht
 
-| Kategorie | LMS (Perl) | Resonance (Python) |
-|-----------|------------|-------------------|
-| **Codebase** | ~200k+ LOC | ~16.200 LOC |
-| **Sprache** | Perl 5 | Python 3.11+ |
+| Metrik | LMS (Perl) | Resonance (Python) |
+|--------|------------|-------------------|
+| **Codebase** | ~200.000+ LOC | ~18.500 LOC |
+| **Tests** | — | 316 Tests |
 | **Alter** | 2001-heute (24 Jahre) | 2025-heute |
 | **Plugins** | 48+ eingebaut | 0 (noch kein Plugin-System) |
 
@@ -26,7 +26,7 @@ Dieser Vergleich zeigt den aktuellen Implementierungsstand von Resonance gegenü
 | **Stream-Kontrolle (strm)** | ✅ | ✅ | Vollständig |
 | **Volume-Kontrolle (audg)** | ✅ | ✅ | Vollständig |
 | **Audio Enable (aude)** | ✅ | 📋 | Stub |
-| **Display-Befehle (grfe/grfb)** | ✅ | 📋 | Stub (nicht relevant für Squeezelite) |
+| **Display-Befehle (grfe/grfb)** | ✅ | 📋 | Stub |
 | **IR-Fernbedienung** | ✅ | 📋 | Stub |
 | **UDP Discovery** | ✅ | ❌ | Nicht implementiert |
 
@@ -39,12 +39,13 @@ Dieser Vergleich zeigt den aktuellen Implementierungsstand von Resonance gegenü
 | **MP3 Direct Streaming** | ✅ | ✅ | Vollständig |
 | **FLAC Direct Streaming** | ✅ | ✅ | Vollständig |
 | **OGG/Vorbis Streaming** | ✅ | ✅ | Vollständig |
-| **AAC/M4A Transcoding** | ✅ | ✅ | Via faad→mp3 |
-| **M4B (Audiobooks) Transcoding** | ✅ | ✅ | Via faad→mp3 |
+| **WAV Streaming** | ✅ | ✅ | Vollständig |
+| **AAC/M4A Transcoding** | ✅ | ✅ | Via faad→flac |
+| **M4B (Audiobooks)** | ✅ | ✅ | Via faad→flac |
 | **ALAC (Apple Lossless)** | ✅ | ❌ | Nicht implementiert |
 | **WMA Transcoding** | ✅ | ❌ | Nicht implementiert |
 | **DSD/DoP** | ✅ | ❌ | Nicht implementiert |
-| **Gapless Playback** | ✅ | ⚠️ | Teilweise (Player-abhängig) |
+| **Gapless Playback** | ✅ | ⚠️ | Player-abhängig |
 | **Crossfade** | ✅ | ❌ | Nicht implementiert |
 | **Replay Gain** | ✅ | ❌ | Nicht implementiert |
 | **Range Requests (Seeking)** | ✅ | ✅ | Vollständig |
@@ -63,14 +64,12 @@ Dieser Vergleich zeigt den aktuellen Implementierungsstand von Resonance gegenü
 | **Contributors/Roles** | ✅ | ✅ | Composer, Conductor, etc. |
 | **Compilation-Flag** | ✅ | ✅ | Vollständig |
 | **Cover Art Extraktion** | ✅ | ✅ | ID3, MP4, FLAC, Vorbis |
-| **BlurHash Placeholders** | ❌ | ✅ | Resonance-exklusiv! |
+| **BlurHash Placeholders** | ❌ | ✅ | **Resonance-exklusiv!** |
 | **Inkrementeller Rescan** | ✅ | ⚠️ | Basis (mtime-basiert) |
 | **Artwork Resizing** | ✅ | ❌ | Nicht implementiert |
 | **Virtual Libraries** | ✅ | ❌ | Nicht implementiert |
 | **Playlists (M3U, PLS)** | ✅ | ❌ | Nicht implementiert |
 | **Volltext-Suche** | ✅ | ✅ | LIKE-basiert |
-| **iTunes Import** | ✅ | ❌ | Nicht implementiert |
-| **MusicIP/MusicMagic** | ✅ | ❌ | Nicht implementiert |
 
 ---
 
@@ -99,7 +98,7 @@ Dieser Vergleich zeigt den aktuellen Implementierungsstand von Resonance gegenü
 |---------|-----|-----------|--------|
 | **Mehrere Player** | ✅ | ✅ | Vollständig |
 | **Player-Registry** | ✅ | ✅ | Vollständig |
-| **Sync-Gruppen** | ✅ | ❌ | Nicht implementiert |
+| **Sync-Gruppen** | ✅ | ❌ | **TODO (Killer-Feature!)** |
 | **Sample-genaue Sync** | ✅ | ❌ | Nicht implementiert |
 | **Latenz-Kompensation** | ✅ | ❌ | Nicht implementiert |
 
@@ -112,11 +111,11 @@ Dieser Vergleich zeigt den aktuellen Implementierungsstand von Resonance gegenü
 | **HTTP Server** | ✅ | ✅ | FastAPI |
 | **JSON-RPC API** | ✅ | ✅ | LMS-kompatibel |
 | **REST API** | ⚠️ | ✅ | Resonance erweitert |
-| **Cometd/Bayeux (Long-Polling)** | ✅ | ✅ | Für iPeng, Squeezer |
+| **Cometd/Bayeux** | ✅ | ✅ | Long-Polling |
 | **CLI (Telnet, Port 9090)** | ✅ | ❌ | Nicht implementiert |
-| **Web-UI (Default Skin)** | ✅ | ✅ | Svelte 5 + Tailwind |
-| **Material Skin** | ✅ (Plugin) | ❌ | Nicht integriert |
-| **Settings/Konfiguration** | ✅ | ❌ | Nicht implementiert |
+| **Web-UI** | ✅ | ✅ | Svelte 5 + Tailwind v4 |
+| **Material Skin** | ✅ | ❌ | Kein Plugin-System |
+| **Settings/Konfiguration** | ✅ | ❌ | Nur CLI-Argumente |
 | **CORS Support** | ⚠️ | ✅ | Vollständig |
 
 ---
@@ -125,10 +124,10 @@ Dieser Vergleich zeigt den aktuellen Implementierungsstand von Resonance gegenü
 
 | App | LMS | Resonance | Status |
 |-----|-----|-----------|--------|
-| **iPeng (iOS)** | ✅ | ✅ | Getestet |
-| **Squeezer (Android)** | ✅ | ✅ | Getestet |
+| **iPeng (iOS)** | ✅ | ✅ | Getestet ✅ |
+| **Squeezer (Android)** | ✅ | ✅ | Getestet ✅ |
 | **Orange Squeeze** | ✅ | ⚠️ | Sollte funktionieren |
-| **Material Skin (Web)** | ✅ | ⚠️ | Teilweise (kein Plugin-System) |
+| **Cadence (Flutter)** | ❌ | ✅ | **Resonance-exklusiv!** |
 
 ---
 
@@ -137,65 +136,43 @@ Dieser Vergleich zeigt den aktuellen Implementierungsstand von Resonance gegenü
 | Player-Typ | LMS | Resonance | Status |
 |------------|-----|-----------|--------|
 | **Squeezelite** | ✅ | ✅ | Vollständig getestet |
-| **Squeezebox Classic (SB3)** | ✅ | ⚠️ | Sollte funktionieren |
-| **Squeezebox Touch** | ✅ | ⚠️ | Sollte funktionieren |
-| **Squeezebox Radio** | ✅ | ⚠️ | Sollte funktionieren |
-| **Transporter** | ✅ | ⚠️ | Sollte funktionieren |
-| **Boom** | ✅ | ⚠️ | Sollte funktionieren |
-| **SLIMP3** | ✅ | ❌ | Nicht unterstützt |
-| **SoftSqueeze** | ✅ | ⚠️ | Ungetestet |
+| **Squeezebox Classic** | ✅ | ⚠️ | Ungetestet |
+| **Squeezebox Touch** | ✅ | ⚠️ | Ungetestet |
+| **Squeezebox Radio** | ✅ | ⚠️ | Ungetestet |
 | **piCorePlayer** | ✅ | ⚠️ | Ungetestet |
 
 ---
 
 ## 🔌 Plugins & Erweiterungen
 
-| Plugin-Kategorie | LMS | Resonance | Status |
-|------------------|-----|-----------|--------|
-| **Plugin-System** | ✅ (48+ Plugins) | ❌ | Nicht implementiert |
-| **Spotify (via 3rd-Party)** | ✅ | ❌ | — |
-| **Podcasts** | ✅ | ❌ | — |
-| **Internet Radio** | ✅ | ❌ | — |
-| **Last.fm Scrobbling** | ✅ | ❌ | — |
-| **Favorites** | ✅ | ❌ | — |
-| **Random Mix** | ✅ | ❌ | — |
-| **Don't Stop The Music** | ✅ | ❌ | — |
-| **UPnP/DLNA Bridge** | ✅ | ❌ | — |
-
----
-
-## 🏗️ Infrastruktur
-
-| Feature | LMS | Resonance | Status |
-|---------|-----|-----------|--------|
-| **Konfigurationsdatei** | ✅ (server.prefs) | ⚠️ | Minimal (CLI-Argumente) |
-| **Logging** | ✅ | ✅ | Python logging |
-| **Systemd Service** | ✅ | ❌ | Nicht vorbereitet |
-| **Docker Support** | ✅ | ❌ | Nicht vorbereitet |
-| **Windows Service** | ✅ | ❌ | Nicht vorbereitet |
-| **Automatische Updates** | ✅ | ❌ | — |
+| Kategorie | LMS | Resonance |
+|-----------|-----|-----------|
+| **Plugin-System** | ✅ (48+ Plugins) | ❌ |
+| **Spotify** | ✅ (3rd-Party) | ❌ |
+| **Podcasts** | ✅ | ❌ |
+| **Internet Radio** | ✅ | ❌ |
+| **Last.fm Scrobbling** | ✅ | ❌ |
+| **Random Mix** | ✅ | ❌ |
 
 ---
 
 ## ✨ Resonance-exklusive Features
 
-Features, die Resonance hat, aber LMS nicht (oder schlechter):
-
 | Feature | Beschreibung |
 |---------|--------------|
 | **BlurHash Placeholders** | Sofortige farbige Placeholder für Cover Art |
-| **Adaptive Akzentfarben** | Automatische Farbextraktion aus Album-Art (node-vibrant) |
-| **Modernes Frontend** | Svelte 5 + Tailwind v4 (vs. jQuery) |
-| **Quality Badges** | Hi-Res Audio Kennzeichnung |
-| **Async von Grund auf** | Python asyncio statt Perl-Event-Loop |
+| **Adaptive Akzentfarben** | Automatische Farbextraktion (node-vibrant) |
+| **Modernes Frontend** | Svelte 5 + Tailwind v4 |
+| **Cadence Desktop App** | Flutter-basierter Controller |
+| **SeekCoordinator** | Latest-Wins Seek ohne Race Conditions |
 
 ---
 
 ## 📈 Zusammenfassung
 
-### ✅ Was Resonance gut kann (Phase 3 abgeschlossen)
+### ✅ Was Resonance gut kann
 
-- Squeezelite-Player vollständig steuern
+- Squeezelite vollständig steuern
 - Musik scannen, indizieren, durchsuchen
 - Streaming (MP3, FLAC, OGG, M4A/M4B)
 - LMS-kompatible Apps (iPeng, Squeezer) bedienen
@@ -205,18 +182,16 @@ Features, die Resonance hat, aber LMS nicht (oder schlechter):
 
 - **Multi-Room Sync** — Das Killer-Feature von LMS
 - **Plugin-System** — Keine Erweiterbarkeit
-- **Internet Radio / Podcasts** — Keine Streaming-Dienste
+- **Internet Radio / Podcasts**
 - **UDP Discovery** — Player müssen Server-IP kennen
-- **Persistente Konfiguration** — Keine Settings-UI
-- **CLI (Port 9090)** — Telnet-Interface fehlt
 
-### 🎯 Empfohlene nächste Prioritäten
+### 🎯 Nächste Prioritäten
 
-1. **UDP Discovery** — Damit Player den Server automatisch finden
-2. **Sync-Gruppen** — Multi-Room ist DAS Squeezebox-Feature
-3. **Persistente Playlists** — Save/Load von Playlists
-4. **Konfigurationsdatei** — server.toml oder ähnlich
+1. **Multi-Room Sync** — DAS Squeezebox-Feature
+2. **UDP Discovery** — Automatische Player-Erkennung
+3. **Persistente Playlists** — Save/Load
+4. **Konfigurationsdatei** — server.toml
 
 ---
 
-*Stand: Februar 2026 — Resonance v0.1.0*
+*Stand: Februar 2026 — 316 Tests, ~18.500 LOC*

@@ -9,15 +9,21 @@ IMPORTANT: This class does NOT bind its own port. The streaming endpoint
 is exposed via FastAPI routes (see web/routes/streaming.py). This avoids
 port conflicts with the main web server.
 
-STREAM CANCELLATION:
-====================
-When a player changes tracks, we need to cancel the current HTTP stream
+STREAM CANCELLATION (LMS-Style):
+================================
+When a player changes tracks or seeks, we need to cancel the current HTTP stream
 immediately so the new track can start without delay. This is done via
 CancellationTokens - each stream checks its token and aborts if cancelled.
-This mimics LMS's closeStream() + forgetClient() behavior.
+This mimics LMS's StreamingController._Stream() behavior:
+  1. songStreamController->close()  -- old stream is cancelled
+  2. song->open(seekdata)           -- new stream starts immediately
+
+NO LOCKS: Unlike earlier implementations, we do NOT use per-player locks
+to serialize streams. LMS doesn't use locks either - it simply closes the
+old stream and opens a new one. Locks caused blocking during rapid seeks
+because the new stream had to wait for the old transcoder to finish.
 """
 
-import asyncio
 import logging
 import mimetypes
 from pathlib import Path
@@ -98,6 +104,22 @@ class StreamingServer:
         # Values are (start_seconds, end_seconds or None)
         self._seek_positions: dict[str, tuple[float, float | None]] = {}
 
+        # Start offset for seek operations (LMS-style startOffset).
+        #
+        # After a seek to position X, the player reports elapsed time relative to
+        # the NEW stream start (0, 1, 2, 3...). The real track position is:
+        #   actual_elapsed = start_offset + raw_elapsed
+        #
+        # This mirrors LMS's song.startOffset() which is set during seek and
+        # added to songElapsedSeconds() in playingSongElapsed().
+        #
+        # The offset is cleared when:
+        # - A new track starts (queue_file without seek)
+        # - A new seek happens (overwrites the old offset)
+        #
+        # It is NOT cleared based on time - it's needed for the entire track duration.
+        self._start_offset: dict[str, float] = {}
+
         # Byte offsets for direct-stream seeking, keyed by player MAC
         # Used for MP3/FLAC/OGG where we can seek by byte position
         self._byte_offsets: dict[str, int] = {}
@@ -109,6 +131,28 @@ class StreamingServer:
 
         # Generation counter per player to detect stale streams
         self._stream_generation: dict[str, int] = {}
+
+        # NOTE: We previously had per-player locks (_stream_locks) to serialize
+        # transcoded streams. This was REMOVED because it caused blocking during
+        # rapid seeks - the new stream had to wait for the old transcoder to finish.
+        #
+        # LMS-style approach: No locks! Old stream aborts via cancel_token,
+        # new stream starts immediately. See StreamingController._Stream() in LMS.
+
+    def get_stream_generation(self, player_mac: str) -> int | None:
+        """
+        Get the current stream generation for a player.
+
+        The generation counter is incremented each time a new file is queued,
+        allowing detection of stale events (e.g., late STMd from a previous stream).
+
+        Args:
+            player_mac: MAC address of the player.
+
+        Returns:
+            The current generation counter, or None if the player has no stream history.
+        """
+        return self._stream_generation.get(player_mac)
 
     def cancel_stream(self, player_mac: str) -> None:
         """
@@ -169,6 +213,10 @@ class StreamingServer:
         # Clear any previous seek position
         self._seek_positions.pop(player_mac, None)
         self._byte_offsets.pop(player_mac, None)
+
+        # Clear start offset for non-seek queueing (track starts from beginning).
+        self._start_offset.pop(player_mac, None)
+
         logger.info("Queued %s for player %s (generation %d)", file_path.name, player_mac, gen)
 
     def queue_file_with_seek(
@@ -201,6 +249,12 @@ class StreamingServer:
         self._stream_queue[player_mac] = file_path
         self._seek_positions[player_mac] = (start_seconds, end_seconds)
         self._byte_offsets.pop(player_mac, None)  # Clear byte offset when using time-based seek
+
+        # Record start offset (LMS-style) so status can calculate correct position.
+        # After seek, player reports elapsed relative to stream start (0, 1, 2...).
+        # Real position = start_offset + raw_elapsed (e.g., 30 + 0 = 30, 30 + 1 = 31...).
+        self._start_offset[player_mac] = float(start_seconds)
+
         logger.info(
             "Queued %s for player %s with seek: start=%.1fs, end=%s (generation %d)",
             file_path.name,
@@ -231,6 +285,25 @@ class StreamingServer:
         """
         self._seek_positions.pop(player_mac, None)
 
+    def get_start_offset(self, player_mac: str) -> float:
+        """
+        Get the start offset for a player (LMS-style startOffset).
+
+        After a seek to position X, the player reports elapsed time relative to
+        the stream start. The real track position is: start_offset + raw_elapsed.
+
+        This mirrors LMS's song.startOffset() from StreamingController.pm:
+            songtime = startStream + songtime
+
+        Returns:
+            Start offset in seconds, or 0.0 if no seek offset is active.
+        """
+        return self._start_offset.get(player_mac, 0.0)
+
+    def clear_start_offset(self, player_mac: str) -> None:
+        """Clear the start offset for a player (e.g., when track changes)."""
+        self._start_offset.pop(player_mac, None)
+
     def queue_file_with_byte_offset(
         self,
         player_mac: str,
@@ -259,6 +332,12 @@ class StreamingServer:
         self._stream_queue[player_mac] = file_path
         self._byte_offsets[player_mac] = byte_offset
         self._seek_positions.pop(player_mac, None)  # Clear time-based seek
+
+        # Byte-offset seek is also a seek: expected elapsed is unknown here unless
+        # the caller computes it. Clear any previous start offset to avoid
+        # reporting stale seek targets.
+        self._start_offset.pop(player_mac, None)
+
         logger.info(
             "Queued %s for player %s with byte offset: %d (generation %d)",
             file_path.name,

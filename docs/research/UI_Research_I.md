@@ -1,5 +1,7 @@
 # Das ultimative Web-Interface für Resonance: Vision & Design-Blueprint
 
+> **📁 ARCHIV** — Dieses Dokument enthält die ursprüngliche Design-Recherche. Für den aktuellen Stand siehe [ARCHITECTURE.md](../ARCHITECTURE.md).
+
 **High-Fidelity Audio verdient ein High-Fidelity Interface.** Dieser Research-Report entwickelt die visuelle und funktionale Vision für Resonance – ein Web-Interface, das Audiophile mit **2TB FLAC-Sammlungen** ebenso begeistert wie Design-Enthusiasten, die ihre Vinyl-Sammlung stolz präsentieren. Die Kernstrategie: Roons Signal-Path-Transparenz kombiniert mit Spotifys visueller Dynamik und einer eigenständigen Designsprache, die Album-Art zum Star macht.
 
 ---

@@ -1,486 +1,393 @@
-# 🎵 Resonance — Architektur & Technische Referenz
+# 🎵 Resonance — Architektur
 
-SlimServer (Logitech Media Server) → Python Portierung
-
----
-
-## 📋 Inhaltsverzeichnis
-
-1. [Überblick](#1-überblick)
-2. [Original-Architektur (Perl)](#2-original-architektur-perl)
-3. [Ziel-Architektur (Python)](#3-ziel-architektur-python)
-4. [Slimproto-Protokoll](#4-slimproto-protokoll)
-5. [Audio-Streaming](#5-audio-streaming)
-6. [Transcoding-Pipeline](#6-transcoding-pipeline)
-7. [Musikbibliothek](#7-musikbibliothek)
-8. [Multi-Room Sync](#8-multi-room-sync)
-9. [CLI-Protokoll](#9-cli-protokoll)
-10. [Web-Interface](#10-web-interface)
-11. [Plugin-System](#11-plugin-system)
-12. [Technologie-Stack](#12-technologie-stack)
-13. [Projektstruktur](#13-projektstruktur)
+Python-Neuimplementierung des Logitech Media Server (LMS/SlimServer).
 
 ---
 
-## 1. Überblick
+## 📋 Überblick
 
-**Resonance** ist eine Python-Neuimplementierung des Logitech Media Server (LMS/SlimServer).
-
-### Ziele
-- Volle Kompatibilität mit Squeezebox-Hardware und Software-Playern (Squeezelite)
-- Moderner, wartbarer Code
-- Nutzung des Python-Ökosystems
-- Einfache Erweiterbarkeit
-
-### Nicht-Ziele (vorerst)
-- 100% Feature-Parität von Tag 1
-- Eigene Player-Implementierung
-
----
-
-## 2. Original-Architektur (Perl)
-
-### Kernmodule im Original
+**Resonance** ist ein Server, der Squeezebox-Player und Software-Player (Squeezelite) steuert.
 
 ```
-Slim/
-├── Networking/
-│   ├── Slimproto.pm      # Haupt-Protokoll (Port 3483)
-│   ├── Discovery.pm      # Player-Discovery (UDP Broadcast)
-│   └── Async.pm          # Event-Loop
-├── Player/
-│   ├── Client.pm         # Player-Abstraktion
-│   ├── Player.pm         # Basis-Player-Logik
-│   ├── Squeezebox.pm     # Hardware-spezifisch
-│   ├── Song.pm           # Track-Handling
-│   ├── Playlist.pm       # Playlist-Management
-│   ├── Pipeline.pm       # Audio-Streaming
-│   ├── Sync.pm           # Multi-Room
-│   └── TranscodingHelper.pm
-├── Music/                # Bibliotheks-Verwaltung
-├── Schema/               # Datenbank
-├── Web/                  # HTTP-Server & UI
-└── Plugin/               # 48+ Plugins
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│  Web-UI /   │ ◄──► │  Resonance  │ ◄──► │ Squeezelite │ ──► 🔊
+│  Mobile App │ HTTP │   Server    │Slim- │  (Player)   │
+│  Cadence    │      │             │proto │             │
+└─────────────┘      └─────────────┘      └─────────────┘
 ```
 
-### Warum Perl funktioniert
-
-Der Server ist **nicht** performance-kritisch, weil:
-1. **Audio-Verarbeitung** → Externe C-Binaries (flac, sox, ffmpeg)
-2. **Streaming** → Kernel-I/O, nicht Perl
-3. **Protokoll-Handling** → Nur Bytes shufflen, simple Logik
+**Wichtig:** Der Server gibt Befehle, Player sind "dumm" und führen aus.
 
 ---
 
-## 3. Ziel-Architektur (Python)
+## 🏗️ System-Architektur
+
+### Das UI - Vermittler - Server Modell
 
 ```
-resonance/
-├── resonance/
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│       UI        │     │    VERMITTLER   │     │     SERVER      │
+│  (Präsentation) │◀───▶│  (API/Adapter)  │◀───▶│  (Business Logic)│
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+### Vermittler-Übersicht
+
+| Vermittler | UI | Protokoll |
+|------------|-----|-----------|
+| **Squeezelite** | Lautsprecher | Slimproto + HTTP Audio |
+| **Web-Layer** | Browser | HTTP + JSON-RPC |
+| **Cadence** | Desktop App | JSON-RPC |
+| **Mobile Apps** | Smartphone | JSON-RPC + Cometd |
+
+---
+
+## 📂 Projektstruktur
+
+```
+resonance-server/
+├── resonance/                    # Hauptpaket (~18.500 LOC)
 │   ├── __init__.py
-│   ├── server.py              # Haupteinstiegspunkt
-│   ├── config.py              # Konfiguration
+│   ├── __main__.py               # Entry: python -m resonance
+│   ├── server.py                 # Haupt-Server, startet alle Komponenten
 │   │
-│   ├── protocol/              # Netzwerk-Protokolle
-│   │   ├── slimproto.py       # Slimproto (Port 3483)
-│   │   ├── messages.py        # Message-Typen
-│   │   ├── discovery.py       # UDP Discovery
-│   │   └── cli.py             # CLI-Protokoll (Port 9090)
+│   ├── config/                   # Konfiguration
+│   │   ├── devices.toml          # Device-Tiers (Modern/Legacy)
+│   │   └── legacy.conf           # Transcoding-Regeln (LMS-Stil)
 │   │
-│   ├── player/                # Player-Verwaltung
-│   │   ├── client.py          # Player-Abstraktion
-│   │   ├── playlist.py        # Playlist-Logik
-│   │   ├── sync.py            # Multi-Room Sync
-│   │   └── types.py           # Device-Typen
+│   ├── core/                     # Business Logic
+│   │   ├── library.py            # MusicLibrary Facade
+│   │   ├── library_db.py         # SQLite + aiosqlite
+│   │   ├── scanner.py            # Audio-Datei Scanner (mutagen)
+│   │   ├── playlist.py           # Playlist & PlaylistManager
+│   │   ├── artwork.py            # Cover Art + BlurHash
+│   │   ├── events.py             # Event-Bus (pub/sub)
+│   │   └── db/                   # DB Schema & Queries
+│   │       ├── models.py         # Dataclasses (Track, Album, Artist)
+│   │       ├── schema.py         # SQLite Schema v8
+│   │       ├── queries_*.py      # Query-Module
+│   │       └── ordering.py       # Sort-Logik
 │   │
-│   ├── streaming/             # Audio-Streaming
-│   │   ├── pipeline.py        # Streaming-Pipeline
-│   │   ├── transcoder.py      # Transcoding-Manager
-│   │   └── http.py            # HTTP-Streaming
+│   ├── player/                   # Player-Verwaltung
+│   │   ├── client.py             # PlayerClient (Status, Commands)
+│   │   └── registry.py           # PlayerRegistry (alle Player)
 │   │
-│   ├── library/               # Musikbibliothek
-│   │   ├── scanner.py         # Verzeichnis-Scanner
-│   │   ├── metadata.py        # Metadaten-Extraktion
-│   │   └── database.py        # DB-Zugriff
+│   ├── protocol/                 # Slimproto-Protokoll
+│   │   ├── slimproto.py          # SlimprotoServer (Port 3483)
+│   │   └── commands.py           # strm, audg, aude Builder
 │   │
-│   ├── web/                   # Web-Interface
-│   │   ├── api.py             # REST-API
-│   │   └── static/            # Frontend-Assets
+│   ├── streaming/                # Audio-Streaming
+│   │   ├── server.py             # StreamingServer, start_offset
+│   │   ├── transcoder.py         # Transcoding Pipeline (faad, flac, lame)
+│   │   ├── seek_coordinator.py   # Latest-Wins Seek-Koordination
+│   │   └── policy.py             # Transcoding-Entscheidungen
 │   │
-│   └── plugins/               # Plugin-System
-│       └── base.py            # Plugin-Basisklasse
+│   └── web/                      # HTTP/API Layer
+│       ├── server.py             # FastAPI App (Port 9000)
+│       ├── jsonrpc.py            # JSON-RPC Handler (/jsonrpc.js)
+│       ├── jsonrpc_helpers.py    # Parameter-Parsing
+│       ├── cometd.py             # Bayeux Long-Polling
+│       ├── handlers/             # Command Handlers
+│       │   ├── status.py         # Player-Status
+│       │   ├── seeking.py        # Seek-Befehle (non-blocking!)
+│       │   ├── playback.py       # Play/Pause/Stop
+│       │   ├── playlist.py       # Queue-Befehle
+│       │   └── library.py        # Library-Abfragen
+│       └── routes/               # FastAPI Routes
+│           ├── api.py            # REST Endpoints
+│           ├── streaming.py      # /stream.mp3
+│           ├── artwork.py        # Cover Art Endpoints
+│           └── cometd.py         # /cometd
 │
-├── tests/
-├── docs/
-├── pyproject.toml
-└── README.md
+├── tests/                        # Tests (~6.400 LOC, 316 Tests)
+├── web-ui/                       # Svelte 5 Frontend
+│   └── src/
+│       ├── lib/
+│       │   ├── api.ts            # TypeScript JSON-RPC Client
+│       │   ├── stores/           # Svelte 5 Runes Stores
+│       │   └── components/       # UI-Komponenten
+│       └── routes/               # SvelteKit Pages
+└── docs/                         # Dokumentation
 ```
 
 ---
 
-## 4. Slimproto-Protokoll
+## 📡 Protokolle & Ports
 
-### Übersicht
+| Port | Protokoll | Zweck |
+|------|-----------|-------|
+| **3483** | Slimproto (TCP) | Player-Steuerung (binär) |
+| **9000** | HTTP | Streaming + JSON-RPC + Web-UI |
 
-- **Port:** 3483 (TCP)
-- **Binärprotokoll** mit 4-Byte Message-Tags
-- **Bidirektional:** Server ↔ Player
+### Slimproto (Port 3483)
 
-### Message-Format
+Binäres TCP-Protokoll zwischen Server und Player.
 
+**Message-Format:**
 ```
 ┌──────────────┬──────────────┬─────────────────┐
-│ Tag (4 Byte) │ Länge (vary) │ Payload (vary)  │
+│ Command      │ Length       │ Payload         │
+│ (4 Bytes)    │ (4 Bytes)    │ (Length Bytes)  │
 └──────────────┴──────────────┴─────────────────┘
 ```
 
-### Wichtige Messages (Client → Server)
+**Wichtige Messages:**
 
-| Tag | Name | Beschreibung |
-|-----|------|--------------|
-| `HELO` | Hello | Initiale Verbindung, Device-Info |
-| `STAT` | Status | Heartbeat, Playback-Status |
-| `IR  ` | Infrared | Fernbedienungs-Codes |
-| `BYE!` | Goodbye | Verbindung trennen |
-| `RESP` | Response | HTTP-Response-Header |
-| `META` | Metadata | Stream-Metadaten |
-| `DSCO` | Disconnect | Stream disconnected |
-| `BUTN` | Button | Hardware-Buttons |
-| `KNOB` | Knob | Drehregler |
+| Tag | Richtung | Beschreibung |
+|-----|----------|--------------|
+| `HELO` | Client→Server | Handshake, Device-Info |
+| `STAT` | Client→Server | Heartbeat, Status |
+| `strm` | Server→Client | Stream-Control (start/pause/stop) |
+| `audg` | Server→Client | Volume |
 
-### Wichtige Messages (Server → Client)
+**STM Event Codes (in STAT):**
 
-| Tag | Name | Beschreibung |
-|-----|------|--------------|
-| `strm` | Stream | Streaming-Befehle |
-| `aude` | Audio Enable | Audio an/aus |
-| `audg` | Audio Gain | Lautstärke |
-| `setd` | Set Data | Konfiguration setzen |
-| `grfb` | Graphics FB | Display-Update |
+| Code | Bedeutung | Aktion |
+|------|-----------|--------|
+| `STMs` | Track Started | → PLAYING |
+| `STMp` | Paused | → PAUSED |
+| `STMr` | Resumed | → PLAYING |
+| `STMf` | Flushed | → **Kein State-Change!** |
+| `STMu` | Underrun | → STOPPED + Track-Finished |
 
-### HELO-Payload (Beispiel)
+### HTTP (Port 9000)
 
-```
-Byte  0:    Device ID
-Bytes 1-2:  Revision
-Bytes 3-8:  MAC-Adresse
-Bytes 9-10: UUID-Länge
-Bytes 11+:  UUID, Capabilities...
-```
-
-### Python-Implementierung (Konzept)
-
-```python
-import asyncio
-import struct
-
-SLIMPROTO_PORT = 3483
-
-class SlimprotoServer:
-    def __init__(self):
-        self.clients: dict[str, PlayerClient] = {}
-    
-    async def start(self):
-        server = await asyncio.start_server(
-            self.handle_connection,
-            host='0.0.0.0',
-            port=SLIMPROTO_PORT
-        )
-        await server.serve_forever()
-    
-    async def handle_connection(self, reader, writer):
-        while True:
-            # 4-Byte Tag lesen
-            tag = await reader.read(4)
-            if not tag:
-                break
-            
-            tag_str = tag.decode('ascii')
-            handler = self.message_handlers.get(tag_str)
-            if handler:
-                await handler(reader, writer)
-    
-    message_handlers = {
-        'HELO': handle_helo,
-        'STAT': handle_stat,
-        'BYE!': handle_bye,
-        # ...
-    }
-```
+| Endpoint | Zweck |
+|----------|-------|
+| `POST /jsonrpc.js` | JSON-RPC API (LMS-kompatibel) |
+| `GET /stream.mp3` | Audio-Streaming |
+| `POST /cometd` | Real-Time Updates (Long-Polling) |
+| `GET /api/*` | REST API |
+| `GET /api/artwork/*` | Cover Art |
 
 ---
 
-## 5. Audio-Streaming
+## 🎵 Audio-Pipeline
 
-### Streaming-Modelle
-
-1. **Direct Streaming** — Player holt Daten direkt vom Server
-2. **Proxy Streaming** — Server leitet externe Streams weiter
-
-### HTTP-Streaming
+### Streaming-Flow
 
 ```
-Player ──GET /stream.mp3──► Server
-       ◄─────Audio-Daten────
+1. Client sendet "playlist play /path/to/song.mp3"
+2. Server queued Track in StreamingServer
+3. Server sendet `strm s` (start) an Player mit HTTP-URL
+4. Player öffnet HTTP-Verbindung zu /stream.mp3
+5. StreamingServer liefert Audio (direct oder transcoded)
+6. Player reportet Status via STAT
 ```
 
-Der Server teilt dem Player per `strm`-Message mit, welche URL er abrufen soll.
-
----
-
-## 6. Transcoding-Pipeline
-
-### Prinzip
+### Transcoding
 
 ```
 ┌─────────┐    ┌─────────┐    ┌─────────┐
-│ Quell-  │───►│ Decoder │───►│ Encoder │───► Player
-│ Datei   │    │ (flac)  │    │ (sox)   │
+│ M4B/M4A │───►│  faad   │───►│  flac   │───► Player
+│  File   │    │ Decoder │    │ Encoder │
 └─────────┘    └─────────┘    └─────────┘
 ```
 
-### convert.conf Format
+**Entscheidungslogik:** `streaming/policy.py`
 
-```
-# Format: source dest device_type device_id
-# Nächste Zeile: Kommando
+| Format | Aktion |
+|--------|--------|
+| MP3, FLAC, OGG, WAV | Direct Streaming |
+| M4A, M4B, AAC | Transcode via faad→flac |
 
-flac mp3 * *
-    [flac] -dcs $FILE$ | [lame] -b $BITRATE$ - -
+### Seek-Koordination
 
-mp3 mp3 * *
-    -
-```
+Problem: Rapid Seeks führen zu Race Conditions.
 
-### Python-Konzept
+Lösung: `SeekCoordinator` mit Latest-Wins-Semantik.
 
 ```python
-async def transcode(input_path: str, output_format: str):
-    # FLAC → PCM
-    decoder = await asyncio.create_subprocess_exec(
-        'flac', '-d', '-c', input_path,
-        stdout=asyncio.subprocess.PIPE
-    )
-    
-    # PCM → MP3
-    encoder = await asyncio.create_subprocess_exec(
-        'lame', '-b', '320', '-', '-',
-        stdin=decoder.stdout,
-        stdout=asyncio.subprocess.PIPE
-    )
-    
-    return encoder.stdout
+# Jeder Seek erhöht Generation
+# Nur der letzte Seek wird ausgeführt
+# 50ms Coalescing für schnelle aufeinanderfolgende Seeks
+```
+
+### Elapsed-Berechnung (LMS-konform)
+
+Nach einem Seek reportet der Player `elapsed` relativ zum Stream-Start:
+
+```python
+# Formel (wie LMS):
+elapsed = start_offset + raw_elapsed
+
+# Beispiel: Seek zu 30s
+# Player reportet: 0, 1, 2, 3...
+# Server berechnet: 30+0=30, 30+1=31, 30+2=32...
 ```
 
 ---
 
-## 7. Musikbibliothek
+## 🌐 Web-Layer Architektur
 
-### Datenbank-Schema (Konzept)
+### FastAPI + JSON-RPC
+
+```
+Browser/App Request
+      │
+      ▼
+┌─────────────────────────────────────────────────────┐
+│                  FastAPI (Port 9000)                 │
+│                                                      │
+│  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐ │
+│  │ Static/UI   │  │ JSON-RPC    │  │ Cometd       │ │
+│  │ (SvelteKit) │  │ (/jsonrpc)  │  │ (Real-Time)  │ │
+│  └─────────────┘  └─────────────┘  └──────────────┘ │
+└───────────────────────────┬─────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────┐
+│              Command Handlers                        │
+│  status.py | playback.py | playlist.py | seeking.py │
+└───────────────────────────┬─────────────────────────┘
+                            │
+                            ▼
+┌─────────────────────────────────────────────────────┐
+│              Core Services                           │
+│  MusicLibrary | Playlist | PlayerRegistry            │
+└─────────────────────────────────────────────────────┘
+```
+
+### JSON-RPC Format (LMS-kompatibel)
+
+```json
+{
+  "id": 1,
+  "method": "slim.request",
+  "params": [
+    "aa:bb:cc:dd:ee:ff",
+    ["playlist", "play", "/path/to/song.mp3"]
+  ]
+}
+```
+
+### Cometd/Bayeux
+
+Long-Polling für Real-Time Updates (iPeng, Squeezer, etc.):
+
+- `/meta/handshake` — Session erstellen
+- `/meta/connect` — Events abholen (60s Timeout)
+- `/slim/subscribe` — Player-Events abonnieren
+
+---
+
+## 🗄️ Datenbank
+
+### SQLite mit aiosqlite
+
+**Schema (v8):**
 
 ```sql
-CREATE TABLE tracks (
-    id INTEGER PRIMARY KEY,
-    url TEXT UNIQUE,          -- file://path oder http://...
-    title TEXT,
-    artist_id INTEGER,
-    album_id INTEGER,
-    duration_ms INTEGER,
-    bitrate INTEGER,
-    samplerate INTEGER,
-    channels INTEGER,
-    filesize INTEGER,
-    mtime INTEGER,            -- Modification time
-    FOREIGN KEY (artist_id) REFERENCES artists(id),
-    FOREIGN KEY (album_id) REFERENCES albums(id)
-);
+-- Kern-Tabellen
+tracks (id, url, title, artist_id, album_id, duration_ms, ...)
+artists (id, name)
+albums (id, title, artist_id, year, artwork_url)
+genres (id, name)
+contributors (id, name, role)
 
-CREATE TABLE artists (
-    id INTEGER PRIMARY KEY,
-    name TEXT UNIQUE
-);
-
-CREATE TABLE albums (
-    id INTEGER PRIMARY KEY,
-    title TEXT,
-    artist_id INTEGER,
-    year INTEGER,
-    artwork_url TEXT
-);
-
-CREATE TABLE playlists (
-    id INTEGER PRIMARY KEY,
-    name TEXT,
-    client_id TEXT            -- NULL = Server-Playlist
-);
-
-CREATE TABLE playlist_tracks (
-    playlist_id INTEGER,
-    track_id INTEGER,
-    position INTEGER,
-    FOREIGN KEY (playlist_id) REFERENCES playlists(id),
-    FOREIGN KEY (track_id) REFERENCES tracks(id)
-);
+-- Verknüpfungen
+track_genres (track_id, genre_id)
+track_contributors (track_id, contributor_id, role)
 ```
 
-### Scanner
+### Library Facade
 
 ```python
-from pathlib import Path
-import mutagen
-
-async def scan_directory(root: Path):
-    for path in root.rglob('*'):
-        if path.suffix.lower() in AUDIO_EXTENSIONS:
-            metadata = mutagen.File(path)
-            await add_or_update_track(path, metadata)
+# Alle Library-Zugriffe über MusicLibrary Klasse:
+library = MusicLibrary(db_path)
+await library.scan_directory("/music")
+artists = await library.list_artists()
+tracks = await library.search("Beatles")
 ```
 
 ---
 
-## 8. Multi-Room Sync
+## 🎨 Frontend (Web-UI)
 
-### Herausforderung
+### Tech Stack
 
-Mehrere Player sollen sample-genau synchron spielen.
+- **Svelte 5** mit Runes ($state, $derived)
+- **SvelteKit** für Routing
+- **Tailwind CSS v4**
+- **TypeScript**
 
-### Prinzip (aus Original)
+### State Management
 
-1. Server sendet Timestamp mit jedem Audio-Chunk
-2. Player puffern und spielen zeitversetzt ab
-3. Regelmäßiger Sync-Check über STAT-Messages
-4. Latenz-Kompensation pro Player
+```typescript
+// Svelte 5 Runes Store
+let status = $state<PlayerStatus | null>(null);
+let playlist = $state<Track[]>([]);
 
-### Relevante Dateien im Original
+// Derived State
+let isPlaying = $derived(status?.mode === 'play');
+```
 
-- `Slim/Player/Sync.pm`
-- `Slim/Player/SongStreamController.pm`
+### Komponenten
+
+| Komponente | Funktion |
+|------------|----------|
+| `NowPlaying.svelte` | Album Art, Progress, Controls |
+| `TrackList.svelte` | Track-Liste mit Actions |
+| `Queue.svelte` | Playlist-Sidebar |
+| `PlayerSelector.svelte` | Player-Auswahl |
+| `CoverArt.svelte` | Cover mit BlurHash |
 
 ---
 
-## 9. CLI-Protokoll
+## 📱 Cadence (Flutter App)
 
-### Übersicht
-
-- **Port:** 9090 (TCP/Telnet)
-- **Textbasiert:** Befehle und Antworten als Strings
-- **Zeilenorientiert:** Ein Befehl pro Zeile
-
-### Befehlsformat
+### Architektur
 
 ```
-<playerid> <command> <args...>
+cadence/lib/
+├── api/
+│   └── resonance_client.dart   # HTTP + JSON-RPC
+├── providers/
+│   └── providers.dart          # Riverpod State
+├── models/
+│   ├── player.dart
+│   ├── track.dart
+│   └── library.dart
+├── screens/
+│   ├── home_screen.dart
+│   ├── library_screen.dart
+│   └── queue_screen.dart
+└── widgets/
+    └── smooth_progress_slider.dart
 ```
 
-### Beispiele
+### State Management
 
-```
-# Pause-Toggle für Player
-00:04:20:12:34:56 pause
-
-# Lautstärke abfragen
-00:04:20:12:34:56 mixer volume ?
-
-# Titel abspielen
-00:04:20:12:34:56 playlist play /music/song.flac
-```
+Riverpod mit `NowPlayingNotifier`:
+- Polling alle 1s für Status
+- Optimistic Updates für UI-Responsiveness
+- Recovery bei Timeouts
 
 ---
 
-## 10. Web-Interface
+## 🔧 Technologie-Stack
 
-### Original
-
-- Template-basiert (Template Toolkit)
-- AJAX für dynamische Updates
-- Skins für verschiedene Geräte
-
-### Resonance (geplant)
-
-- FastAPI Backend
-- REST-API für alle Operationen
-- Modernes Frontend (Vue/React/Svelte TBD)
-- Server-Sent Events für Live-Updates
-
----
-
-## 11. Plugin-System
-
-### Original
-
-48+ Plugins für:
-- Streaming-Dienste (Spotify, Deezer via 3rd-Party)
-- Internet-Radio
-- Podcasts
-- Spiele (SlimTris!)
-- Visualisierungen
-
-### Resonance (Konzept)
-
-```python
-from abc import ABC, abstractmethod
-
-class Plugin(ABC):
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        pass
-    
-    @abstractmethod
-    async def on_load(self, server):
-        pass
-    
-    async def on_unload(self):
-        pass
-```
-
----
-
-## 12. Technologie-Stack
-
-| Komponente | Technologie | Begründung |
-|------------|-------------|------------|
-| Async Runtime | asyncio | Standard, gut unterstützt |
-| Web Framework | FastAPI | Modern, schnell, OpenAPI |
-| Datenbank | SQLite + aiosqlite | Einfach, serverless |
-| Audio-Metadaten | mutagen | Standard für Python |
-| Transcoding | ffmpeg, flac, sox | Bewährt, wie im Original |
-| Config | TOML | Modern, lesbar |
-| Logging | Python logging | Standard |
-| Testing | pytest | Standard |
-
----
-
-## 13. Projektstruktur
-
-```
-resonance/
-├── resonance/           # Hauptpaket
-│   ├── __init__.py
-│   ├── __main__.py      # Entry: python -m resonance
-│   └── ...
-├── tests/               # Tests
-├── docs/                # Dokumentation
-│   ├── AI_BOOTSTRAP.md
-│   ├── ARCHITECTURE.md  # (diese Datei)
-│   ├── CHANGELOG.md
-│   └── TODO.md
-├── bin/                 # Native Binaries (optional)
-├── pyproject.toml       # Projekt-Konfiguration
-├── README.md
-└── LICENSE
-```
+| Komponente | Technologie |
+|------------|-------------|
+| **Runtime** | Python 3.11+ (asyncio) |
+| **Web Framework** | FastAPI |
+| **Datenbank** | SQLite + aiosqlite |
+| **Audio-Metadaten** | mutagen |
+| **Transcoding** | faad, flac, lame, sox |
+| **Frontend** | Svelte 5 + Tailwind v4 |
+| **Desktop App** | Flutter + Riverpod |
+| **Testing** | pytest |
 
 ---
 
 ## 📚 Verwandte Dokumente
 
-- [TODO.md](./TODO.md) - Aufgabenliste & Roadmap
-- [CHANGELOG.md](./CHANGELOG.md) - Änderungshistorie
-- [AI_BOOTSTRAP.md](./AI_BOOTSTRAP.md) - Kontext für AI-Assistenten
+- [AI_BOOTSTRAP.md](./AI_BOOTSTRAP.md) — Quick Reference für AI
+- [SLIMPROTO.md](./SLIMPROTO.md) — Protokoll-Details
+- [SEEK_ELAPSED_FINDINGS.md](./SEEK_ELAPSED_FINDINGS.md) — Seek-Implementierung
+- [COMPARISON_LMS.md](./COMPARISON_LMS.md) — Feature-Vergleich mit LMS
+- [E2E_TEST_GUIDE.md](./E2E_TEST_GUIDE.md) — Test-Anleitung
 
 ---
 
 *Zuletzt aktualisiert: Februar 2026*
-
-> **Hinweis:** Diese Datei beschreibt die grundlegende Architektur. Für den aktuellen Implementierungsstatus siehe [ARCHITECTURE_WEB.md](./ARCHITECTURE_WEB.md) und [AI_BOOTSTRAP.md](./AI_BOOTSTRAP.md).

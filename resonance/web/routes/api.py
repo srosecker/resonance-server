@@ -154,12 +154,58 @@ async def get_player_status(player_id: str) -> dict[str, Any]:
     state_name = status.state.name if hasattr(status.state, "name") else "STOPPED"
     mode = state_to_mode.get(state_name, "stop")
 
+    # -------------------------------------------------------------------------
+    # LMS-style elapsed calculation (from StreamingController.pm):
+    #   songtime = startOffset + songElapsedSeconds
+    #
+    # After a seek to position X, the player reports elapsed time relative to
+    # the NEW stream start (0, 1, 2, 3...). The real track position is:
+    #   actual_elapsed = start_offset + raw_elapsed
+    #
+    # Example: Seek to 30s → player reports 0,1,2,3... → we return 30,31,32,33...
+    #
+    # NO HEURISTICS needed - this is exactly how LMS does it.
+    # The start_offset is set when queuing a seek and cleared when a new track starts.
+    # -------------------------------------------------------------------------
+
+    # Get raw elapsed from player (relative to stream start after seek)
+    # Prefer elapsed_milliseconds for precision when available.
+    raw_elapsed_sec: float
+    if hasattr(status, "elapsed_milliseconds") and status.elapsed_milliseconds > 0:
+        raw_elapsed_sec = status.elapsed_milliseconds / 1000.0
+    else:
+        raw_elapsed_sec = float(getattr(status, "elapsed_seconds", 0.0) or 0.0)
+
+    # Get start offset from streaming server (LMS-style startOffset)
+    start_offset: float = 0.0
+    if _streaming_server is not None:
+        try:
+            start_offset = _streaming_server.get_start_offset(player_id)
+        except Exception:
+            start_offset = 0.0
+
+    # Get duration for capping
+    duration_sec = 0.0
+    if _playlist_manager is not None:
+        playlist = _playlist_manager.get(player_id)
+        if playlist is not None:
+            current = playlist.current_track
+            if current is not None:
+                duration_sec = (current.duration_ms or 0) / 1000.0
+
+    # Calculate actual elapsed: start_offset + raw_elapsed (LMS formula)
+    elapsed_sec = start_offset + raw_elapsed_sec
+
+    # Cap elapsed to duration (never show more than 100% progress)
+    if duration_sec > 0 and elapsed_sec > duration_sec:
+        elapsed_sec = duration_sec
+
     result: dict[str, Any] = {
         "player_name": player.name,
         "player_connected": 1,
         "power": 1,
         "mode": mode,
-        "time": status.elapsed_seconds,
+        "time": elapsed_sec,
         "rate": 1 if mode == "play" else 0,
         "mixer volume": status.volume,
     }

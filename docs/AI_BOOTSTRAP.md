@@ -22,206 +22,262 @@
 
 ---
 
-## 🧠 STOPP! LIES DAS ZUERST!
+## 📍 Aktueller Stand
 
-**Diese Datei ist DEIN GEDÄCHTNIS.**
+| Metrik | Wert |
+|--------|------|
+| **Phase** | 3 von 4 (LMS-Kompatibilität) ✅ |
+| **Tests** | 316/316 bestanden ✅ |
+| **Server (Python)** | ~18.500 LOC |
+| **Tests** | ~6.400 LOC |
+| **Web-UI (Svelte/TS)** | ~900 LOC |
+| **Cadence (Flutter)** | ~6.000 LOC |
+| **Stream-Lock Bug** | ✅ Behoben (LMS-Style) |
 
-Du bist eine AI ohne persistenten Speicher. Zwischen Sessions vergisst du ALLES.
-Diese Datei ist dein einziges "externes Gehirn" — dein Langzeitgedächtnis.
+### Was funktioniert
 
-### Deine Pflicht als AI:
+- ✅ Slimproto-Server (Player-Steuerung)
+- ✅ HTTP-Streaming mit Transcoding (MP3, FLAC, OGG, M4A/M4B)
+- ✅ Musikbibliothek (Scanner, SQLite, Suche)
+- ✅ JSON-RPC API (LMS-kompatibel für iPeng, Squeezer)
+- ✅ Cometd/Bayeux Real-Time Updates
+- ✅ Web-UI (Svelte 5 + Tailwind v4)
+- ✅ Cadence Desktop App (Flutter)
+- ✅ Playlist/Queue mit Shuffle/Repeat
+- ✅ Seeking mit LMS-konformer Elapsed-Berechnung
+- ✅ Cover Art mit BlurHash Placeholders
 
-1. **LESEN** — Lies diese Datei komplett am Anfang jeder Session
-2. **LERNEN** — Verinnerliche die dokumentierten Fallstricke und Patterns
-3. **SCHREIBEN** — Dokumentiere SOFORT neue Erkenntnisse, nicht "später"
-4. **AKTUALISIEREN** — Nach jeder größeren Änderung Pause machen und dokumentieren
-
----
-
-## 📍 Aktueller Stand (Februar 2026)
-
-**Phase:** 3 von 4 (LMS-Kompatibilität) — **Phase 3 abgeschlossen! ✅**  
-**Tests:** 293/293 bestanden ✅  
-**LOC:** ~16.200 Python + ~6.000 Tests + ~900 Svelte/TS
-
-### 🆕 Cadence — Flutter Desktop App (Session 30-32)
-
-**Desktop-App für Resonance** — Voll funktionsfähig!
+### Cadence — Flutter Desktop App
 
 | Was | Details |
 |-----|---------|
-| **Name** | Cadence |
 | **Pfad** | `C:\Users\stephan\Desktop\cadence` |
 | **Stack** | Flutter 3.x, Riverpod, Catppuccin Mocha Theme |
 | **Plattformen** | Windows, macOS, Linux |
-| **Lizenz** | BSD-3-Clause (wie JiveLite) |
-| **Status** | Library + Queue + Playback funktioniert! ✅ |
-| **Git** | Initialisiert ✅ |
+| **Status** | Library + Queue + Playback funktioniert ✅ |
 
-**Fertig (Session 30):**
-- ✅ Projekt-Skeleton mit Flutter
-- ✅ Catppuccin Mocha Theme
-- ✅ JiveLite HD Icons kopiert (BSD-lizenziert)
-- ✅ NavigationRail + Home Screen
-- ✅ Now Playing Bar (UI)
-- ✅ API Client für Resonance
-- ✅ Player & Track Models mit JSON-Serialisierung
-- ✅ App kompiliert und startet
+---
 
-**Fertig (Session 31):**
-- ✅ **Server-Verbindung Dialog** — URL eingeben, testen, speichern (SharedPreferences)
-- ✅ **Settings Persistierung** — `lib/models/settings.dart` + `SettingsRepository`
-- ✅ **Riverpod Providers** — `lib/providers/providers.dart`:
-  - `settingsProvider`, `connectionProvider`, `playersProvider`
-  - `selectedPlayerProvider`, `nowPlayingProvider` (mit Polling)
-  - `artistsProvider`, `albumsProvider`, `tracksByAlbumProvider`
-- ✅ **Player-Auswahl Dropdown** — Zeigt alle verbundenen Player, speichert Auswahl
-- ✅ **Auto-Connect on Startup** — Verbindet automatisch zum gespeicherten Server
-- ✅ **Library Browser komplett überarbeitet** — `lib/screens/library_screen.dart`:
-  - Inline-Navigation statt modale Dialoge
-  - Breadcrumb-Leiste: `Library > Artists > [Name] > [Album]`
-  - Artists-Grid (runde Avatare, Hover-Effekte)
-  - Albums-Grid (Cover-Art, Schatten, Hover mit Play-Overlay)
-  - Album-Detail-View (großes Cover, Track-Liste, Play All Button)
-  - Track-Zeilen mit Hover-Effekten (Nummer → Play-Icon)
-- ✅ **JSON-RPC statt REST** — API-Client nutzt `/jsonrpc` für Playback-Befehle
-- ✅ **Now Playing Bar (halb fertig)** — Playback-Controls verbunden, Volume-Slider funktioniert
-
-**Fertig (Session 32):**
-- ✅ **Now Playing Bar komplett** — Cover-Art, Seek-Slider, Zeit-Anzeige
-- ✅ **Queue-View** — `lib/screens/queue_screen.dart`:
-  - Aktuelle Playlist anzeigen
-  - Track auswählen, entfernen, Drag & Drop Reorder
-  - Clear Queue mit Bestätigung
-- ✅ **Smooth Progress Bar** — Anchor+Slew Interpolation ohne Zappeln
-- ✅ **Track-Highlighting** — Aktueller Track in Album-Liste gehighlightet (Mauve + Volume-Icon)
-- ✅ **Track-Sortierung** — Nach `discNumber` → `trackNumber`
-- ✅ **Bugfix: `resonanceClientProvider`** — Watch auf ConnectionState statt Notifier
-- ✅ **Bugfix: `playTrack`** — Korrektes JSON-RPC Format (clear → add → index → play)
-- ✅ **Git initialisiert** — 2 Commits
-
-### 🔜 Nächste Schritte
+## 🔜 Nächste Schritte
 
 | Aufgabe | Projekt | Priorität |
 |---------|---------|-----------|
-| Keyboard-Shortcuts (Space=Play/Pause) | Cadence | 🟡 Mittel |
-| Search in Library | Cadence | 🟡 Mittel |
-| Fullscreen Now Playing View | Cadence | 🟢 Nice-to-have |
-| Drag & Drop von Library zur Queue | Cadence | 🟢 Nice-to-have |
-| View Transitions API | Web-UI | 🟡 Mittel |
-| Fullscreen Now Playing | Web-UI | 🟡 Mittel |
+| Seeking End-to-End testen | Server+Cadence | 🔴 Hoch |
+| Keyboard-Shortcuts (Space=Play/Pause) | Cadence | 🟢 Niedrig |
+| Search in Library | Cadence | 🟢 Niedrig |
+| Fullscreen Now Playing View | Cadence | 🟢 Niedrig |
+| View Transitions API | Web-UI | 🟢 Niedrig |
+| Multi-Room Sync | Server | 🟢 Niedrig |
+| UDP Discovery | Server | 🟢 Niedrig |
 
-### 📁 Wichtige Cadence-Dateien
+### Nächste Session
 
-```
-cadence/
-├── lib/
-│   ├── main.dart                    # Entry, SharedPreferences init
-│   ├── api/
-│   │   └── resonance_client.dart    # HTTP + JSON-RPC Client
-│   ├── models/
-│   │   ├── models.dart              # Barrel file
-│   │   ├── player.dart              # Player model (robust JSON parsing)
-│   │   ├── track.dart               # Track model
-│   │   ├── library.dart             # Artist, Album, SearchResults
-│   │   └── settings.dart            # Settings + SettingsRepository
-│   ├── providers/
-│   │   └── providers.dart           # Alle Riverpod Providers
-│   ├── screens/
-│   │   ├── home_screen.dart         # Hauptscreen mit Navigation
-│   │   └── library_screen.dart      # Library Browser (komplett)
-│   ├── widgets/
-│   │   ├── widgets.dart             # Barrel file
-│   │   └── server_connection_dialog.dart
-│   └── theme/
-│       └── catppuccin.dart          # Catppuccin Mocha Theme
-└── pubspec.yaml                     # Dependencies
-```
+**Server und Cadence neu starten, Seeking testen!**
 
-### 🛠️ Cadence Build-Befehle
-
-```powershell
-cd C:\Users\stephan\Desktop\cadence
-
-# Dependencies + Code-Gen
-flutter pub get
-flutter pub run build_runner build --delete-conflicting-outputs
-
-# Analyze
-flutter analyze
-
-# Build + Run
-flutter build windows --debug
-start build/windows/x64/runner/Debug/cadence.exe
-```
+Die Fixes sind implementiert aber noch nicht live getestet:
+- Slider sendet jetzt nur bei Mouse-Release
+- Pipeline-Cleanup ist synchron und blockiert nicht mehr
+- SeekCoordinator hat Timeout auf Lock-Acquisition
 
 ---
 
 ## ⚡ Quick Start
 
-### Nächste Session starten mit:
-```
-Lies AI_BOOTSTRAP.md und mach weiter wo wir aufgehört haben.
-```
-
-### Entwicklungsumgebung
-
-**⚠️ WICHTIG: micromamba verwenden!**
-
 ```powershell
-# Tests ausführen
-micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest -v
-
 # Server starten
+cd resonance-server
 micromamba run -p ".build/mamba/envs/resonance-env" python -m resonance --verbose
 
-# Web-UI starten (anderes Terminal)
-cd web-ui && npm run dev
-```
-Dann öffne: http://localhost:5173/
+# Web-UI starten (separates Terminal)
+cd resonance-server/web-ui
+npm run dev
+# → http://localhost:5173/
 
-### Cadence (Flutter App) starten
-
-```powershell
+# Cadence starten
 cd C:\Users\stephan\Desktop\cadence
-
-# Dependencies holen
-flutter pub get
-
-# App starten (Windows)
 flutter run -d windows
 
-# Oder Build ausführen und starten
-flutter build windows --debug
-start build/windows/x64/runner/Debug/cadence.exe
+# Tests ausführen
+cd resonance-server
+micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest -v
 ```
 
 ---
 
-## 🔒 Git — Versionskontrolle
+## 📂 Projektstruktur
 
-Das Projekt ist unter Git-Versionskontrolle. Falls etwas schief geht:
+```
+resonance-server/
+├── resonance/                    # Hauptpaket (~18.500 LOC)
+│   ├── server.py                 # Haupt-Server, startet alle Komponenten
+│   ├── config/                   # Konfiguration (devices.toml, legacy.conf)
+│   ├── core/                     # Business Logic
+│   │   ├── library.py            # MusicLibrary Facade
+│   │   ├── library_db.py         # SQLite DB Layer
+│   │   ├── scanner.py            # Audio-Datei Scanner
+│   │   ├── playlist.py           # Playlist/Queue Management
+│   │   ├── artwork.py            # Cover Art + BlurHash
+│   │   ├── events.py             # Event-Bus (pub/sub)
+│   │   └── db/                   # DB Schema & Queries
+│   ├── player/                   # Player-Verwaltung
+│   │   ├── client.py             # PlayerClient Klasse
+│   │   └── registry.py           # PlayerRegistry
+│   ├── protocol/                 # Slimproto-Protokoll
+│   │   ├── slimproto.py          # SlimprotoServer, STM Event Handling
+│   │   └── commands.py           # strm, audg, etc. Builder
+│   ├── streaming/                # Audio-Streaming
+│   │   ├── server.py             # StreamingServer, start_offset
+│   │   ├── transcoder.py         # Transcoding Pipeline (faad, flac, lame)
+│   │   ├── seek_coordinator.py   # Latest-Wins Seek-Koordination
+│   │   └── policy.py             # Transcoding-Entscheidungen
+│   └── web/                      # HTTP/API Layer
+│       ├── server.py             # FastAPI App
+│       ├── jsonrpc.py            # JSON-RPC Handler
+│       ├── cometd.py             # Bayeux Long-Polling
+│       ├── handlers/             # Command Handlers
+│       │   ├── status.py         # Player-Status (elapsed = start_offset + raw)
+│       │   ├── seeking.py        # Seek-Befehle (non-blocking!)
+│       │   ├── playback.py       # Play/Pause/Stop
+│       │   ├── playlist.py       # Queue-Befehle
+│       │   └── library.py        # Library-Abfragen
+│       └── routes/               # FastAPI Routes
+├── tests/                        # Tests (~6.400 LOC, 316 Tests)
+├── web-ui/                       # Svelte 5 Frontend
+└── docs/                         # Dokumentation
 
-```powershell
-# Status prüfen
-git status
-
-# Änderungen verwerfen (einzelne Datei)
-git checkout -- path/to/file.py
-
-# ALLE Änderungen verwerfen (Vorsicht!)
-git restore .
-
-# Letzten Commit anzeigen
-git --no-pager log --oneline -5
-
-# Diff anzeigen (was hat sich geändert?)
-git --no-pager diff
+cadence/                          # Flutter Desktop App
+├── lib/
+│   ├── api/resonance_client.dart # HTTP + JSON-RPC Client
+│   ├── providers/providers.dart  # Riverpod State Management
+│   ├── screens/                  # UI Screens
+│   └── widgets/                  # Reusable Widgets
 ```
 
-**⚠️ Wichtig für AI:** Vor größeren Refactorings oder wenn unsicher:
-1. `git status` prüfen ob alles committet ist
-2. Bei Fehler: User fragen ob `git restore` gewünscht
+---
+
+## 🚨 KRITISCHE FALLSTRICKE
+
+### 1. LMS-kompatible Seek-Elapsed-Berechnung 🚨
+
+Nach Seek reportet Squeezelite `elapsed` **relativ zum Stream-Start** (0, 1, 2...), nicht zur Track-Position!
+
+**LMS-Formel:** `elapsed = start_offset + raw_elapsed`
+
+```python
+# In status.py:
+start_offset = streaming_server.get_start_offset(player_mac)  # Seek-Position
+raw_elapsed = player.status.elapsed_seconds                    # Vom Player
+actual_elapsed = start_offset + raw_elapsed                    # Echte Position
+```
+
+### 2. STM Event Handling (LMS-konform) 🚨
+
+| Event | Bedeutung | Aktion |
+|-------|-----------|--------|
+| `STMs` | Track **S**tarted | → PLAYING |
+| `STMp` | **P**ause | → PAUSED |
+| `STMr` | **R**esume | → PLAYING |
+| `STMf` | **F**lush | → **KEIN** State-Change! |
+| `STMd` | **D**ecode ready | → **KEIN** Auto-Advance! |
+| `STMu` | **U**nderrun | → STOPPED + Track-Finished |
+
+**Wichtig:** Nur `STMu` triggert Track-Finished/Auto-Advance!
+
+### 3. Pause muss LMS-konform sein 🚨
+
+```dart
+// Cadence: Explizite Befehle statt Toggle
+await client.pause(playerId);   // pause 1
+await client.resume(playerId);  // pause 0
+```
+
+### 3b. Next/Previous muss `playlist jump` verwenden 🚨
+
+```dart
+// ❌ FALSCH - funktioniert nicht zuverlässig
+await _jsonRpc(playerId, ['playlist', 'index', '+1']);
+
+// ✅ RICHTIG - LMS-kompatibel
+await _jsonRpc(playerId, ['playlist', 'jump', '+1']);
+```
+
+### 3c. playAlbum: loadtracks startet automatisch 🚨
+
+```dart
+// ❌ FALSCH - redundante Befehle, Race Conditions
+await _jsonRpc(playerId, ['playlist', 'loadtracks', 'album_id:$albumId']);
+await _jsonRpc(playerId, ['playlist', 'index', 0]);
+await _jsonRpc(playerId, ['play']);
+
+// ✅ RICHTIG - Server macht auto-start
+await _jsonRpc(playerId, ['playlist', 'loadtracks', 'album_id:$albumId']);
+```
+
+### 4. Seek darf JSON-RPC nicht blockieren 🚨
+
+```python
+# In seeking.py cmd_time():
+asyncio.create_task(run_seek())  # Fire-and-forget
+return {"_time": target_time}    # Sofort antworten
+```
+
+### 5. Python Falsy-Falle 🚨
+
+```python
+# ❌ FALSCH
+if playlist:  # Leere Liste = False!
+
+# ✅ RICHTIG
+if playlist is not None:
+```
+
+### 6. cancel_stream() NIEMALS nach queue_file() 🚨
+
+`queue_file()` erhöht die Stream-Generation. Danach `cancel_stream()` = Self-Cancel!
+
+### 7. micromamba statt venv 🚨
+
+```powershell
+# ✅ RICHTIG
+micromamba run -p ".build/mamba/envs/resonance-env" python ...
+
+# ❌ FALSCH - System-Python!
+python ...
+```
+
+### 8. NIEMALS `git checkout -- .` ohne Backup 🚨
+
+```powershell
+# ❌ NIEMALS - Verliert alle uncommitted Änderungen!
+git checkout -- .
+
+# ✅ RICHTIG - Erst committen oder stashen
+git stash
+# oder
+git add -A && git commit -m "WIP: checkpoint before changes"
+```
+
+---
+
+## 🖥️ Häufige Befehle
+
+```powershell
+# Tests
+micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest -v
+micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest tests/test_player.py -v
+
+# Linting
+micromamba run -p ".build/mamba/envs/resonance-env" ruff check --fix resonance/
+
+# Web-UI
+cd web-ui && npm run check && npm run build
+
+# Cadence
+cd C:\Users\stephan\Desktop\cadence && flutter analyze && flutter run -d windows
+
+# Git
+git status && git --no-pager diff && git --no-pager log --oneline -5
+```
 
 ---
 
@@ -229,640 +285,46 @@ git --no-pager diff
 
 | Was | Pfad |
 |-----|------|
-| **Resonance Projekt** | `resonance-server/` |
-| **Cadence (Flutter App)** | `C:\Users\stephan\Desktop\cadence` |
+| **Resonance Server** | `resonance-server/` |
+| **Cadence (Flutter)** | `C:\Users\stephan\Desktop\cadence` |
 | **JiveLite (Referenz)** | `jivelite-master/` |
 | **Original SlimServer** | `slimserver-public-9.1/` (Perl-Referenz) |
-| **micromamba Environment** | `resonance-server/.build/mamba/envs/resonance-env` |
+| **micromamba Env** | `resonance-server/.build/mamba/envs/resonance-env` |
 
-### 🔍 SlimServer-Referenz (Perl Original)
+---
 
-**Wichtig:** Die AI hat vollen Lesezugriff auf `slimserver-public-9.1/`!
+## 🔍 LMS-Referenz nachschlagen
 
-Das ist der **Original Logitech Media Server** (Perl) — unsere Referenz für:
-- Slimproto-Protokoll Implementierung
-- JSON-RPC API Kompatibilität
-- CLI-Befehle und Parameter
-
-**Typische Verzeichnisse:**
-```
-slimserver-public-9.1/
-├── Slim/                    # Haupt-Perl-Module
-│   ├── Player/              # Player-Logik
-│   ├── Control/             # CLI/JSON-RPC Handler
-│   ├── Web/                 # Web-Interface
-│   └── Networking/          # Slimproto
-├── HTML/                    # Web-Assets
-└── Bin/                     # Binaries
-```
-
-**Beispiel — Perl-Code nachschlagen:**
-```
-# Wie macht LMS das?
+```powershell
+# Beispiel: Wie macht LMS das?
 grep(regex="sub pause", include_pattern="slimserver-public-9.1/**/*.pm")
 read_file(path="slimserver-public-9.1/Slim/Player/Client.pm")
 ```
 
----
-
-## 📁 Dokumentations-Übersicht
-
-| Datei | Zweck |
-|-------|-------|
-| **AI_BOOTSTRAP.md** | ⭐ Dein Gedächtnis! Kontext, Fallstricke |
-| **ARCHITECTURE.md** | System-Design, Komponenten, Struktur |
-| **ARCHITECTURE_WEB.md** | Web-Layer Details, UI-Vermittler-Server |
-| **SLIMPROTO.md** | Protokoll-Referenz (Binärformat) |
-| **CHANGELOG.md** | Was wurde wann gemacht (Historie) |
+Wichtige LMS-Dateien:
+- `Slim/Player/StreamingController.pm` — Elapsed-Berechnung, startOffset
+- `Slim/Player/Squeezebox2.pm` — STM Event Handling
+- `Slim/Control/Commands.pm` — CLI-Befehle
 
 ---
 
-## 💻 System & Entwicklungsumgebung
-
-### System-Info
-
-| Was | Wert |
-|-----|------|
-| **Betriebssystem** | Windows 11 |
-| **Shell** | PowerShell (Default), auch `sh` via Git Bash |
-| **Editor** | Zed (mit Agent Panel) |
-| **AI-Modell** | Claude (via Zed Pro oder Anthropic API) |
-| **Python** | via micromamba (nicht System-Python!) |
-| **Node.js** | Für web-ui (npm) |
-
-### Zed Agent Panel — Übersicht
-
-Das **Agent Panel** ist Zeds integrierte AI-Schnittstelle:
-- Öffnen: `Ctrl+Shift+P` → "agent: new thread" oder ✨-Icon in Statusleiste
-- **Profile:** Write (alle Tools), Ask (nur lesen), Minimal (keine Tools)
-- **Wir nutzen:** Write-Profil mit allen Tools aktiviert
-
-#### Wichtige Keybindings
-
-| Aktion | Keybinding |
-|--------|------------|
-| Neuer Thread | `Ctrl+Shift+P` → "agent: new thread" |
-| Thread-History | `Ctrl+Shift+J` |
-| Alle Threads | `Ctrl+Shift+H` |
-| Model wechseln | `Ctrl+Alt+/` |
-| Review Changes | `Ctrl+Shift+R` |
-| Agent folgen | Crosshair-Icon unten links |
-
-#### Kontext hinzufügen
-
-- **@-Mentions:** `@dateiname`, `@verzeichnis/`, `@symbol`
-- **Selektion:** Text markieren → `Ctrl+>` (fügt als Kontext hinzu)
-- **Bilder:** Einfach in Editor einfügen (Copy+Paste)
-- **Vorherige Threads:** `@thread-name` referenzieren
-
-#### Checkpoints & Review
-
-- **Checkpoint:** Nach jeder Änderung erscheint "Restore Checkpoint" Button
-- **Review Changes:** Zeigt alle Änderungen in Multi-Buffer-Tab
-- **Accept/Reject:** Pro Hunk oder alle auf einmal
-
----
-
-## 💻 PowerShell-Umgebung
-### ⚠️ micromamba statt venv
-
-Zed hat eine `detect_venv` Funktion, aber wir nutzen **micromamba** statt Python venv!
-Deshalb funktioniert die automatische Aktivierung nicht für uns.
-
-**Lösung:** Wir nutzen die `.zed/tasks.json` mit vordefinierten micromamba-Befehlen.
-
-### PowerShell-Besonderheiten
-
-```powershell
-# Befehle verketten
-command1; command2          # Sequentiell (auch bei Fehler weiter)
-command1 && command2        # Nur wenn command1 erfolgreich
-
-# Pfade: Backslash ODER Forward-Slash funktionieren beide
-cd resonance-server\web-ui  # Windows-Style
-cd resonance-server/web-ui  # Unix-Style (funktioniert auch!)
-
-# Environment-Variablen
-$env:VARIABLE_NAME = "value"
-```
-
----
-
-## 🖥️ Zed Terminal & Tasks
-
-### Terminal Keybindings
-
-| Aktion | Keybinding |
-|--------|------------|
-| Terminal Panel toggle | `Ctrl+`` |
-| Neues Terminal | `Ctrl+~` |
-| Terminal splitten | `Ctrl+Shift+5` |
-| Suche im Terminal | `Ctrl+Shift+F` |
-| Clear Terminal | `Ctrl+Shift+L` |
-
-**Path Hyperlinks:** `Ctrl+Click` auf Dateipfade im Terminal-Output öffnet die Datei in Zed!
-(z.B. bei Python Tracebacks: `File "script.py", line 10`)
-
-### 🚀 Vordefinierte Tasks (`.zed/tasks.json`)
-
-Statt lange Befehle zu tippen, nutze Tasks! Öffne mit `Ctrl+Shift+P` → "task: spawn":
-
-| Task | Was macht es? |
-|------|---------------|
-| **Test: Alle** | `pytest -v` (alle Tests) |
-| **Test: Aktuelle Datei** | `pytest $ZED_FILE -v` |
-| **Test: Schnell** | `pytest -m "not slow"` |
-| **Ruff: Check + Fix** | Linting mit Auto-Fix |
-| **Web-UI: Type Check** | `npm run check` |
-| **Web-UI: Build** | `npm run build` |
-| **⚠️ Server starten** | Startet Resonance (blockiert!) |
-
-**Task Keybindings:**
-- `Ctrl+Shift+P` → "task: spawn" — Task-Auswahl öffnen
-- `Ctrl+Shift+R` oder `Alt+T` — Letzten Task wiederholen
-
-### 🐛 Debugger (Python)
-
-Zed hat einen eingebauten Python-Debugger via `debugpy`:
-
-| Aktion | Keybinding |
-|--------|------------|
-| Debugger starten | `F4` |
-| Breakpoint setzen | Klick neben Zeilennummer |
-| Step Over | `F10` |
-| Step Into | `F11` |
-| Continue | `F5` |
-
-**Hinweis:** Wir haben noch keine `.zed/debug.json` — bei Bedarf können wir eine erstellen.
-
----
-
-## 🔍 Code-Qualität (automatisch via Zed)
-
-Zed ist so konfiguriert, dass Code-Qualität **automatisch** geprüft wird.
-Die Konfiguration liegt in `.zed/settings.json` und `pyproject.toml`.
-
-### Aktive Tools
-
-| Tool | Funktion | Wann läuft es? |
-|------|----------|----------------|
-| **ruff format** | Code-Formatierung (Black-kompatibel) | ✅ On Save (automatisch!) |
-| **ruff check** | Linting (Pyflakes, isort, etc.) | ✅ Diagnostics (live) |
-| **pyright** | Typ-Prüfung (statische Analyse) | ✅ Diagnostics (live) |
-| **svelte-check** | Svelte/TS Prüfung | ✅ Diagnostics (web-ui/) |
-
-### Was das für die AI bedeutet
-
-1. **Format-on-Save:** Nach `edit_file` wird Python-Code automatisch formatiert
-   - Kein manuelles `ruff format` nötig!
-   - Line-Length: 100 Zeichen
-
-2. **Diagnostics zeigt ALLES:** Wenn ich `diagnostics` aufrufe, bekomme ich:
-   - Pyright Typ-Fehler
-   - Ruff Linting-Fehler
-   - Svelte-Check Fehler (für web-ui/)
-
-3. **Konfiguration lesen:**
-   - Python Linting: `pyproject.toml` → `[tool.ruff]`
-   - Typ-Prüfung: `pyrightconfig.json`
-   - Zed-Integration: `.zed/settings.json`
-
-### Ruff-Regeln (aktiviert in pyproject.toml)
-
-```
-E, W     — pycodestyle (Stil)
-F        — Pyflakes (Fehler)
-I        — isort (Import-Sortierung)
-B        — flake8-bugbear (häufige Bugs)
-C4       — flake8-comprehensions
-UP       — pyupgrade (moderne Syntax)
-ARG      — unused arguments
-SIM      — simplify
-PTH      — pathlib statt os.path
-RUF      — Ruff-spezifisch
-```
-
----
-
-## 🛠️ Zed Agent Tools (Built-in)
-
-Die folgenden Tools sind in Zed eingebaut und stehen dem AI-Agent zur Verfügung.
-Offizielle Doku: https://zed.dev/docs/ai/tools
-
-### Read & Search Tools
-| Tool | Zweck | Wichtige Parameter |
-|------|-------|-------------------|
-| `grep` | **Code-Suche mit Regex** (bevorzugen!) | `regex`, `include_pattern` |
-| `find_path` | Dateien per Glob-Pattern finden | `glob` |
-| `read_file` | Datei-Inhalt lesen | `path`, `start_line`, `end_line` |
-| `list_directory` | Verzeichnis-Inhalt auflisten | `path` |
-| `diagnostics` | **LSP-Fehler/Warnungen** — zeigt Pyright + Ruff + svelte-check | `path` (optional, ohne = Projekt-Übersicht) |
-| `fetch` | URL abrufen und als Markdown zurückgeben | `url` |
-| `now` | Aktuelles Datum/Uhrzeit | `timezone` |
-| `thinking` | Problemlösung ohne Aktion (Planung) | `content` |
-
-### Edit Tools
-
-| Tool | Zweck | Wichtige Parameter |
-|------|-------|-------------------|
-| `edit_file` | Datei erstellen/bearbeiten | `path`, `mode`, `display_description` |
-| `terminal` | Shell-Befehle ausführen | **`cd` ist Pflicht!**, `command`, `timeout_ms` |
-| `copy_path` | Datei/Verzeichnis kopieren | `source_path`, `destination_path` |
-| `move_path` | Verschieben/Umbenennen | `source_path`, `destination_path` |
-| `delete_path` | Datei/Verzeichnis löschen | `path` |
-| `create_directory` | Verzeichnis erstellen (inkl. Parents) | `path` |
-| `open` | Datei/URL mit Default-App öffnen | `path_or_url` |
-
-### ⚠️ Terminal — Kritische Details
-
-```
-# Terminal braucht IMMER den cd Parameter!
-terminal(cd="resonance-server", command="...")
-
-# FALSCH: cd als Teil des Commands
-terminal(command="cd resonance-server && pytest")  # ❌ Funktioniert nicht!
-
-# RICHTIG: cd als separater Parameter
-terminal(cd="resonance-server", command="micromamba run -p ...")  # ✅
-```
-
-**Timeout setzen** für lang laufende Befehle:
-```
-terminal(cd="resonance-server", command="pytest -v", timeout_ms=60000)
-```
-
-**Keine Endlos-Prozesse** (Server, Watcher) — die blockieren!
-
-### 🔌 MCP (Model Context Protocol) — Was ist das?
-
-**MCP** ist ein offenes Protokoll, das AI-Agents erlaubt, mit externen Tools zu kommunizieren.
-Zed unterstützt MCP-Server, die zusätzliche Tools bereitstellen können.
-
-Für unser Projekt ist der **Svelte MCP Server** konfiguriert, der Svelte-spezifische Tools bietet.
-
----
-
-### Svelte MCP Tools (für web-ui/)
-
-Diese Tools kommen vom Svelte MCP Server und sind **zusätzlich** zu den Zed Built-in Tools verfügbar:
-
-| Tool | Zweck | Wann nutzen |
-|------|-------|-------------|
-| `list-sections` | Alle Svelte/SvelteKit Docs-Sektionen auflisten | **Zuerst aufrufen!** Gibt Überblick mit use_cases |
-| `get-documentation` | Dokumentation für Sektionen holen | Nach `list-sections`, **Array möglich!** |
-| `svelte-autofixer` | Code auf Svelte 5 Fehler prüfen | **IMMER vor Code-Übergabe an User!** |
-| `playground-link` | REPL-Link für Code generieren | Nach Rückfrage an User, nicht für Projekt-Dateien |
-
-#### Svelte MCP Workflow
-
-```
-1. ERST versuchen mit eigenem Wissen + svelte-autofixer zu arbeiten
-   (list-sections/get-documentation sind token-intensiv!)
-
-2. Falls Docs nötig:
-   a) list-sections aufrufen → Überblick über alle Docs
-   b) use_cases analysieren → Welche Sektionen passen zur Aufgabe?
-   c) get-documentation mit ALLEN relevanten Sektionen auf einmal:
-      → get-documentation(section=["$state", "$effect", "bind:"])
-
-3. Code schreiben
-
-4. svelte-autofixer IMMER vor Übergabe an User!
-   → svelte-autofixer(code="...", desired_svelte_version=5, filename="Component.svelte")
-```
-
-#### svelte-autofixer — Details
-
-```
-svelte-autofixer(
-  code="<script>let count = $state(0);</script>...",
-  desired_svelte_version=5,        # Immer 5 für unser Projekt!
-  filename="MyComponent.svelte",   # Nur Dateiname, NICHT ganzer Pfad!
-  async=false                      # true nur bei async/await im Markup
-)
-```
-
-**Typische Fehler die der Autofixer findet:**
-- Falsche Rune-Syntax (`$state()` vs altes `let`)
-- Event-Handler: `onclick` statt `on:click` (Svelte 5!)
-- Fehlende Reaktivität bei abgeleiteten Werten
-- TypeScript-Fehler in Svelte-Komponenten
-- Snippet-Syntax (`{#snippet}` statt `<slot>`)
-
-#### get-documentation — Beispiele
-
-```
-# Einzelne Sektion
-get-documentation(section="$state")
-
-# Mehrere Sektionen auf einmal (effizienter!)
-get-documentation(section=["$state", "$derived", "$effect", "bind:"])
-
-# SvelteKit-spezifisch
-get-documentation(section=["routing", "load", "form-actions"])
-```
-
-#### Wichtige Svelte 5 Docs-Sektionen
-
-| Thema | Sektionen |
-|-------|-----------|
-| **Runes (Reaktivität)** | `$state`, `$derived`, `$effect`, `$props`, `$bindable` |
-| **Template** | `{#if ...}`, `{#each ...}`, `{#snippet ...}`, `{@render ...}` |
-| **Events/Binding** | `bind:`, `use:`, `transition:`, `animate:` |
-| **Komponenten** | `$props`, `context`, `lifecycle-hooks` |
-| **SvelteKit** | `routing`, `load`, `form-actions`, `hooks`, `$app/navigation` |
-
-### Default Debug-Loop (nach jeder Code-Änderung)
-
-```
-1. diagnostics aufrufen (zeigt Pyright + Ruff + svelte-check)
-   → diagnostics()                    # Projekt-Übersicht
-   → diagnostics(path="resonance-server/resonance/player.py")  # Einzeldatei
-
-2. Minimal-invasiv fixen (nur was gemeldet wird)
-
-3. diagnostics erneut prüfen → sollte "No errors or warnings" zeigen
-
-4. Bei Bedarf: Tests im Terminal ausführen
-```
-
-**Wichtig:** `diagnostics` ist die primäre Quelle für Fehler! 
-- Python: Pyright (Typen) + Ruff (Linting)
-- Svelte/TS: svelte-check
-- Format-Fehler gibt es nicht — ruff formatiert on-save automatisch!
-
-### Such-Strategie
-
-```
-# Code/Symbole suchen → grep (mit Regex)
-grep(regex="def play_track", include_pattern="**/*.py")
-
-# Dateien finden → find_path (mit Glob)  
-find_path(glob="**/Player*.svelte")
-
-# Verzeichnis erkunden → list_directory
-list_directory(path="resonance-server/resonance")
-```
-
-### Regeln
-
-- **Nutze `diagnostics`** um statische Analyse einzubeziehen
-- **Laufzeit-Wahrheit** = Tests/Commands im Terminal, Output verwenden
-- **Nie behaupten** dass ein Tool lief, wenn kein Output vorliegt
-- **Svelte-Code:** Immer `svelte-autofixer` nutzen bevor du Code zeigst
-- **Pfade:** Immer mit Root-Directory beginnen (`resonance-server/...`)
-
----
-
-## 🖥️ Häufige PowerShell-Befehle
-
-### Python/Backend
-
-```powershell
-# Tests ausführen (alle)
-micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest -v
-
-# Tests ausführen (einzelne Datei)
-micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest tests/test_player.py -v
-
-# Tests ausführen (einzelner Test)
-micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest tests/test_player.py::test_play_pause -v
-
-# Server starten (blockiert!)
-micromamba run -p ".build/mamba/envs/resonance-env" python -m resonance --verbose
-
-# Ruff Linting
-micromamba run -p ".build/mamba/envs/resonance-env" ruff check resonance/
-
-# Ruff Auto-Fix
-micromamba run -p ".build/mamba/envs/resonance-env" ruff check --fix resonance/
-```
-
-### Web-UI (Svelte)
-
-```powershell
-# Dev-Server starten (blockiert!)
-cd web-ui; npm run dev
-
-# Type-Check
-cd web-ui; npm run check
-
-# Build für Produktion
-cd web-ui; npm run build
-
-# Dependencies installieren
-cd web-ui; npm install
-```
-
-### Git
-
-```powershell
-# Status
-git status
-
-# Diff (ohne Pager, für Terminal-Tool)
-git --no-pager diff
-
-# Diff einer Datei
-git --no-pager diff path/to/file.py
-
-# Log (kurz)
-git --no-pager log --oneline -10
-```
-
-### Datei-Operationen
-
-```powershell
-# Datei-Inhalt anzeigen
-Get-Content path/to/file.txt
-
-# Datei suchen
-Get-ChildItem -Recurse -Filter "*.py" | Select-Object FullName
-
-# Dateien mit Inhalt suchen (wie grep)
-Select-String -Path "resonance/*.py" -Pattern "def play"
-
-# Verzeichnis-Baum
-tree /F resonance/
-```
-
-### Nützliche Kombinationen
-
-```powershell
-# Tests + bei Erfolg Linting
-micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest -v && micromamba run -p ".build/mamba/envs/resonance-env" ruff check resonance/
-
-# Alle Python-Dateien mit "TODO" finden
-Select-String -Path "resonance/**/*.py" -Pattern "TODO" -Recurse
-```
-
-### 🚀 Kurzbefehl-Aliases (für Terminal-Tool)
-
-Da die micromamba-Befehle lang sind, hier Copy-Paste-Vorlagen:
-
-```powershell
-# === TESTS ===
-# Kurz: Alle Tests
-micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest -v
-
-# Kurz: Schnelle Tests (ohne slow marker)
-micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest -v -m "not slow"
-
-# === LINTING ===
-# Kurz: Ruff check + fix
-micromamba run -p ".build/mamba/envs/resonance-env" ruff check --fix resonance/
-
-# === WEB-UI ===
-# Type-Check (kein Dev-Server — der blockiert!)
-cd web-ui; npm run check
-```
-
----
-
-## 📋 Typische Szenarien
-
-### Szenario: Neue Svelte-Komponente erstellen
-
-```
-1. Ziel-Verzeichnis prüfen:
-   list_directory(path="resonance-server/web-ui/src/lib/components")
-
-2. Ähnliche Komponente als Referenz lesen:
-   read_file(path="resonance-server/web-ui/src/lib/components/Player.svelte")
-
-3. Neue Komponente erstellen:
-   edit_file(path="...", mode="create", ...)
-
-4. svelte-autofixer laufen lassen (vor Übergabe!)
-
-5. diagnostics prüfen:
-   diagnostics(path="resonance-server/web-ui/src/lib/components/NewComponent.svelte")
-```
-
-### Szenario: Python-Bug fixen
-
-```
-1. Relevanten Code finden:
-   grep(regex="def problematic_function", include_pattern="**/*.py")
-
-2. Datei lesen:
-   read_file(path="resonance-server/resonance/module.py")
-
-3. Fix implementieren:
-   edit_file(path="...", mode="edit", ...)
-
-4. Tests laufen lassen:
-   terminal(cd="resonance-server", command="micromamba run -p ... pytest tests/test_module.py -v")
-
-5. diagnostics prüfen
-```
-
-### Szenario: LMS-API-Kompatibilität prüfen
-
-```
-1. Original-LMS-Code finden:
-   grep(regex="function_name", include_pattern="slimserver-public-9.1/**/*.pm")
-
-2. Perl-Code lesen und verstehen:
-   read_file(path="slimserver-public-9.1/Slim/...")
-
-3. Mit Resonance-Implementierung vergleichen:
-   grep(regex="function_name", include_pattern="resonance-server/**/*.py")
-```
-
-### Szenario: Dokumentation aktualisieren
-
-```
-1. Diese Datei bearbeiten:
-   edit_file(path="resonance-server/docs/AI_BOOTSTRAP.md", mode="edit", ...)
-
-2. CHANGELOG.md aktualisieren:
-   edit_file(path="resonance-server/docs/CHANGELOG.md", mode="edit", ...)
-```
-
----
-
-## 🚨 KRITISCHE FALLSTRICKE — LIES DAS!
-
-### 1. Python Falsy-Falle 🚨
-
-```python
-# ❌ NIEMALS für Playlist oder Collections!
-if playlist:  # FALSCH - leer = False!
-
-# ✅ RICHTIG
-if playlist is not None:
-```
-
-### 2. TrackRow/AlbumRow sind Dataclasses 🚨
-
-```python
-# ❌ FALSCH
-row["path"]  # TypeError!
-
-# ✅ RICHTIG
-getattr(row, "path", None)
-```
-
-### 3. Playlist-Attribute 🚨
-
-```python
-# ❌ FALSCH
-playlist.shuffle  # AttributeError
-
-# ✅ RICHTIG
-playlist.shuffle_mode.value  # 0 oder 1
-playlist.repeat_mode.value   # 0, 1 oder 2
-```
-
-### 4. PlayerStatus hat `state`, nicht `mode` 🚨
-
-```python
-# ❌ FALSCH
-status.mode
-
-# ✅ RICHTIG
-status.state.name  # "PLAYING", "PAUSED", "STOPPED"
-```
-
-### 5. cancel_stream() NIEMALS nach queue_file() 🚨
-
-`queue_file()` erhöht die Stream-Generation. Danach `cancel_stream()` = Self-Cancel!
-
-### 6. STMd bei elapsed=0 ignorieren 🚨
-
-Sonst: früher Stream-Disconnect → ungewolltes Auto-Advance.
-
-### 7. UI: pendingAction IMMER setzen 🚨
-
-```typescript
-// ✅ Polling-Race verhindern
-setPendingAction(2000);
-currentTrack = track;
-await api.playTrack(...);
-```
-
-### 8. Doppelklick-Schutz ist Pflicht 🚨
-
-```typescript
-let isPlayInFlight = $state(false);
-if (isPlayInFlight) return;
-```
-
-### 9. Volume vor Stream-Start 🚨
-
-`audg` muss VOR `strm` gesendet werden!
-
-### 10. URLs: 0.0.0.0 → 127.0.0.1 🚨
-
-Browser blockieren `0.0.0.0`. Immer `127.0.0.1` verwenden.
-
-### 11. micromamba activate funktioniert nicht 🚨
-
-```powershell
-# ✅ RICHTIG
-micromamba run -p ".build/mamba/envs/resonance-env" python ...
-```
+## 📋 Decision Log
+
+| Entscheidung | Begründung |
+|--------------|------------|
+| LMS-kompatible Elapsed | `elapsed = start_offset + raw_elapsed` — Siehe `SEEK_ELAPSED_FINDINGS.md` |
+| SeekCoordinator | Latest-Wins, 50ms Coalescing, saubere Subprocess-Termination |
+| STMu für Track-Finished | Nur STMu triggert Auto-Advance (wie LMS `playerStopped()`) |
+| Python + asyncio | Modern, gute Library-Unterstützung |
+| Svelte 5 + Tailwind v4 | Modernes Frontend, kleine Bundles |
+| Flutter für Cadence | Cross-Platform Desktop, Riverpod für State |
+| Resonance: GPL v2 | LMS-Community Kompatibilität |
+| Cadence: BSD-3-Clause | Wie JiveLite (dessen Icons wir nutzen) |
+| `playlist jump` statt `index` | LMS-konform, zuverlässiger für Next/Previous |
+| `loadtracks` ohne extra play | Server startet automatisch nach loadtracks |
+| ~~Stream-Lock per Player~~ | **Entfernt!** LMS-Style: Kein Lock, cancel_token bricht alte Streams ab |
+| Sync Pipeline Cleanup | `_cleanup_popen_pipeline_sync()` - kein await im finally-Block |
+| Slider: onChangeEnd | Seek nur bei Release, nicht bei jeder Mausbewegung |
 
 ---
 
@@ -870,63 +332,42 @@ micromamba run -p ".build/mamba/envs/resonance-env" python ...
 
 Wenn der Mensch sagt **"whktm"** oder **"wir haben keine tokens mehr"**:
 
-1. **SOFORT dokumentieren:** AI_BOOTSTRAP.md + CHANGELOG.md
-2. **Dem Menschen sagen:**
-   ```
-   Nächste Session: "Lies AI_BOOTSTRAP.md und mach weiter"
-   ```
-
----
-
-## 🚫 Was die AI NICHT tun darf
-
-1. **Kein Refactoring ohne grüne Tests** — Erst Tests laufen lassen, dann ändern
-2. **Keine API-Änderungen ohne LMS-Vergleich** — JSON-RPC muss LMS-kompatibel bleiben
-3. **Keine neuen Dependencies ohne Rückfrage** — Frag den Menschen
-4. **Keine Dateien löschen ohne Backup** — Erst `.bak` erstellen
-5. **Keine "Vereinfachungen" die Features entfernen** — Code darf nicht "aufgeräumt" werden indem Funktionalität verschwindet
-
----
-
-## 📋 Decision Log
-
-Warum wir Dinge so machen wie wir sie machen:
-
-| Entscheidung | Begründung |
-|--------------|------------|
-| **Python + asyncio** | Moderner als Perl, gute Library-Unterstützung |
-| **FastAPI statt Flask** | Async-native, automatische OpenAPI-Docs |
-| **SQLite statt PostgreSQL** | Serverless, wie Original-LMS |
-| **Svelte 5 statt React** | Weniger Boilerplate, Runes sind elegant |
-| **LMS-API-Kompatibilität** | Bestehende Apps (iPeng, Squeezer) sollen funktionieren |
-| **Kein Plugin-System (noch)** | Erst Core stabil, dann erweiterbar |
-| **Resonance: GPL v2** | Kompatibilität mit LMS-Community, respektvoller Umgang |
-| **Cadence: BSD-3-Clause** | Wie JiveLite, dessen Icons wir nutzen |
-| **Flutter für Cadence** | Cross-Platform Desktop, schöne UI, Dart ist produktiv |
-| **Riverpod statt Provider** | Moderner, besser testbar, keine BuildContext-Abhängigkeit |
-| **Catppuccin Theme** | Konsistent mit Web-UI, schön, gut dokumentiert |
+1. **SOFORT dokumentieren:** AI_BOOTSTRAP.md + CHANGELOG.md aktualisieren
+2. **Dem Menschen sagen:** `Nächste Session: "Lies AI_BOOTSTRAP.md und mach weiter"`
 
 ---
 
 ## ✅ Session-Ende-Checkliste
 
-Bevor du die Session beendest oder bei "whktm":
-
-- [ ] **Tests grün?** — `micromamba run -p ... python -m pytest`
-- [ ] **Docs aktualisiert?** — AI_BOOTSTRAP.md, CHANGELOG.md
-- [ ] **Neue Fallstricke dokumentiert?** — Wenn du auf etwas gestoßen bist
-- [ ] **Nächste Schritte klar?** — Was soll die nächste Session machen?
+- [ ] Tests grün? (`pytest -v`)
+- [ ] Docs aktualisiert?
+- [ ] Neue Fallstricke dokumentiert?
+- [ ] Nächste Schritte klar?
 
 ---
 
-## 🧹 Aufräumen ist deine Pflicht!
+## 🚫 Was die AI NICHT tun darf
 
-- Unnötige Dateien löschen
-- Toten Code entfernen
-- Docs aktuell halten
+1. Kein Refactoring ohne grüne Tests
+2. Keine API-Änderungen ohne LMS-Vergleich
+3. Keine neuen Dependencies ohne Rückfrage
+4. Keine Dateien löschen ohne Backup
+5. Keine "Vereinfachungen" die Features entfernen
+6. **NIEMALS `git checkout -- .` oder `git reset --hard` ohne explizite Bestätigung!**
 
 ---
 
-*Für Architektur-Details: [ARCHITECTURE.md](./ARCHITECTURE.md)*  
-*Für Session-Historie: [CHANGELOG.md](./CHANGELOG.md)*  
-*Für LMS-Vergleich: [COMPARISON_LMS.md](./COMPARISON_LMS.md)*
+## 📚 Dokumentation
+
+| Dokument | Inhalt |
+|----------|--------|
+| [COLDSTART.md](./COLDSTART.md) | **Minimaler Einstieg** (Token-sparend) |
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | System-Architektur, Protokolle, Code-Struktur |
+| [SEEK_ELAPSED_FINDINGS.md](./SEEK_ELAPSED_FINDINGS.md) | LMS-konforme Seek/Elapsed Implementierung |
+| [SLIMPROTO.md](./SLIMPROTO.md) | Binärprotokoll Details, Message-Format |
+| [COMPARISON_LMS.md](./COMPARISON_LMS.md) | Feature-Vergleich mit Original LMS |
+| [E2E_TEST_GUIDE.md](./E2E_TEST_GUIDE.md) | Testen mit echten Apps (iPeng, Squeezer) |
+| [CHANGELOG.md](./CHANGELOG.md) | Änderungshistorie |
+| [ECOSYSTEM.md](./ECOSYSTEM.md) | Squeezebox Hardware/Software Übersicht |
+
+> **Tipp:** Für schnellen Session-Start mit wenig Tokens: `Lies COLDSTART.md`

@@ -6,21 +6,43 @@ for audio formats that legacy hardware cannot decode natively.
 
 The transcoding pipeline streams audio through external binaries (faad, flac, sox, lame)
 and yields chunks for HTTP streaming.
+
+Windows reliability note:
+    On Windows, an asyncio-driven multi-process pipeline that manually copies bytes
+    between subprocess stdio streams can prematurely EOF under cancellation/teardown
+    pressure (rapid seeks). The original LMS (Perl) uses OS-level pipes.
+
+    To match that behavior and avoid premature EOF/races, we implement a Popen-based
+    pipeline for multi-stage transcodes. We then bridge the final stdout into the
+    async world using a background thread and an asyncio.Queue.
+
+Cancellation/Teardown (Windows-safe):
+    - If the client disconnects or a seek cancels the HTTP stream, the async generator
+      may be cancelled mid-read. We treat this as normal.
+    - We terminate the Popen pipeline with best-effort escalation (terminate -> kill),
+      and we always close pipes defensively.
+
+Diagnostics:
+    - We log subprocess stderr on early termination and on cancellation to diagnose
+      cases where the pipeline yields only a small number of bytes and exits.
 """
 
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
+import queue
 import re
 import shlex
 import shutil
+import subprocess
+import threading
+from collections.abc import AsyncGenerator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import TYPE_CHECKING, AsyncGenerator
 
-if TYPE_CHECKING:
-    from resonance.player.client import DeviceType
+from resonance.streaming.seek_coordinator import cleanup_processes
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +52,10 @@ THIRD_PARTY_BIN = Path(__file__).parent.parent.parent / "third_party" / "bin"
 
 # Buffer size for streaming (64KB chunks)
 STREAM_BUFFER_SIZE = 65536
+
+# If a transcode yields only a tiny amount of output, it's almost always a broken pipeline/EOF.
+# Keep this conservative; we only use it for diagnostics.
+_EARLY_TERMINATION_BYTES = 512 * 1024  # 512KB
 
 
 @dataclass
@@ -169,7 +195,7 @@ def parse_legacy_conf(config_path: Path | None = None) -> TranscodeConfig:
     current_capabilities: str = ""
 
     with config_path.open("r", encoding="utf-8") as f:
-        for line_num, line in enumerate(f, 1):
+        for line in f:
             # Strip whitespace
             line = line.rstrip()
 
@@ -348,31 +374,132 @@ def build_command(
     return result
 
 
-async def _pipe_data(
-    source: asyncio.StreamReader,
-    dest: asyncio.StreamWriter,
+def _read_stream_in_thread(
+    stream,
+    loop: asyncio.AbstractEventLoop,
+    out_q: queue.Queue[bytes | None],
 ) -> None:
     """
-    Copy data from source StreamReader to dest StreamWriter.
+    Read a blocking file-like stream in a thread and forward bytes into a threadsafe queue.
 
-    This is needed on Windows because asyncio subprocess pipes cannot be
-    directly connected - we must manually copy the data.
+    We intentionally do NOT push directly into an asyncio.Queue from the thread, because
+    that can overflow (`QueueFull`) if the event loop is busy. Instead we use a standard
+    `queue.Queue`, and the async side drains it (with backpressure) safely.
+
+    The queue receives:
+      - bytes chunks
+      - None sentinel on EOF
     """
     try:
         while True:
-            chunk = await source.read(STREAM_BUFFER_SIZE)
-            if not chunk:
+            data = stream.read(STREAM_BUFFER_SIZE)
+            if not data:
                 break
-            dest.write(chunk)
-            await dest.drain()
+            # Blocks when the async consumer is behind -> backpressure, no crashes.
+            out_q.put(data)
     except Exception as e:
-        logger.debug("Pipe data error (may be expected on close): %s", e)
+        logger.debug("Threaded stdout reader error (expected on teardown): %s", e)
     finally:
+        with contextlib.suppress(Exception):
+            out_q.put(None)
+        with contextlib.suppress(Exception):
+            stream.close()
+
+
+def _terminate_popen_safely(proc: subprocess.Popen, timeout: float = 2.0) -> None:
+    """
+    Best-effort terminate/kill for subprocess.Popen processes.
+
+    This is intentionally defensive; Windows is sensitive to teardown ordering.
+    """
+    if proc.poll() is not None:
+        return
+
+    with contextlib.suppress(Exception):
+        proc.terminate()
+
+    try:
+        proc.wait(timeout=timeout)
+        return
+    except Exception:
+        pass
+
+    with contextlib.suppress(Exception):
+        proc.kill()
+    with contextlib.suppress(Exception):
+        proc.wait(timeout=1.0)
+
+
+def _cleanup_popen_pipeline_sync(procs: list[subprocess.Popen]) -> None:
+    """
+    Clean up a Popen pipeline - SYNCHRONOUS and FAST.
+
+    This is designed for rapid seek scenarios where we need to abandon
+    old transcoders quickly without waiting for them to fully terminate.
+
+    LMS-style approach: Just close the pipes and kill the processes.
+    Don't wait - the OS will clean them up.
+
+    IMPORTANT: This function is intentionally NOT async. It must be callable
+    from a finally block during asyncio.CancelledError handling, where
+    await/create_task may not work correctly.
+    """
+    # Close pipe endpoints first to unblock any readers/writers
+    for p in procs:
+        with contextlib.suppress(Exception):
+            if p.stdin:
+                p.stdin.close()
+        with contextlib.suppress(Exception):
+            if p.stdout:
+                p.stdout.close()
+        with contextlib.suppress(Exception):
+            if p.stderr:
+                p.stderr.close()
+
+    # Kill processes immediately - don't wait for graceful termination
+    # This is critical for rapid seeks where we can't afford to block
+    for p in reversed(procs):
+        if p.poll() is None:  # Still running
+            with contextlib.suppress(Exception):
+                p.kill()  # SIGKILL - immediate, no waiting
+
+    # Don't wait for processes to die - OS will reap them eventually
+    # Waiting here can block for seconds if processes are slow to terminate
+
+
+async def _log_popen_stderr(
+    procs: list[subprocess.Popen],
+    *,
+    cancelled: bool,
+    bytes_yielded: int,
+) -> None:
+    """
+    Read and log stderr (best effort). Tools often write useful messages to stderr even with rc=0.
+
+    IMPORTANT: This must not block! Use timeout and be defensive.
+    """
+    for i, p in enumerate(procs):
+        if not p.stderr:
+            continue
+        data = b""
         try:
-            dest.close()
-            await dest.wait_closed()
-        except Exception:
+            # Use timeout to avoid blocking forever if process is still running
+            data = await asyncio.wait_for(
+                asyncio.to_thread(p.stderr.read, 4096),  # Read limited amount
+                timeout=0.1,  # Very short timeout - we don't want to block
+            )
+        except (asyncio.TimeoutError, Exception):
+            # Timeout or error - just skip, this is best-effort logging
             pass
+        if data:
+            logger.info(
+                "Transcode stderr (popen=%d, pid=%s, cancelled=%s, bytes=%d): %s",
+                i,
+                getattr(p, "pid", None),
+                cancelled,
+                bytes_yielded,
+                data.decode(errors="ignore")[:2000],
+            )
 
 
 async def transcode_stream(
@@ -386,8 +513,8 @@ async def transcode_stream(
 
     This sets up a subprocess pipeline and yields chunks of transcoded data.
 
-    On Windows, asyncio subprocess pipes cannot be directly chained (no fileno()),
-    so we manually copy data between processes using background tasks.
+    Windows uses a Popen-based OS-pipe pipeline (to match LMS behavior and avoid
+    premature EOF races). Other platforms use the asyncio pipeline.
 
     Args:
         file_path: Path to the source audio file.
@@ -397,15 +524,12 @@ async def transcode_stream(
 
     Yields:
         Chunks of transcoded audio data.
-
-    Raises:
-        ValueError: If the rule is passthrough or binary not found.
-        RuntimeError: If transcoding fails.
     """
+    logger.debug("[TRANSCODE] transcode_stream() called for %s", file_path.name)
+
     if rule.is_passthrough():
         raise ValueError("Cannot transcode with passthrough rule")
 
-    # Build the command pipeline
     try:
         commands = build_command(rule, file_path, start_seconds, end_seconds)
     except ValueError as e:
@@ -414,7 +538,7 @@ async def transcode_stream(
 
     if start_seconds:
         logger.info(
-            "Starting transcode: %s -> %s using %d command(s), seeking to %.1fs",
+            "[TRANSCODE] Starting: %s -> %s using %d command(s), seeking to %.1fs",
             file_path.name,
             rule.dest_format,
             len(commands),
@@ -422,69 +546,167 @@ async def transcode_stream(
         )
     else:
         logger.info(
-            "Starting transcode: %s -> %s using %d command(s)",
+            "[TRANSCODE] Starting: %s -> %s using %d command(s)",
             file_path.name,
             rule.dest_format,
             len(commands),
         )
 
-    # Set up the pipeline
+    if len(commands) > 1:
+        # Windows-safe Popen pipeline (also used generally for multi-stage pipelines)
+        procs: list[subprocess.Popen] = []
+        out_q: queue.Queue[bytes | None] = queue.Queue(maxsize=32)
+        reader_thread: threading.Thread | None = None
+        loop = asyncio.get_running_loop()
+
+        bytes_yielded = 0
+
+        try:
+            prev_stdout = None
+
+            for i, cmd in enumerate(commands):
+                logger.debug("[TRANSCODE] Starting Popen stage %d: %s", i, " ".join(cmd))
+
+                proc = subprocess.Popen(
+                    cmd,
+                    stdin=prev_stdout,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    bufsize=0,
+                )
+                procs.append(proc)
+                logger.debug("[TRANSCODE] Popen stage %d started, pid=%s", i, proc.pid)
+
+                # The next stage consumes this stage's stdout
+                prev_stdout = proc.stdout
+
+            final_stdout = procs[-1].stdout
+            if final_stdout is None:
+                raise RuntimeError("No stdout from final transcode process (Popen)")
+
+            logger.debug("[TRANSCODE] All Popen stages started, starting reader thread")
+
+            # Start a blocking reader thread for the final stdout
+            reader_thread = threading.Thread(
+                target=_read_stream_in_thread,
+                args=(final_stdout, loop, out_q),
+                daemon=True,
+            )
+            reader_thread.start()
+
+            logger.debug("[TRANSCODE] Reader thread started, entering yield loop")
+            chunk_count = 0
+            while True:
+                # Use timeout on queue.get() to allow asyncio cancellation
+                # Without this, CancelledError can't interrupt blocking get()
+                try:
+                    item = await asyncio.to_thread(out_q.get, timeout=0.5)
+                except queue.Empty:
+                    # Timeout - loop again to check for cancellation
+                    continue
+                if item is None:
+                    logger.debug("[TRANSCODE] Received None from queue, EOF")
+                    break
+                bytes_yielded += len(item)
+                chunk_count += 1
+                if chunk_count <= 3 or chunk_count % 100 == 0:
+                    logger.debug("[TRANSCODE] Yielded chunk %d, %d bytes total", chunk_count, bytes_yielded)
+                yield item
+
+            # Give the pipeline a moment to finalize and expose returncodes
+            for p in procs:
+                with contextlib.suppress(Exception):
+                    await asyncio.to_thread(p.wait, 0.2)
+
+            # Log suspicious early termination diagnostics (including stderr)
+            early = bytes_yielded > 0 and bytes_yielded < _EARLY_TERMINATION_BYTES
+            if early:
+                await _log_popen_stderr(procs, cancelled=False, bytes_yielded=bytes_yielded)
+
+            # If any stage failed, surface it
+            for i, p in enumerate(procs):
+                rc = p.poll()
+                if rc is not None and rc != 0:
+                    await _log_popen_stderr(procs, cancelled=False, bytes_yielded=bytes_yielded)
+                    raise RuntimeError(f"Transcode stage {i} exited with code {rc}")
+
+            logger.info("Transcode complete: %s, yielded %d bytes", file_path.name, bytes_yielded)
+
+        except asyncio.CancelledError:
+            was_cancelled = True
+            logger.debug("[TRANSCODE] CancelledError caught, bytes_yielded=%d", bytes_yielded)
+            # Don't try to read stderr on cancellation - just cleanup and go!
+            raise
+        finally:
+            logger.debug("[TRANSCODE] Entering finally block, cleaning up pipeline")
+            # Ensure pipeline is torn down and reader is unblocked
+            # This MUST be fast and non-blocking for rapid seeks to work
+            # Use SYNC cleanup - no await, no create_task - just close and kill
+            _cleanup_popen_pipeline_sync(procs)
+            logger.debug("[TRANSCODE] Pipeline cleanup complete")
+
+        return
+
+    # Single-stage transcodes: keep existing asyncio subprocess path
     processes: list[asyncio.subprocess.Process] = []
     pipe_tasks: list[asyncio.Task[None]] = []
 
     try:
-        # Start all processes
         for i, cmd in enumerate(commands):
-            is_first = i == 0
-            is_last = i == len(commands) - 1
-
             logger.debug("Starting subprocess %d: %s", i, " ".join(cmd))
 
             proc = await asyncio.create_subprocess_exec(
                 *cmd,
-                stdin=None if is_first else asyncio.subprocess.PIPE,
+                stdin=None,
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,  # Capture stderr for logging
+                stderr=asyncio.subprocess.PIPE,
             )
             processes.append(proc)
 
-        # Connect processes with pipe tasks (for multi-stage pipelines)
-        for i in range(len(processes) - 1):
-            source_proc = processes[i]
-            dest_proc = processes[i + 1]
-
-            if source_proc.stdout is None or dest_proc.stdin is None:
-                raise RuntimeError(f"Missing pipe for process {i}")
-
-            # Create background task to copy data between processes
-            task = asyncio.create_task(_pipe_data(source_proc.stdout, dest_proc.stdin))
-            pipe_tasks.append(task)
-
-        # Read from the last process's stdout
         final_proc = processes[-1]
         if final_proc.stdout is None:
             raise RuntimeError("No stdout from transcode process")
 
         bytes_yielded = 0
-        while True:
-            chunk = await final_proc.stdout.read(STREAM_BUFFER_SIZE)
-            if not chunk:
-                break
-            bytes_yielded += len(chunk)
-            yield chunk
+        was_cancelled = False
+        try:
+            while True:
+                chunk = await final_proc.stdout.read(STREAM_BUFFER_SIZE)
+                if not chunk:
+                    break
+                bytes_yielded += len(chunk)
+                yield chunk
+        except asyncio.CancelledError:
+            was_cancelled = True
+            raise
+        finally:
+            early_termination = bytes_yielded > 0 and bytes_yielded < _EARLY_TERMINATION_BYTES
+            if was_cancelled or early_termination:
+                for i, proc in enumerate(processes):
+                    if proc.stderr:
+                        data = b""
+                        with contextlib.suppress(Exception):
+                            data = await proc.stderr.read()
+                        if data:
+                            logger.info(
+                                "Transcode stderr (proc=%d, pid=%s, cancelled=%s, bytes=%d): %s",
+                                i,
+                                getattr(proc, "pid", None),
+                                was_cancelled,
+                                bytes_yielded,
+                                data.decode(errors="ignore")[:2000],
+                            )
 
-        # Wait for processes to finish and check for errors
         for i, proc in enumerate(processes):
             if proc.returncode is None:
-                try:
+                with contextlib.suppress(asyncio.TimeoutError):
                     await asyncio.wait_for(proc.wait(), timeout=1.0)
-                except asyncio.TimeoutError:
-                    pass
 
             if proc.returncode is not None and proc.returncode != 0:
                 stderr_data = b""
                 if proc.stderr:
-                    stderr_data = await proc.stderr.read()
+                    with contextlib.suppress(Exception):
+                        stderr_data = await proc.stderr.read()
 
                 logger.warning(
                     "Transcode process %d exited with code %d: %s",
@@ -493,32 +715,10 @@ async def transcode_stream(
                     stderr_data.decode(errors="ignore")[:500] if stderr_data else "no stderr",
                 )
 
-        logger.info(
-            "Transcode complete: %s, yielded %d bytes",
-            file_path.name,
-            bytes_yielded,
-        )
+        logger.info("[TRANSCODE] Complete: %s, yielded %d bytes", file_path.name, bytes_yielded)
 
     finally:
-        # Cancel pipe tasks
-        for task in pipe_tasks:
-            if not task.done():
-                task.cancel()
-                try:
-                    await task
-                except (asyncio.CancelledError, Exception):
-                    pass
-
-        # Clean up all processes
-        for proc in processes:
-            if proc.returncode is None:
-                try:
-                    proc.terminate()
-                    await asyncio.wait_for(proc.wait(), timeout=2.0)
-                except (asyncio.TimeoutError, Exception):
-                    proc.kill()
-                except Exception:
-                    pass
+        await cleanup_processes(processes, pipe_tasks)
 
 
 def get_output_content_type(dest_format: str) -> str:

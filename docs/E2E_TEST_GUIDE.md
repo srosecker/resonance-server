@@ -15,18 +15,12 @@ Diese Anleitung beschreibt, wie man Resonance mit echten LMS-Apps (iPeng, Squeez
 
 ## 🚀 Server starten
 
-### Option 1: Einfacher Start
-
 ```powershell
-cd C:\Users\stephan\Desktop\resonance
-micromamba run -p .build/mamba/envs/resonance-env python -m resonance
-```
+cd resonance-server
+micromamba run -p ".build/mamba/envs/resonance-env" python -m resonance --verbose
 
-### Option 2: Mit Music-Root
-
-```powershell
-cd C:\Users\stephan\Desktop\resonance
-micromamba run -p .build/mamba/envs/resonance-env python -m resonance --music-root "D:\Musik"
+# Mit Music-Root:
+micromamba run -p ".build/mamba/envs/resonance-env" python -m resonance --music-root "D:\Musik"
 ```
 
 Der Server startet:
@@ -40,7 +34,7 @@ Der Server startet:
 ### Windows
 
 ```powershell
-cd C:\Users\stephan\Desktop\resonance
+cd resonance-server
 .\third_party\squeezelite\squeezelite-ffmpeg-x64.exe -s 127.0.0.1 -o "WASAPI" -C 5
 ```
 
@@ -52,6 +46,7 @@ cd C:\Users\stephan\Desktop\resonance
 ### Liste der Audiogeräte anzeigen
 
 ```powershell
+cd resonance-server
 .\third_party\squeezelite\squeezelite-ffmpeg-x64.exe -l
 ```
 
@@ -299,9 +294,9 @@ Nach erfolgreichem Test solltest du:
 ## 🔗 Weiterführende Links
 
 - [AI_BOOTSTRAP.md](./AI_BOOTSTRAP.md) — Projekt-Kontext
-- [ARCHITECTURE_WEB.md](./ARCHITECTURE_WEB.md) — Web-Architektur
+- [ARCHITECTURE.md](./ARCHITECTURE.md) — System-Architektur
 - [SLIMPROTO.md](./SLIMPROTO.md) — Protokoll-Details
 
 ---
 
-*Erstellt: Februar 2025*
+*Zuletzt aktualisiert: Februar 2026*

@@ -370,20 +370,20 @@ class TestStatHandling:
 
         assert client.status.state == PlayerState.PAUSED
 
-    async def test_handle_stat_stopped_state(
+    async def test_handle_stat_playing_state_on_stms(
         self,
         slimproto_server: SlimprotoServer,
         mock_reader: AsyncMock,
         mock_writer: MagicMock,
     ) -> None:
-        """STAT with STMs should set stopped state."""
+        """STAT with STMs (track Started) should set PLAYING state (LMS-conformant)."""
         client = PlayerClient(mock_reader, mock_writer)
         client._id = "00:04:20:12:34:56"
 
         payload = build_stat_message(event_code="STMs")
         await slimproto_server._handle_stat(client, payload)
 
-        assert client.status.state == PlayerState.STOPPED
+        assert client.status.state == PlayerState.PLAYING
 
     async def test_handle_stat_short_payload(
         self,

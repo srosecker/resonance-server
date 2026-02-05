@@ -292,4 +292,4 @@ Einige Hersteller bieten native LMS-Unterstützung:
 
 ---
 
-*Zuletzt aktualisiert: Februar 2025*
+*Zuletzt aktualisiert: Februar 2026*

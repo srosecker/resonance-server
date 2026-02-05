@@ -17,6 +17,7 @@ from resonance.core.library_db import LibraryDb
 from resonance.core.playlist import PlaylistManager
 from resonance.player.registry import PlayerRegistry
 from resonance.protocol.slimproto import SlimprotoServer
+from resonance.streaming.seek_coordinator import init_seek_coordinator
 from resonance.streaming.server import StreamingServer
 from resonance.web.server import WebServer
 
@@ -82,6 +83,10 @@ class ResonanceServer:
             streaming_port=web_port,
             player_registry=self.player_registry,
         )
+        # Link back to ResonanceServer for track-finished suppression
+        # Note: Use _resonance_server to avoid conflict with SlimprotoServer._server (asyncio server)
+        self.slimproto._resonance_server = self
+
         # Expose StreamingServer on SlimprotoServer so the STAT handler can attach
         # the current stream generation to track-finished events (STMd) and ignore stale events.
         self.slimproto.streaming_server = self.streaming_server
@@ -110,6 +115,9 @@ class ResonanceServer:
         # Key: player MAC, Value: event-loop time() until which STMd should be ignored.
         self._suppress_track_finished_until: dict[str, float] = {}
 
+        # SeekCoordinator for latest-wins seek semantics (initialized on start)
+        self.seek_coordinator = None
+
     async def start(self) -> None:
         """Start all server components."""
         logger.info("Starting Resonance server on %s:%d", self.host, self.port)
@@ -130,6 +138,10 @@ class ResonanceServer:
         # Mark streaming server as ready (no longer binds its own port)
         # Streaming is now handled via FastAPI routes at /stream.mp3
         await self.streaming_server.start()
+
+        # Initialize SeekCoordinator with StreamingServer for generation tracking.
+        # This provides latest-wins semantics and safe subprocess termination for seeks.
+        self.seek_coordinator = init_seek_coordinator(self.streaming_server)
 
         # Start Web server (HTTP/JSON-RPC + Streaming)
         self.web_server = WebServer(
@@ -266,7 +278,7 @@ class ResonanceServer:
         # When the user manually switches tracks, the streaming server increments generation.
         # A late STMd from the previous stream must NOT advance the playlist to track +1.
         if event.stream_generation is not None:
-            current_gen = getattr(self.streaming_server, "_stream_generation", {}).get(player_id)
+            current_gen = self.streaming_server.get_stream_generation(player_id)
             if current_gen is not None and current_gen != event.stream_generation:
                 logger.info(
                     "Ignoring stale track-finished for player %s (event gen=%s, current gen=%s)",
@@ -312,4 +324,3 @@ class ResonanceServer:
         """
         until = asyncio.get_running_loop().time() + seconds
         self._suppress_track_finished_until[player_mac] = until
-        logger.debug("Suppressed track-finished for player %s until %.3f", player_mac, until)

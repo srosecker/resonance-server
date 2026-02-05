@@ -1,5 +1,7 @@
 # Deep Research (2026): Das ultimative Web-Interface für **Resonance**
 
+> **📁 ARCHIV** — Dieses Dokument enthält die tiefgehende Design-Recherche. Für den aktuellen Stand siehe [ARCHITECTURE.md](../ARCHITECTURE.md).
+
 > Ziel: Ein Web-Interface, das nicht nur „LMS-kompatibel“ ist, sondern **Design‑Referenz** für Self‑Hosted Music wird: schnell, warm, hochwertig, multiroom‑fähig, keyboard‑stark, und mit echten *Wow‑Momenten*.
 
 ---

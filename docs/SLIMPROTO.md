@@ -336,27 +336,44 @@ Player                              Server
 
 ## Implementierungsstatus in Resonance
 
-| Message | Richtung | Implementiert | Datei |
-|---------|----------|---------------|-------|
-| HELO | C→S | ✅ Vollständig | `slimproto.py` |
-| STAT | C→S | ✅ Vollständig | `slimproto.py` |
-| BYE! | C→S | ✅ Vollständig | `slimproto.py` |
-| IR | C→S | 📋 Stub | `slimproto.py` |
-| DSCO | C→S | 📋 Stub | `slimproto.py` |
-| RESP | C→S | 📋 Stub | `slimproto.py` |
-| META | C→S | 📋 Stub | `slimproto.py` |
-| BUTN | C→S | 📋 Stub | `slimproto.py` |
-| KNOB | C→S | 📋 Stub | `slimproto.py` |
-| strm | S→C | ✅ Vollständig | `commands.py`, `slimproto.py` |
-| audg | S→C | ✅ Vollständig | `commands.py`, `slimproto.py` |
-| aude | S→C | 📋 Stub | `commands.py` |
-| setd | S→C | 📋 Stub | - |
-| grfe/grfb | S→C | 📋 Stub | `commands.py` |
+| Message | Richtung | Status | Datei |
+|---------|----------|--------|-------|
+| HELO | C→S | ✅ Vollständig | `protocol/slimproto.py` |
+| STAT | C→S | ✅ Vollständig | `protocol/slimproto.py` |
+| BYE! | C→S | ✅ Vollständig | `protocol/slimproto.py` |
+| IR | C→S | 📋 Stub | `protocol/slimproto.py` |
+| DSCO | C→S | 📋 Stub | `protocol/slimproto.py` |
+| RESP | C→S | 📋 Stub | `protocol/slimproto.py` |
+| META | C→S | 📋 Stub | `protocol/slimproto.py` |
+| BUTN | C→S | 📋 Stub | `protocol/slimproto.py` |
+| KNOB | C→S | 📋 Stub | `protocol/slimproto.py` |
+| strm | S→C | ✅ Vollständig | `protocol/commands.py` |
+| audg | S→C | ✅ Vollständig | `protocol/commands.py` |
+| aude | S→C | 📋 Stub | `protocol/commands.py` |
+| setd | S→C | 📋 Stub | — |
+| grfe/grfb | S→C | 📋 Stub | `protocol/commands.py` |
+
+**STM Event Handling (in STAT):**
+
+| Event | Status | Aktion |
+|-------|--------|--------|
+| STMs | ✅ | → PLAYING |
+| STMp | ✅ | → PAUSED |
+| STMr | ✅ | → PLAYING |
+| STMf | ✅ | → Kein State-Change |
+| STMu | ✅ | → STOPPED + Track-Finished |
+| STMd | ✅ | → Kein Auto-Advance |
+| STMt | ✅ | Heartbeat |
 
 ---
 
 ## Referenzen
 
 - `slimserver-public-9.1/Slim/Networking/Slimproto.pm` — Original-Implementierung
-- `slimserver-public-9.1/Slim/Player/Squeezebox.pm` — Player-spezifische Befehle
+- `slimserver-public-9.1/Slim/Player/Squeezebox2.pm` — STM Event Handling
+- `slimserver-public-9.1/Slim/Player/StreamingController.pm` — Elapsed-Berechnung
 - [Squeezelite Source](https://github.com/ralph-irving/squeezelite) — Client-Implementierung in C
+
+---
+
+*Zuletzt aktualisiert: Februar 2026*

@@ -10,7 +10,9 @@ and the player's format expectations (strm command).
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import time
 from pathlib import Path
 from typing import TYPE_CHECKING, AsyncIterator
 
@@ -26,6 +28,16 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["streaming"])
+
+# If a transcoded stream ends extremely quickly, that can indicate a broken pipeline/teardown
+# race (premature EOF). However, short segments (e.g. seeking near end-of-track) will also
+# legitimately end quickly. We therefore only warn for "meaningfully long" requested segments
+# (see logic below), and we increase the byte threshold to reduce false positives.
+#
+# Note: When start/end are unknown (startup stream), we can't infer the requested segment
+# length, so we avoid warning in that case.
+_SUSPICIOUS_TRANSCODE_EOF_BYTES = 2 * 1024 * 1024  # 2MB
+_SUSPICIOUS_TRANSCODE_EOF_SECONDS = 1.0            # 1s
 
 # Reference to StreamingServer, set during route registration
 _streaming_server: StreamingServer | None = None
@@ -99,12 +111,13 @@ async def stream_audio(
 
     # Check if we need to transcode
     if needs_transcoding(suffix, device_type=None):
-        return await _stream_with_transcoding(player, file_path)
+        return await _stream_with_transcoding(request, player, file_path)
     else:
-        return await _stream_direct(player, file_path, file_size, range_header)
+        return await _stream_direct(request, player, file_path, file_size, range_header)
 
 
 async def _stream_with_transcoding(
+    request: Request,
     player_mac: str,
     file_path: Path,
 ) -> StreamingResponse:
@@ -112,6 +125,10 @@ async def _stream_with_transcoding(
     Stream a file with transcoding (for M4B/M4A/MP4 etc.).
 
     Uses the transcoder module to convert to a streamable format.
+
+    NOTE:
+    We serialize transcoded streams per player to avoid overlapping transcode pipelines
+    during rapid seeks (Windows asyncio subprocess teardown races).
     """
     if _streaming_server is None:
         raise HTTPException(status_code=503, detail="Streaming server not initialized")
@@ -128,12 +145,33 @@ async def _stream_with_transcoding(
     start_seconds = seek_pos[0] if seek_pos else None
     end_seconds = seek_pos[1] if seek_pos else None
 
-    # Get cancellation token for stream abort
+    # Capture generation for logging (this token is replaced on each queue)
     cancel_token = _streaming_server.get_cancellation_token(player_mac)
+    token_generation = getattr(cancel_token, "generation", None)
 
     async def generate() -> AsyncIterator[bytes]:
-        """Generate transcoded audio chunks."""
+        """Generate transcoded audio chunks.
+
+        LMS-style approach: No locks! When a new seek/stream is requested,
+        the old stream's cancel_token is set, and this generator aborts
+        on the next chunk. The new stream starts immediately without waiting.
+
+        This matches LMS's StreamingController._Stream() which simply closes
+        the old songStreamController and opens a new one - no serialization.
+        """
+        started_at = time.time()
+        bytes_sent = 0
         chunk_count = 0
+        abort_reason: str | None = None
+
+        # LMS-style: No lock! Old stream aborts via cancel_token, new stream starts immediately.
+        # This prevents blocking during rapid seeks where the old transcoder might be slow.
+        logger.debug(
+            "[STREAM] player=%s gen=%s starting transcode (LMS-style, no lock)",
+            player_mac,
+            token_generation,
+        )
+
         try:
             async for chunk in transcode_stream(
                 file_path,
@@ -141,20 +179,98 @@ async def _stream_with_transcoding(
                 start_seconds=start_seconds,
                 end_seconds=end_seconds,
             ):
-                # Check for cancellation every 4 chunks
-                if chunk_count % 4 == 0 and cancel_token and cancel_token.cancelled:
-                    logger.info("Stream cancelled for player %s (transcoded)", player_mac)
-                    break
+                # Abort quickly if the client went away.
+                #
+                # This is important because upstream cancellation might not arrive
+                # immediately, and we want to stop transcoding as soon as possible.
+                if await request.is_disconnected():
+                    abort_reason = "disconnected"
+                    logger.info(
+                        "Stream client disconnected for player %s (transcoded, gen=%s)",
+                        player_mac,
+                        token_generation,
+                    )
+                    return
+
+                # Abort quickly on generation cancellation (seek/track change).
+                # This is the LMS-style "close stream" - when a new seek comes in,
+                # cancel_stream() sets cancelled=True and we abort immediately.
+                if cancel_token and cancel_token.cancelled:
+                    abort_reason = "cancelled"
+                    logger.info(
+                        "[STREAM] Stream cancelled for player %s (transcoded, gen=%s) - new seek/track",
+                        player_mac,
+                        token_generation,
+                    )
+                    return
 
                 yield chunk
+                bytes_sent += len(chunk)
                 chunk_count += 1
 
-                # Clear seek position after first chunk
+                # Clear seek position after first chunk so subsequent requests don't reuse it.
                 if chunk_count == 1:
                     _streaming_server.clear_seek_position(player_mac)
 
+        except asyncio.CancelledError:
+            # Uvicorn/FastAPI can cancel the generator when the client disconnects.
+            abort_reason = abort_reason or "cancelled_error"
+            raise
         except Exception as e:
+            abort_reason = abort_reason or "error"
             logger.exception("Transcoding error for %s: %s", file_path, e)
+        finally:
+            elapsed = time.time() - started_at
+            final_reason = abort_reason or "eof"
+
+            # A transcoded stream that ends (EOF) after a tiny amount of data and very quickly
+            # can indicate a broken pipeline. However, if the request is a near-end seek
+            # (e.g. start close to end), a tiny/fast EOF is expected and should not warn.
+            #
+            # We only warn when the requested segment is "meaningfully long" but still ends
+            # very quickly / with very little data.
+            requested_segment_seconds: float | None = None
+            if start_seconds is not None and end_seconds is not None:
+                requested_segment_seconds = max(0.0, float(end_seconds) - float(start_seconds))
+
+            # Only warn when:
+            # - we actually know the requested segment length (start/end provided), AND
+            # - it was a "meaningfully long" segment (>=10s), AND
+            # - we still ended extremely quickly / with very little data.
+            warn_suspicious_eof = (
+                final_reason == "eof"
+                and bytes_sent > 0
+                and (
+                    bytes_sent < _SUSPICIOUS_TRANSCODE_EOF_BYTES
+                    or elapsed < _SUSPICIOUS_TRANSCODE_EOF_SECONDS
+                )
+                and requested_segment_seconds is not None
+                and requested_segment_seconds >= 10.0
+            )
+
+            if warn_suspicious_eof:
+                logger.warning(
+                    "Suspicious transcoded EOF player=%s gen=%s chunks=%d bytes=%d elapsed=%.3fs file=%s start=%s end=%s",
+                    player_mac,
+                    token_generation,
+                    chunk_count,
+                    bytes_sent,
+                    elapsed,
+                    file_path.name,
+                    f"{start_seconds:.3f}" if start_seconds is not None else "None",
+                    f"{end_seconds:.3f}" if end_seconds is not None else "None",
+                )
+
+            logger.info(
+                "Transcoded stream finished player=%s gen=%s reason=%s chunks=%d bytes=%d elapsed=%.3fs file=%s",
+                player_mac,
+                token_generation,
+                final_reason,
+                chunk_count,
+                bytes_sent,
+                elapsed,
+                file_path.name,
+            )
 
     # Transcoded output is MP3 (as per streaming/policy.py)
     return StreamingResponse(
@@ -168,6 +284,7 @@ async def _stream_with_transcoding(
 
 
 async def _stream_direct(
+    request: Request,
     player_mac: str,
     file_path: Path,
     file_size: int,
@@ -197,13 +314,16 @@ async def _stream_direct(
 
     content_length = end_byte - start_byte + 1
 
-    # Get cancellation token
     cancel_token = _streaming_server.get_cancellation_token(player_mac)
+    token_generation = getattr(cancel_token, "generation", None)
 
     async def generate() -> AsyncIterator[bytes]:
         """Generate file chunks from the specified byte range."""
+        started_at = time.time()
+        bytes_sent = 0
         chunk_size = 65536  # 64KB chunks
         chunk_count = 0
+        abort_reason: str | None = None
 
         try:
             with open(file_path, "rb") as f:
@@ -211,10 +331,25 @@ async def _stream_direct(
                 remaining = content_length
 
                 while remaining > 0:
-                    # Check for cancellation every 4 chunks
+                    # Abort if client disconnected.
+                    if chunk_count % 4 == 0 and await request.is_disconnected():
+                        abort_reason = "disconnected"
+                        logger.info(
+                            "Stream client disconnected for player %s (direct, gen=%s)",
+                            player_mac,
+                            token_generation,
+                        )
+                        return
+
+                    # Abort on cancellation (seek/track change).
                     if chunk_count % 4 == 0 and cancel_token and cancel_token.cancelled:
-                        logger.info("Stream cancelled for player %s (direct)", player_mac)
-                        break
+                        abort_reason = "cancelled"
+                        logger.info(
+                            "Stream cancelled for player %s (direct, gen=%s)",
+                            player_mac,
+                            token_generation,
+                        )
+                        return
 
                     read_size = min(chunk_size, remaining)
                     chunk = f.read(read_size)
@@ -223,14 +358,33 @@ async def _stream_direct(
 
                     yield chunk
                     remaining -= len(chunk)
+                    bytes_sent += len(chunk)
                     chunk_count += 1
 
                     # Clear byte offset after first chunk
                     if chunk_count == 1 and forced_offset is not None:
                         _streaming_server.clear_byte_offset(player_mac)
 
+        except asyncio.CancelledError:
+            abort_reason = abort_reason or "cancelled_error"
+            raise
         except Exception as e:
+            abort_reason = abort_reason or "error"
             logger.exception("Streaming error for %s: %s", file_path, e)
+        finally:
+            elapsed = time.time() - started_at
+            logger.info(
+                "Direct stream finished player=%s gen=%s reason=%s chunks=%d bytes=%d elapsed=%.3fs file=%s range=%s-%s",
+                player_mac,
+                token_generation,
+                abort_reason or "eof",
+                chunk_count,
+                bytes_sent,
+                elapsed,
+                file_path.name,
+                start_byte,
+                end_byte,
+            )
 
     # Determine response status and headers
     if start_byte > 0 or end_byte < file_size - 1:

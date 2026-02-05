@@ -163,6 +163,45 @@ class ArtworkManager:
 
         return None
 
+    async def get_blurhash_if_cached(self, track_path: str) -> Optional[str]:
+        """
+        Fast path: return BlurHash ONLY if it's already cached.
+
+        This must be cheap and must NOT trigger artwork extraction or BlurHash
+        generation. It exists to keep latency-sensitive endpoints (e.g. JSON-RPC
+        `status`) responsive under load and during seeks.
+
+        Returns:
+            Cached BlurHash string or None if not available.
+        """
+        if not self._blurhash_available:
+            return None
+
+        path = Path(track_path)
+        if not path.exists():
+            return None
+
+        try:
+            stat = path.stat()
+            mtime_ns = stat.st_mtime_ns
+            size = stat.st_size
+        except OSError as e:
+            logger.warning("Failed to stat %s: %s", path, e)
+            return None
+
+        cache_key = self._compute_cache_key(path, mtime_ns, size)
+        blurhash_file = self.cache_dir / f"{cache_key}.blurhash"
+
+        if not blurhash_file.exists():
+            return None
+
+        try:
+            blurhash_str = await asyncio.to_thread(blurhash_file.read_text)
+            return blurhash_str.strip()
+        except Exception as e:
+            logger.debug("Failed to read BlurHash cache for %s: %s", path, e)
+            return None
+
     async def get_blurhash(self, track_path: str) -> Optional[str]:
         """
         Get BlurHash for a track's artwork.

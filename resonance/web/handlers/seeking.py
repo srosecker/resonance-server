@@ -8,14 +8,27 @@ Handles time/position control commands:
 
 Direct-stream seeking uses byte offset heuristics for MP3/FLAC/OGG.
 Transcoded seeking uses faad's -j/-e parameters for M4B/M4A.
+
+This module integrates with SeekCoordinator for:
+- Latest-wins semantics (only the most recent seek executes)
+- Coalescing of rapid seek requests during user scrubbing
+- Safe subprocess termination to prevent asyncio race conditions
+
+IMPORTANT (LMS-compat / Race protection):
+Seeking is a user-initiated manual action. Any pending/deferred "track finished"
+timers (e.g. from early STMd deferral) must be cancelled/ignored, otherwise a
+late deferred track-finished can incorrectly auto-advance the playlist to the
+next track right after a seek.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from pathlib import Path
 from typing import Any
 
+from resonance.streaming.seek_coordinator import get_seek_coordinator
 from resonance.web.handlers import CommandContext
 
 logger = logging.getLogger(__name__)
@@ -46,6 +59,17 @@ async def cmd_time(
     - time <seconds> : Seek to absolute position
     - time +<seconds> : Seek forward
     - time -<seconds> : Seek backward
+
+    Seeks are coordinated through SeekCoordinator for latest-wins semantics.
+
+    NOTE (LMS-style semantics):
+    This handler must be fast. Seeking can involve cancelling streams, stopping/flushing,
+    restarting transcode pipelines, etc. Waiting for the full seek execution here can
+    cause JSON-RPC timeouts on clients.
+
+    Therefore, we schedule the coordinated seek asynchronously ("fire-and-forget") and
+    immediately acknowledge the target time. Clients will observe the seek via polling
+    (`status`) and/or subsequent STAT updates.
     """
     if ctx.player_id == "-":
         return {"_time": 0}
@@ -92,8 +116,23 @@ async def cmd_time(
                 # Clamp to duration minus 1 second to avoid EOF issues
                 target_time = min(target_time, max(0, duration - 1.0))
 
-    # Perform the seek
-    await perform_seek(ctx, player, target_time)
+    # Use SeekCoordinator for latest-wins semantics
+    coordinator = get_seek_coordinator()
+
+    async def seek_executor(seek_target: float) -> None:
+        await _execute_seek_internal(ctx, player, seek_target)
+
+    async def run_seek() -> None:
+        try:
+            await coordinator.seek(ctx.player_id, target_time, seek_executor)
+        except Exception:
+            logger.exception(
+                "Background seek failed for player %s (target=%.3fs)",
+                ctx.player_id,
+                target_time,
+            )
+
+    asyncio.create_task(run_seek())
 
     return {"_time": target_time}
 
@@ -104,13 +143,71 @@ async def perform_seek(
     target_seconds: float,
 ) -> None:
     """
-    Execute a seek operation.
+    Execute a seek operation through the SeekCoordinator.
+
+    This is the public API for seek operations. It uses the SeekCoordinator
+    for latest-wins semantics, ensuring that rapid seeks don't overwhelm
+    the server with transcode pipeline restarts.
 
     For transcoded formats (M4B/M4A), uses time-based seeking via faad -j/-e.
     For direct-stream formats (MP3/FLAC/OGG), uses byte offset seeking.
     """
+    coordinator = get_seek_coordinator()
+
+    async def seek_executor(seek_target: float) -> None:
+        await _execute_seek_internal(ctx, player, seek_target)
+
+    await coordinator.seek(ctx.player_id, target_seconds, seek_executor)
+
+
+async def _execute_seek_internal(
+    ctx: CommandContext,
+    player: Any,
+    target_seconds: float,
+) -> None:
+    """
+    Internal seek execution logic.
+
+    This is called by the SeekCoordinator after coalescing and
+    generation checks. It performs the actual seek work:
+    1. Cancel current stream
+    2. Stop and flush player
+    3. Queue new stream with seek position
+    4. Start playback from new position
+
+    This function should NOT be called directly - use perform_seek() instead.
+    """
     if ctx.playlist_manager is None or ctx.streaming_server is None:
         return
+
+    # ---------------------------------------------------------------------
+    # Race protection: seeking is a manual user action.
+    #
+    # If the protocol layer scheduled a deferred "track finished" (e.g. STMd
+    # deferral because output buffer is still playing), that task MUST NOT be
+    # allowed to fire after a seek, otherwise it can incorrectly advance the
+    # playlist to track +1.
+    #
+    # We therefore:
+    # 1) cancel any pending deferred track-finished task for this player (best-effort)
+    # 2) suppress track-finished handling briefly (best-effort)
+    # ---------------------------------------------------------------------
+    try:
+        slimproto = getattr(ctx, "slimproto", None)
+        if slimproto is not None:
+            cancel_fn = getattr(slimproto, "cancel_deferred_track_finished", None)
+            if callable(cancel_fn):
+                cancel_fn(ctx.player_id)
+
+            # Suppress track-finished handling for a short window
+            server = getattr(slimproto, "_resonance_server", None)
+            if server is not None:
+                suppress_fn = getattr(server, "suppress_track_finished_for_player", None)
+                if callable(suppress_fn):
+                    suppress_fn(ctx.player_id, seconds=2.0)
+    except Exception:
+        # Defensive: seek must still work even if suppression hooks are unavailable
+        pass
 
     playlist = ctx.playlist_manager.get(ctx.player_id)
     if playlist is None:
@@ -123,7 +220,7 @@ async def perform_seek(
     file_path = Path(current_track.path)
     suffix = file_path.suffix.lower()
 
-    # Cancel existing stream
+    # Cancel existing stream (this also increments generation in StreamingServer)
     ctx.streaming_server.cancel_stream(ctx.player_id)
 
     # Stop and flush player

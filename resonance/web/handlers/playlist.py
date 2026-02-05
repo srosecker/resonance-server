@@ -9,11 +9,22 @@ Handles playlist management commands:
 - playlist clear: Clear the playlist
 - playlist move: Move a track to a new position
 - playlist index: Jump to a track by index
-- playlist shuffle: Toggle or set shuffle mode
-- playlist repeat: Set repeat mode (off/one/all)
+- playlist shuffle: Toggle shuffle mode
+- playlist repeat: Set repeat mode
 - playlist tracks: Get playlist track info
 - playlist loadtracks: Load tracks into playlist
 - playlist jump: Relative navigation (+1/-1 for next/previous)
+
+NOTE (LMS compatibility):
+LMS `playlist loadtracks` does more than just populate the playlist:
+- stop+clear the current playlist
+- add tracks
+- reshuffle (if needed)
+- then `playlist jump` to the requested index (defaults to 0), which starts playback
+
+Resonance mirrors the "stop+clear then jump" behavior to avoid races where the client
+loads tracks and then issues separate commands (index/play) while late track-finished
+events or old streams are still in flight.
 """
 
 from __future__ import annotations
@@ -218,6 +229,12 @@ async def _playlist_clear(
     """
     if ctx.player_id == "-":
         return {"error": "No player specified"}
+
+    # Suppress track-finished for a short window to prevent race conditions
+    if hasattr(ctx.slimproto, "_resonance_server") and hasattr(
+        ctx.slimproto._resonance_server, "suppress_track_finished_for_player"
+    ):
+        ctx.slimproto._resonance_server.suppress_track_finished_for_player(ctx.player_id, seconds=6.0)
 
     if ctx.playlist_manager is None:
         return {"error": "Playlist manager not available"}
@@ -440,17 +457,35 @@ async def _playlist_loadtracks(
     """
     Handle 'playlist loadtracks' - load tracks into playlist.
 
-    Clears the existing playlist and loads new tracks.
+    LMS compatibility:
+    - stop+clear current playlist/stream first
+    - load tracks
+    - then jump to index 0 to start playback (like LMS does via playlist jump)
     """
     if ctx.player_id == "-":
         return {"error": "No player specified"}
 
+    # Suppress track-finished for a short window to prevent race conditions
+    if hasattr(ctx.slimproto, "_resonance_server") and hasattr(
+        ctx.slimproto._resonance_server, "suppress_track_finished_for_player"
+    ):
+        ctx.slimproto._resonance_server.suppress_track_finished_for_player(ctx.player_id, seconds=6.0)
+
     if ctx.playlist_manager is None:
         return {"error": "Playlist manager not available"}
 
-    # Clear existing playlist
+    # Stop + clear (LMS-like): prevents buffered/stale audio and reduces races.
     playlist = ctx.playlist_manager.get(ctx.player_id)
     playlist.clear()
+
+    if ctx.streaming_server is not None:
+        ctx.streaming_server.cancel_stream(ctx.player_id)
+
+    player = await ctx.player_registry.get_by_mac(ctx.player_id)
+    if player is not None:
+        await player.stop()
+        if hasattr(player, "flush"):
+            await player.flush()
 
     # Parse track criteria from params
     tagged_params = parse_tagged_params(params)
@@ -461,12 +496,13 @@ async def _playlist_loadtracks(
     db = ctx.music_library._db
 
     # Load tracks based on criteria
+    # Use "album" order (disc_no, track_no) for proper album playback order
     if album_id is not None:
-        rows = await db.list_tracks_by_album(album_id=album_id, offset=0, limit=1000)
+        rows = await db.list_tracks_by_album(album_id=album_id, offset=0, limit=1000, order_by="album")
     elif artist_id is not None:
-        rows = await db.list_tracks_by_artist(artist_id=artist_id, offset=0, limit=1000)
+        rows = await db.list_tracks_by_artist(artist_id=artist_id, offset=0, limit=1000, order_by="album")
     elif genre_id is not None:
-        rows = await db.list_tracks_by_genre_id(genre_id=genre_id, offset=0, limit=1000)
+        rows = await db.list_tracks_by_genre_id(genre_id=genre_id, offset=0, limit=1000, order_by="title")
     else:
         return {"error": "No track criteria specified"}
 
@@ -490,6 +526,12 @@ async def _playlist_loadtracks(
             compilation=row_dict.get("compilation", 0),
         )
         playlist.add(track)
+
+    # Start playback deterministically at the first track (LMS does this via playlist jump).
+    if player is not None and len(playlist) > 0:
+        track0 = playlist.play(0)
+        if track0 is not None:
+            await _start_track_stream(ctx, player, track0)
 
     return {"count": len(playlist)}
 
@@ -561,10 +603,10 @@ async def _start_track_stream(
         return
 
     # Suppress track-finished for a short window to prevent race conditions
-    if hasattr(ctx.slimproto, "_server") and hasattr(
-        ctx.slimproto._server, "suppress_track_finished_for_player"
+    if hasattr(ctx.slimproto, "_resonance_server") and hasattr(
+        ctx.slimproto._resonance_server, "suppress_track_finished_for_player"
     ):
-        ctx.slimproto._server.suppress_track_finished_for_player(ctx.player_id, seconds=6.0)
+        ctx.slimproto._resonance_server.suppress_track_finished_for_player(ctx.player_id, seconds=6.0)
 
     # Cancel any existing stream
     ctx.streaming_server.cancel_stream(ctx.player_id)
