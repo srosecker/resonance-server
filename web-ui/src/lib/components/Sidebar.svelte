@@ -4,7 +4,6 @@
     Library,
     Search,
     Settings,
-    Music2,
     ListMusic,
     Disc3,
     Users,
@@ -69,13 +68,91 @@
   >
     <div class="flex items-center gap-3">
       <div
-        class="w-8 h-8 rounded-lg flex items-center justify-center color-transition dynamic-gradient"
-        style="background: linear-gradient(135deg, var(--dynamic-accent) 0%, var(--dynamic-accent-light) 100%);"
+        class="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center"
       >
-        <Music2 size={20} class="text-crust" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 48 48"
+          class="w-10 h-10"
+        >
+          <defs>
+            <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#22d3ee" />
+              <stop offset="100%" stop-color="#60a5fa" />
+            </linearGradient>
+            <radialGradient id="shine" cx="30%" cy="30%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.15" />
+              <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+          <!-- Vinyl record body -->
+          <circle cx="24" cy="24" r="22" fill="#3b3b4f" />
+          <circle cx="24" cy="24" r="22" fill="url(#shine)" />
+          <!-- Grooves -->
+          <circle
+            cx="24"
+            cy="24"
+            r="18"
+            fill="none"
+            stroke="url(#accentGrad)"
+            stroke-width="1"
+            opacity="0.25"
+          />
+          <circle
+            cx="24"
+            cy="24"
+            r="14"
+            fill="none"
+            stroke="url(#accentGrad)"
+            stroke-width="1"
+            opacity="0.35"
+          />
+          <circle
+            cx="24"
+            cy="24"
+            r="10"
+            fill="none"
+            stroke="url(#accentGrad)"
+            stroke-width="1"
+            opacity="0.25"
+          />
+          <!-- Label -->
+          <circle
+            cx="24"
+            cy="24"
+            r="7"
+            fill="#2a2a3c"
+            stroke="url(#accentGrad)"
+            stroke-width="1.5"
+          />
+          <!-- Spindle -->
+          <circle
+            cx="24"
+            cy="24"
+            r="2"
+            fill="#1e1e2e"
+            stroke="url(#accentGrad)"
+            stroke-width="1.2"
+          />
+          <!-- Outer ring -->
+          <circle
+            cx="24"
+            cy="24"
+            r="22"
+            fill="none"
+            stroke="url(#accentGrad)"
+            stroke-width="1"
+            opacity="0.5"
+          />
+        </svg>
       </div>
       <div>
-        <h1 class="text-lg font-bold text-gradient select-none">Resonance</h1>
+        <h1
+          class="text-lg font-bold text-gradient select-none"
+          style="font-family: 'Orbitron', sans-serif;"
+        >
+          Resonance
+        </h1>
       </div>
     </div>
     <!-- Mobile Close Button -->

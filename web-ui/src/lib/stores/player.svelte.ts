@@ -8,6 +8,11 @@
  * - Current track info
  * - Playlist
  * - Smooth elapsed time interpolation between server polls
+ *
+ * Improved with robust smoothing logic from Cadence (Flutter app):
+ * - Slew-rate limiting to prevent jitter
+ * - Monotonic clamp while playing
+ * - Hard reset on track change or large jumps
  */
 
 import { api, type Player, type PlayerStatus, type Track } from "$lib/api";
@@ -52,67 +57,117 @@ let pollInterval: ReturnType<typeof setInterval> | null = null;
 let playerPollInterval: ReturnType<typeof setInterval> | null = null;
 
 // =============================================================================
-// Elapsed Time Interpolation
+// Elapsed Time Interpolation (Cadence-style robust smoothing)
 // =============================================================================
 //
-// Note on time values:
-// - `status.time` = raw server value, updated every ~1s poll (not used for display)
-// - `serverTime` = our local copy of server time, used as interpolation basis
-// - `interpolatedTime` = smoothly updated value for UI display (60fps)
+// Architecture:
+// - `anchorElapsed` = server's elapsed time when we last received it
+// - `anchorTimestamp` = performance.now() when we received anchorElapsed
+// - `displayElapsed` = smoothed value for UI (updated every frame)
 //
-// This separation allows smooth progress bar updates between server polls
-// while staying in sync with the authoritative server time.
+// The smoothing uses slew-rate limiting to avoid jitter while still
+// tracking the server's authoritative time.
 
-// Last known server time and when we received it
-let serverTime = $state(0);
-let serverTimeReceivedAt = $state(0);
+// Anchor from server ("truth") + timestamp when received
+let anchorElapsed = $state(0);
+let anchorTimestamp = $state(0);
 
-// Interpolated elapsed time (updates every frame when playing)
-let interpolatedTime = $state(0);
+// Smoothed display value (what the UI sees)
+let displayElapsed = $state(0);
+
+// Last track ID for detecting track changes
+let lastTrackId = $state<number | null>(null);
 
 // Animation frame handle
 let animationFrameId: number | null = null;
 
-// Easing factor: how quickly we correct drift toward server time
-// Lower = smoother but slower to correct, higher = snappier but can jitter
-const DRIFT_EASING_FACTOR = 0.08;
+// Slew-rate limits (per ~16ms frame at 60fps)
+// These values are tuned to match Cadence's 100ms tick with maxForwardStep=0.12, maxBackwardStep=0.06
+// Converted to per-frame: 0.12/6 ≈ 0.02 forward, 0.06/6 ≈ 0.01 backward
+const MAX_FORWARD_STEP_PER_FRAME = 0.025; // Allow 1.5x speed forward (catch up)
+const MAX_BACKWARD_STEP_PER_FRAME = 0.012; // Allow 0.75x speed backward (rare correction)
 
-// Maximum allowed drift before we snap instead of ease (seconds)
-const MAX_DRIFT_BEFORE_SNAP = 3.0;
+// Threshold for "large jump" detection (seek, track change)
+const JUMP_THRESHOLD = 1.5;
 
 // Pending volume - when set, prevents polling from overwriting volume
 let pendingVolume: number | null = null;
 let pendingVolumeTimeout: ReturnType<typeof setTimeout> | null = null;
 
+// Pending seek - when set, prevents polling from overwriting elapsed
+let pendingSeek = $state(false);
+let pendingSeekTimeout: ReturnType<typeof setTimeout> | null = null;
+
 /**
- * Update interpolated time based on server time + local elapsed
+ * Reset smoothing to a specific value (used on seek, track change)
  */
-function updateInterpolatedTime(): void {
-  if (status.mode === "play" && serverTimeReceivedAt > 0) {
-    const now = performance.now();
-    const localElapsed = (now - serverTimeReceivedAt) / 1000;
-    const newTime = serverTime + localElapsed;
+function resetSmoothing(toElapsed: number): void {
+  anchorElapsed = toElapsed;
+  anchorTimestamp = performance.now();
+  displayElapsed = toElapsed;
+}
 
-    // Clamp to duration (with small buffer to avoid flicker at end)
-    const clampedTime = Math.min(newTime, Math.max(0, status.duration - 0.1));
+/**
+ * Update display elapsed based on anchor + local time progression
+ * Uses slew-rate limiting for smooth transitions
+ */
+function updateDisplayElapsed(): void {
+  const isCurrentlyPlaying =
+    status.mode === "play" || status.mode === "playing";
 
-    // Track-end detection: if we're at/past duration, stop interpolating
-    // The next server poll will tell us if track changed
-    if (status.duration > 0 && newTime >= status.duration) {
-      interpolatedTime = status.duration;
-      // Don't continue animation - wait for server to tell us about next track
-      return;
+  if (!isCurrentlyPlaying || anchorTimestamp === 0) {
+    // When paused/stopped, don't predict forward
+    // But keep animation loop running to catch state changes
+    if (isCurrentlyPlaying) {
+      animationFrameId = requestAnimationFrame(updateDisplayElapsed);
     }
+    return;
+  }
 
-    interpolatedTime = clampedTime;
+  const duration = status.duration || 0;
+  if (duration === 0) {
+    animationFrameId = requestAnimationFrame(updateDisplayElapsed);
+    return;
+  }
+
+  const now = performance.now();
+  const dt = (now - anchorTimestamp) / 1000;
+
+  // Predicted position based on anchor + elapsed time
+  const predicted = Math.min(anchorElapsed + dt, duration);
+
+  const current = displayElapsed;
+
+  // Slew-rate limiting: move towards predicted with limited speed
+  let next: number;
+  if (predicted >= current) {
+    // Moving forward (normal playback or catching up)
+    next = current + Math.min(MAX_FORWARD_STEP_PER_FRAME, predicted - current);
   } else {
-    interpolatedTime = serverTime;
+    // Moving backward (rare, only if server corrects us)
+    const back = Math.min(MAX_BACKWARD_STEP_PER_FRAME, current - predicted);
+    next = current - back;
   }
 
-  // Continue animation loop if playing
-  if (status.mode === "play") {
-    animationFrameId = requestAnimationFrame(updateInterpolatedTime);
+  // Monotonic clamp while playing: prevent tiny backward jitters
+  if (next < current && current - next < 0.1) {
+    next = current;
   }
+
+  // Clamp to valid range
+  next = Math.max(0, Math.min(next, duration));
+
+  // Track-end detection: if we're at/past duration, stop interpolating
+  if (duration > 0 && next >= duration - 0.05) {
+    displayElapsed = duration;
+    // Don't continue animation - wait for server to tell us about next track
+    return;
+  }
+
+  displayElapsed = next;
+
+  // Continue animation loop
+  animationFrameId = requestAnimationFrame(updateDisplayElapsed);
 }
 
 /**
@@ -120,8 +175,10 @@ function updateInterpolatedTime(): void {
  */
 function startInterpolation(): void {
   stopInterpolation();
-  if (status.mode === "play") {
-    animationFrameId = requestAnimationFrame(updateInterpolatedTime);
+  const isCurrentlyPlaying =
+    status.mode === "play" || status.mode === "playing";
+  if (isCurrentlyPlaying) {
+    animationFrameId = requestAnimationFrame(updateDisplayElapsed);
   }
 }
 
@@ -137,24 +194,32 @@ function stopInterpolation(): void {
 
 /**
  * Sync server time - called when we receive a status update
- * Uses easing to smoothly correct drift instead of hard snapping
+ * Detects track changes and large jumps for hard reset
  */
-function syncServerTime(newTime: number): void {
-  const oldInterpolated = interpolatedTime;
-  const drift = Math.abs(newTime - oldInterpolated);
-
-  // If drift is too large (seek, track change, etc.), snap immediately
-  if (drift > MAX_DRIFT_BEFORE_SNAP || serverTimeReceivedAt === 0) {
-    serverTime = newTime;
-    interpolatedTime = newTime;
-  } else {
-    // Ease toward server time to correct small drifts smoothly
-    serverTime = newTime;
-    interpolatedTime =
-      oldInterpolated + (newTime - oldInterpolated) * DRIFT_EASING_FACTOR;
+function syncServerTime(newTime: number, trackId: number | null = null): void {
+  // Detect track change
+  const isTrackChange = trackId !== null && trackId !== lastTrackId;
+  if (trackId !== null) {
+    lastTrackId = trackId;
   }
 
-  serverTimeReceivedAt = performance.now();
+  // Detect large jump (seek from server or other cause)
+  const jump = Math.abs(newTime - displayElapsed);
+
+  // Hard reset conditions:
+  // - Track changed
+  // - Large jump detected
+  // - First sync (anchorTimestamp === 0)
+  const shouldHardReset =
+    isTrackChange || jump > JUMP_THRESHOLD || anchorTimestamp === 0;
+
+  if (shouldHardReset) {
+    resetSmoothing(newTime);
+  } else {
+    // Soft update: just update anchor, let slew-rate limiting handle convergence
+    anchorElapsed = newTime;
+    anchorTimestamp = performance.now();
+  }
 }
 
 // =============================================================================
@@ -167,10 +232,10 @@ const isPaused = $derived(status.mode === "pause" || status.mode === "paused");
 const isStopped = $derived(status.mode === "stop" || status.mode === "stopped");
 const hasTrack = $derived(currentTrack !== null);
 
-// Use interpolated time for smooth progress
-const elapsedTime = $derived(interpolatedTime);
+// Use display elapsed for smooth progress (from Cadence-style smoothing)
+const elapsedTime = $derived(displayElapsed);
 const progress = $derived(
-  status.duration > 0 ? (interpolatedTime / status.duration) * 100 : 0,
+  status.duration > 0 ? (displayElapsed / status.duration) * 100 : 0,
 );
 
 const selectedPlayer = $derived(
@@ -208,6 +273,13 @@ async function loadStatus(): Promise<void> {
     console.log("[loadStatus] SKIPPED - pendingAction is true");
     return;
   }
+
+  // Skip polling while a seek is pending
+  if (pendingSeek) {
+    console.log("[loadStatus] SKIPPED - pendingSeek is true");
+    return;
+  }
+
   console.log("[loadStatus] Fetching status...");
 
   try {
@@ -217,9 +289,13 @@ async function loadStatus(): Promise<void> {
     const nowPlaying =
       newStatus.mode === "play" || newStatus.mode === "playing";
 
-    // Sync server time BEFORE updating status for consistency
-    // This ensures interpolation uses the correct basis before mode changes
-    syncServerTime(newStatus.time || 0);
+    // Check if track changed - if so, load BlurHash for new track
+    const newTrack = newStatus.currentTrack ?? null;
+    const trackChanged = newTrack?.id !== currentTrack?.id;
+    const trackId = newTrack?.id ?? null;
+
+    // Sync server time with track change detection
+    syncServerTime(newStatus.time || 0, trackId);
 
     // Preserve pending volume if set (user is adjusting volume)
     const preservedVolume =
@@ -227,10 +303,6 @@ async function loadStatus(): Promise<void> {
 
     status = newStatus;
     status.volume = preservedVolume;
-
-    // Check if track changed - if so, load BlurHash for new track
-    const newTrack = newStatus.currentTrack ?? null;
-    const trackChanged = newTrack?.id !== currentTrack?.id;
 
     currentTrack = newTrack;
     isConnected = true;
@@ -283,14 +355,12 @@ async function loadPlaylist(): Promise<void> {
 function selectPlayer(playerId: string): void {
   selectedPlayerId = playerId;
   stopInterpolation();
+  resetSmoothing(0);
+  lastTrackId = null;
   loadStatus();
   loadPlaylist();
 }
 
-/**
- * Set pending action flag to prevent polling from overwriting UI state.
- * Automatically clears after a short timeout.
- */
 /**
  * Set pending action flag to prevent polling from overwriting UI state.
  * Automatically clears after a timeout.
@@ -315,14 +385,38 @@ function setPendingAction(timeoutMs = 500): void {
   }, timeoutMs);
 }
 
+/**
+ * Set pending seek flag to prevent polling from overwriting elapsed time.
+ * Automatically clears after a timeout.
+ */
+function setPendingSeek(timeoutMs = 1000): void {
+  console.log(
+    "[setPendingSeek] Setting pendingSeek = true, timeout =",
+    timeoutMs,
+  );
+  pendingSeek = true;
+  if (pendingSeekTimeout) {
+    clearTimeout(pendingSeekTimeout);
+  }
+  pendingSeekTimeout = setTimeout(() => {
+    console.log("[setPendingSeek] Timeout expired, pendingSeek = false");
+    pendingSeek = false;
+    pendingSeekTimeout = null;
+  }, timeoutMs);
+}
+
 async function play(): Promise<void> {
   if (!selectedPlayerId) return;
+
   console.log("[play] Called, setting pendingAction");
   setPendingAction();
+
+  // Optimistic UI update
   status.mode = "play";
-  // Sync from current interpolated time to ensure consistent basis
-  syncServerTime(interpolatedTime);
+  resetSmoothing(displayElapsed);
   startInterpolation();
+
+  // Server is now LMS-like: 'play' from STOP with a non-empty queue starts the current playlist item.
   console.log("[play] Sending API play request...");
   await api.play(selectedPlayerId);
   console.log("[play] API play request completed");
@@ -334,7 +428,8 @@ async function pause(): Promise<void> {
   setPendingAction();
   status.mode = "pause";
   stopInterpolation();
-  serverTime = interpolatedTime;
+  // Keep current display elapsed as anchor
+  anchorElapsed = displayElapsed;
   console.log("[pause] Sending API pause request...");
   await api.pause(selectedPlayerId);
   console.log("[pause] API pause request completed");
@@ -362,7 +457,7 @@ async function next(): Promise<void> {
   if (!selectedPlayerId) return;
   setPendingAction();
   stopInterpolation();
-  syncServerTime(0);
+  resetSmoothing(0);
   await api.next(selectedPlayerId);
   // Wait a bit for the server to process, then fetch new status
   setTimeout(() => {
@@ -375,7 +470,7 @@ async function previous(): Promise<void> {
   if (!selectedPlayerId) return;
   setPendingAction();
   stopInterpolation();
-  syncServerTime(0);
+  resetSmoothing(0);
   await api.previous(selectedPlayerId);
   // Wait a bit for the server to process, then fetch new status
   setTimeout(() => {
@@ -388,7 +483,7 @@ async function jumpToIndex(index: number, track?: Track): Promise<void> {
   if (!selectedPlayerId) return;
   setPendingAction();
   stopInterpolation();
-  syncServerTime(0);
+  resetSmoothing(0);
 
   // Optimistic update: set currentTrack immediately if provided
   if (track) {
@@ -409,12 +504,25 @@ async function jumpToIndex(index: number, track?: Track): Promise<void> {
 
 async function seek(seconds: number): Promise<void> {
   if (!selectedPlayerId) return;
-  await api.seek(selectedPlayerId, seconds);
-  // Immediately update interpolated time for responsiveness
-  syncServerTime(seconds);
-  if (status.mode === "play") {
+
+  console.log("[seek] Called, target:", seconds);
+
+  // Set pending seek to prevent polling from reverting our optimistic update
+  setPendingSeek(1500);
+
+  // Immediately update display elapsed for responsiveness (like Cadence)
+  resetSmoothing(seconds);
+
+  // Restart interpolation if playing
+  const isCurrentlyPlaying =
+    status.mode === "play" || status.mode === "playing";
+  if (isCurrentlyPlaying) {
     startInterpolation();
   }
+
+  console.log("[seek] Sending API seek request...");
+  await api.seek(selectedPlayerId, seconds);
+  console.log("[seek] API seek request completed");
 }
 
 async function setVolume(volume: number): Promise<void> {
@@ -489,7 +597,7 @@ async function playTrack(track: Track): Promise<void> {
   status.mode = "play";
   status.duration = track.duration || 0;
   // Reset time and start interpolation
-  syncServerTime(0);
+  resetSmoothing(0);
   startInterpolation();
 
   console.log("[playerStore] playTrack: calling api.playTrack...");
@@ -522,7 +630,7 @@ async function clearPlaylist(): Promise<void> {
   // Prevent the polling loop from briefly re-hydrating stale "currentTrack" / mode.
   setPendingAction(1000);
   stopInterpolation();
-  syncServerTime(0);
+  resetSmoothing(0);
 
   status.mode = "stop";
   status.time = 0;
@@ -582,7 +690,9 @@ async function initialize(): Promise<void> {
   await loadPlaylist();
   startPolling();
   // Start interpolation if already playing
-  if (status.mode === "play") {
+  const isCurrentlyPlaying =
+    status.mode === "play" || status.mode === "playing";
+  if (isCurrentlyPlaying) {
     startInterpolation();
   }
 }

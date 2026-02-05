@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#06b6d4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="56" fill="#1e293b"/>
+
+  <!-- Letter R -->
+  <path d="M35 85 L35 35 L55 35 Q72 35 72 50 Q72 62 58 65 L75 85 L62 85 L47 65 L47 85 Z M47 45 L47 57 L55 57 Q62 57 62 51 Q62 45 55 45 Z"
+        fill="url(#waveGradient)"/>
+
+  <!-- Sound wave arcs -->
+  <path d="M78 45 Q88 60 78 75"
+        stroke="url(#waveGradient)" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M88 38 Q102 60 88 82"
+        stroke="url(#waveGradient)" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.7"/>
+</svg>

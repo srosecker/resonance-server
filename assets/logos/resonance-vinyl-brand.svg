@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <!-- Brand gradient (Resonance cyan -> blue) -->
+    <linearGradient id="vinylGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+
+    <!-- Subtle shine on the record -->
+    <radialGradient id="vinylShine" cx="35%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Soft outer glow for the signature waveform -->
+    <filter id="waveGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="1.6" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="
+        1 0 0 0 0
+        0 1 0 0 0
+        0 0 1 0 0
+        0 0 0 0.28 0" result="soft"/>
+      <feMerge>
+        <feMergeNode in="soft"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background (rounded square) -->
+  <rect width="400" height="400" rx="24" fill="#1e1e2e"/>
+
+  <!-- Vinyl record -->
+  <circle cx="200" cy="200" r="145" fill="#11111b"/>
+  <circle cx="200" cy="200" r="145" fill="url(#vinylShine)"/>
+
+  <!-- Grooves (kept subtle to avoid noise at smaller sizes) -->
+  <circle cx="200" cy="200" r="132" fill="none" stroke="#06b6d4" stroke-width="0.5" opacity="0.07"/>
+  <circle cx="200" cy="200" r="120" fill="none" stroke="#06b6d4" stroke-width="0.5" opacity="0.09"/>
+  <circle cx="200" cy="200" r="108" fill="none" stroke="#06b6d4" stroke-width="0.5" opacity="0.11"/>
+  <circle cx="200" cy="200" r="96"  fill="none" stroke="#06b6d4" stroke-width="0.5" opacity="0.10"/>
+  <circle cx="200" cy="200" r="84"  fill="none" stroke="#06b6d4" stroke-width="0.5" opacity="0.08"/>
+  <circle cx="200" cy="200" r="72"  fill="none" stroke="#06b6d4" stroke-width="0.5" opacity="0.10"/>
+
+  <!-- Signature waveform (single, distinctive stroke; no extra side streaks; no center equalizer) -->
+  <path d="
+    M 200 55
+    Q 235 72 265 95
+    Q 305 125 322 155
+    Q 340 190 345 205
+    Q 345 232 330 262
+    Q 310 295 280 315
+    Q 250 335 220 342
+    Q 200 346 180 342
+    Q 150 335 120 315
+    Q 90 295 70 262
+    Q 58 232 55 205
+  "
+    fill="none"
+    stroke="url(#vinylGrad)"
+    stroke-width="3.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.62"
+    filter="url(#waveGlow)"/>
+
+  <!-- Label area -->
+  <circle cx="200" cy="200" r="45" fill="#181825" stroke="url(#vinylGrad)" stroke-width="1.6" opacity="0.65"/>
+
+  <!-- Center spindle -->
+  <circle cx="200" cy="200" r="5" fill="#1e1e2e" stroke="url(#vinylGrad)" stroke-width="1.6"/>
+</svg>

@@ -488,6 +488,7 @@
               {tracks}
               showAlbum={false}
               highlightId={playerStore.currentTrack?.id}
+              albumId={uiStore.selectedAlbum?.id}
             />
           {:else if uiStore.currentView === "search"}
             <!-- Search Results -->

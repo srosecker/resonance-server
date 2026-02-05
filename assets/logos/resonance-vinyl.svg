@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="vinylGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+    <radialGradient id="vinylShine" cx="35%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="400" height="400" rx="24" fill="#1e1e2e"/>
+
+  <!-- Vinyl record -->
+  <circle cx="200" cy="200" r="145" fill="#11111b"/>
+  <circle cx="200" cy="200" r="145" fill="url(#vinylShine)"/>
+
+  <!-- Grooves -->
+  <circle cx="200" cy="200" r="135" fill="none" stroke="#06b6d4" stroke-width="0.4" opacity="0.08"/>
+  <circle cx="200" cy="200" r="125" fill="none" stroke="#06b6d4" stroke-width="0.4" opacity="0.1"/>
+  <circle cx="200" cy="200" r="115" fill="none" stroke="#06b6d4" stroke-width="0.4" opacity="0.12"/>
+  <circle cx="200" cy="200" r="105" fill="none" stroke="#06b6d4" stroke-width="0.4" opacity="0.14"/>
+  <circle cx="200" cy="200" r="95" fill="none" stroke="#06b6d4" stroke-width="0.4" opacity="0.1"/>
+  <circle cx="200" cy="200" r="85" fill="none" stroke="#06b6d4" stroke-width="0.4" opacity="0.08"/>
+  <circle cx="200" cy="200" r="75" fill="none" stroke="#06b6d4" stroke-width="0.4" opacity="0.12"/>
+  <circle cx="200" cy="200" r="65" fill="none" stroke="#06b6d4" stroke-width="0.4" opacity="0.1"/>
+
+  <!-- Label area -->
+  <circle cx="200" cy="200" r="45" fill="#181825" stroke="url(#vinylGrad)" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Center spindle -->
+  <circle cx="200" cy="200" r="5" fill="#1e1e2e" stroke="url(#vinylGrad)" stroke-width="1.5"/>
+</svg>

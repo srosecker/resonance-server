@@ -28,7 +28,10 @@ async def cmd_play(
     """
     Handle 'play' command.
 
-    Starts or resumes playback on the player.
+    LMS-like behavior:
+    - If the player is STOPPED and there is a non-empty playlist, start streaming
+      the current playlist item (queue playback).
+    - Otherwise, resume/unpause via player.play().
     """
     if ctx.player_id == "-":
         return {"error": "No player specified"}
@@ -37,8 +40,41 @@ async def cmd_play(
     if player is None:
         return {"error": "Player not found"}
 
-    await player.play()
+    # If we're stopped and have a playlist, start the current track stream explicitly.
+    try:
+        playlist = None
+        if ctx.playlist_manager is not None:
+            playlist = ctx.playlist_manager.get(ctx.player_id)
 
+        state_name = (
+            player.status.state.name
+            if hasattr(player, "status")
+            and hasattr(player.status, "state")
+            and hasattr(player.status.state, "name")
+            else "STOPPED"
+        )
+        is_stopped = state_name in ("STOPPED", "DISCONNECTED")
+
+        if playlist is not None and len(playlist) > 0 and is_stopped:
+            # Avoid top-level import to prevent circular imports
+            from resonance.web.handlers.playlist import _start_track_stream
+
+            track = playlist.play(playlist.current_index)
+            if track is not None:
+                logger.info(
+                    "[cmd_play] STOPPED -> starting stream from playlist",
+                    extra={
+                        "player_id": ctx.player_id,
+                        "index": playlist.current_index,
+                        "track_id": getattr(track, "id", None),
+                    },
+                )
+                await _start_track_stream(ctx, player, track)
+                return {}
+    except Exception:
+        logger.exception("[cmd_play] Failed to start from playlist, falling back to resume")
+
+    await player.play()
     return {}
 
 

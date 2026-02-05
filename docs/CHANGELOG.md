@@ -6,7 +6,53 @@ Alle wesentlichen Änderungen am Projekt werden hier dokumentiert.
 
 ## [Unreleased] — Phase 3 Abgeschlossen ✅
 
-**Stand:** 316/316 Tests bestanden | ~18.500 LOC Python | ~6.000 LOC Flutter
+**Stand:** 356/356 Tests bestanden | ~19.000 LOC Python | ~6.000 LOC Flutter
+
+### ✅ Play-from-STOP Fix + Web-UI UX (2026-02-06)
+
+**Problem:** Wenn der Player gestoppt war und Tracks in der Queue lagen, startete
+der `play`-Befehl nicht zuverlässig — Track wurde kurz angespielt, dann Abbruch.
+
+**Root Cause:** `cmd_play()` im Server machte nur `await player.play()` (Resume),
+aber startete **keinen Stream** aus der Playlist bei STOP-State.
+
+**Fix (LMS-like):**
+- `play` bei STOP + nicht-leere Queue → `playlist.play(current_index)` + `_start_track_stream()`
+- Fallback bei PLAYING/PAUSED → `player.play()` (Resume wie bisher)
+
+**Weitere Änderungen:**
+- Regression-Test hinzugefügt (356 Tests gesamt)
+- Web-UI: Album Action Bar mit **Play / Shuffle / Add to Queue** Buttons
+- Web-UI: **+** Button bei Tracks fügt einzelnen Track zur Queue hinzu
+- Web-UI: Workaround in `playerStore.play()` entfernt (Server ist jetzt korrekt)
+
+### ✅ Web-UI Verbesserungen: Cadence-Style Smoothing (2026-02-06)
+
+**Problem:** Progress-Bar im Web-UI war weniger flüssig als in Cadence (Flutter)
+
+**Lösung:** Cadence-Style Elapsed-Time-Interpolation portiert:
+
+1. **Slew-rate Limiting**
+   - Forward: max 0.025s pro Frame (1.5x Geschwindigkeit)
+   - Backward: max 0.012s pro Frame (nur bei Server-Korrektur)
+   - Verhindert Jitter und abrupte Sprünge
+
+2. **Monotonic Clamp**
+   - Verhindert kleine Rückwärts-Bewegungen (<0.1s)
+   - Sorgt für flüssige Vorwärtsbewegung
+
+3. **Track-Change-Detection**
+   - Erkennt Track-Wechsel und große Sprünge (>1.5s)
+   - Hard-Reset der Smoothing-State bei Erkennung
+
+4. **pendingSeek Flag**
+   - Verhindert Polling während Seek-Operationen
+   - Kein "Zurückspringen" nach Seek
+
+**Weitere Fixes:**
+- TypeScript-Typen für `playlist_loop` erweitert (`coverArt`, `artwork_url`)
+- `svelte.config.js`: `handleHttpError` für fehlendes favicon
+- Build erfolgreich, alle 355 Tests bestanden
 
 ### ✅ Behoben: Rapid Seeking Blocking (2026-02-05)
 

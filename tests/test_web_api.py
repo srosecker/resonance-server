@@ -21,9 +21,15 @@ Seeking notes:
 - Direct-stream seeking uses a server-side byte offset heuristic for MP3/FLAC/OGG.
 - For MP3, we try to skip ID3v2 tag bytes (so early seeks don't land in metadata).
 - If duration is unknown, we fall back to a conservative bytes/sec estimate.
+
+Playback notes:
+- LMS-like behavior: `play` from STOP with a non-empty queue should start
+  streaming the current playlist item (not just "resume").
 """
 
 from __future__ import annotations
+
+from typing import Any
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -116,6 +122,119 @@ class TestServerStatus:
 # =============================================================================
 # JSON-RPC Tests
 # =============================================================================
+
+
+@pytest.mark.asyncio
+async def test_jsonrpc_play_from_stop_starts_current_playlist_track(
+    web_server: WebServer,
+    client: AsyncClient,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """
+    Regression: If the player is STOPPED and there is a non-empty playlist,
+    issuing slim.request(player_id, ["play"]) must start streaming the
+    *current* playlist item (LMS semantics).
+
+    We intentionally set current_index != 0 to catch "always start at 0" bugs.
+    """
+    player_id = "aa:bb:cc:dd:ee:ff"
+
+    # Sentinel track returned by playlist.play(index)
+    class _SentinelTrack:
+        id = 424242
+        path = "file:///music/sentinel.flac"
+        title = "Sentinel"
+        artist_name = "Test Artist"
+        album_title = "Test Album"
+        duration_ms = 123000
+
+    sentinel_track = _SentinelTrack()
+
+    started: dict[str, Any] = {}
+
+    # Patch the stream-start function used by playlist/index and by the fixed `play`.
+    from resonance.web.handlers import playlist as playlist_handler
+
+    async def _fake_start_track_stream(ctx: Any, player: Any, track: Any) -> None:
+        started["start_track_stream_called"] = True
+        started["started_track_id"] = getattr(track, "id", None)
+        started["started_track_path"] = getattr(track, "path", None)
+
+    monkeypatch.setattr(
+        playlist_handler,
+        "_start_track_stream",
+        _fake_start_track_stream,
+        raising=True,
+    )
+
+    # Fake playlist with current_index != 0
+    class _FakePlaylist:
+        def __init__(self) -> None:
+            self.current_index = 1
+            self._tracks = [object(), object()]  # len() must be > 0
+
+        def __len__(self) -> int:
+            return len(self._tracks)
+
+        def play(self, index: int) -> Any:
+            started["playlist_play_index"] = index
+            self.current_index = index
+            return sentinel_track
+
+    class _FakePlaylistManager:
+        def get(self, pid: str) -> _FakePlaylist:
+            assert pid == player_id
+            return _FakePlaylist()
+
+    # Fake STOPPED player returned by registry.get_by_mac()
+    class _FakeState:
+        def __init__(self, name: str) -> None:
+            self.name = name
+
+    class _FakeStatus:
+        def __init__(self, state_name: str) -> None:
+            self.state = _FakeState(state_name)
+
+    class _FakePlayer:
+        def __init__(self) -> None:
+            self.status = _FakeStatus("STOPPED")
+
+        async def play(self) -> None:
+            # If server incorrectly does resume-only, this might be called,
+            # but stream-start must happen for this regression to pass.
+            started["player_play_called"] = True
+
+    class _FakePlayerRegistry:
+        async def get_by_mac(self, mac: str):
+            assert mac == player_id
+            return _FakePlayer()
+
+    # Inject fakes into the JSON-RPC handler dependencies used to build CommandContext.
+    #
+    # WebServer wires these dependencies into `web_server.jsonrpc_handler` at init time,
+    # so patching `web_server.player_registry` / `web_server.playlist_manager` alone
+    # does not affect JSON-RPC command execution.
+    web_server.jsonrpc_handler.player_registry = _FakePlayerRegistry()
+    web_server.jsonrpc_handler.playlist_manager = _FakePlaylistManager()
+
+    # Act: issue "play" via JSON-RPC for this player.
+    response = await client.post(
+        "/jsonrpc.js",
+        json={
+            "id": 9999,
+            "method": "slim.request",
+            "params": [player_id, ["play"]],
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    payload = response.json()
+    assert "result" in payload
+
+    assert started.get("start_track_stream_called") is True, started
+    assert started.get("playlist_play_index") == 1, started
+    assert started.get("started_track_id") == sentinel_track.id, started
+    assert started.get("started_track_path") == sentinel_track.path, started
 
 
 class TestJsonRpc:

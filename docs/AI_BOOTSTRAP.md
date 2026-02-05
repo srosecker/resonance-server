@@ -27,7 +27,7 @@
 | Metrik | Wert |
 |--------|------|
 | **Phase** | 3 von 4 (LMS-Kompatibilität) ✅ |
-| **Tests** | 355/355 bestanden ✅ |
+| **Tests** | 356/356 bestanden ✅ |
 | **Server (Python)** | ~19.000 LOC |
 | **Tests** | ~7.000 LOC |
 | **Web-UI (Svelte/TS)** | ~900 LOC |
@@ -48,6 +48,7 @@
 - ✅ **UDP Discovery** (Player finden Server automatisch)
 - ✅ **aude** Audio Enable/Disable (Power on/off für Hardware)
 - ✅ **JiveLite-kompatible Cover-URLs** (icon-id, icon für Radio/Touch)
+- ✅ **Branding: Logos für Resonance (Vinyl) und Cadence (Kassette)**
 
 ### Cadence — Flutter Desktop App
 
@@ -75,6 +76,32 @@
 | Multi-Room Sync | Server | 🟢 Niedrig |
 
 ### Zuletzt erledigt
+
+**Session: Logos & Branding**
+- ✅ **Resonance Logo**: Vinyl-Schallplatte (Cyan/Blau), inline SVG in Web-UI Sidebar
+- ✅ **Cadence Logo**: Kassette (Mauve/Pink), CustomPainter in Flutter Sidebar
+- ✅ **Windows App-Icon**: Multi-Size ICO (16-32px: vereinfachte zwei Spulen, 48px+: volle Kassette)
+- ✅ `flutter_launcher_icons` für Icon-Generierung eingerichtet
+- ✅ Logo-Dateien in `resonance-server/assets/logos/` und `cadence/assets/brand/`
+- ✅ PROMPTS.md mit Bildgenerator-Prompts für alle Logo-Varianten
+
+**Session: Play-from-STOP Fix + Web-UI UX**
+- ✅ **LMS-like `play` Befehl**: Bei STOP + Queue startet jetzt der aktuelle Playlist-Track (nicht nur Resume)
+- ✅ Regression-Test für play-from-stop (356 Tests gesamt)
+- ✅ Web-UI: Album Action Bar mit Play/Shuffle/Add to Queue Buttons
+- ✅ Web-UI: + Button bei Tracks fügt einzelnen Track zur Queue hinzu
+- ✅ Web-UI: Workaround entfernt (Server ist jetzt korrekt)
+- ✅ Web-UI: Cadence-Style Elapsed-Interpolation mit Slew-rate Limiting
+- ✅ Web-UI: pendingSeek verhindert Polling-Konflikte beim Seeking
+
+**Session: Web-UI Verbesserungen (Cadence-Style)**
+- ✅ Robustere Elapsed-Time-Interpolation mit Slew-rate Limiting
+- ✅ Monotonic Clamp verhindert Rückwärts-Jitter beim Progress-Bar
+- ✅ Track-Change-Detection mit Hard-Reset bei großen Sprüngen
+- ✅ Seek mit pendingSeek-Flag verhindert Polling-Konflikte
+- ✅ TypeScript-Typen für playlist_loop gefixt (coverArt, artwork_url)
+- ✅ svelte.config.js: handleHttpError für fehlendes favicon
+- ✅ Build erfolgreich, alle 355 Tests bestanden
 
 **Session: Hardware-Support & JiveLite-Kompatibilität**
 - ✅ UDP Discovery IPAD-Bug gefixt (Server meldet jetzt IP korrekt)
@@ -113,6 +140,20 @@ flutter run -d windows
 cd resonance-server
 micromamba run -p ".build/mamba/envs/resonance-env" python -m pytest -v
 ```
+
+---
+
+## 🎨 Branding
+
+| Projekt | Logo | Farben | Dateien |
+|---------|------|--------|---------|
+| **Resonance** | Vinyl 💿 | Cyan `#06b6d4` → Blau `#3b82f6` | `resonance-server/assets/logos/` |
+| **Cadence** | Kassette 📼 | Mauve `#CBA6F7` → Pink `#F5C2E7` | `cadence/assets/brand/` |
+
+**Icon-Strategie:**
+- **Titelleiste (16-32px):** Vereinfachtes Symbol (nur zwei Spulen-Kreise)
+- **Sidebar (44px+):** Volles Logo mit Details
+- **Splash/About (128px+):** Volles Logo + Text
 
 ---
 
@@ -223,6 +264,19 @@ await _jsonRpc(playerId, ['play']);
 
 // ✅ RICHTIG - Server macht auto-start
 await _jsonRpc(playerId, ['playlist', 'loadtracks', 'album_id:$albumId']);
+```
+
+### 3d. `play` bei STOP startet Queue-Track 🚨
+
+Bei STOP + nicht-leerer Queue startet `play` den **aktuellen** Playlist-Track (LMS-like):
+
+```python
+# In playback.py cmd_play():
+if is_stopped and playlist is not None and len(playlist) > 0:
+    track = playlist.play(playlist.current_index)
+    await _start_track_stream(ctx, player, track)  # Startet Stream!
+else:
+    await player.play()  # Fallback: Resume
 ```
 
 ### 4. Seek darf JSON-RPC nicht blockieren 🚨
@@ -343,6 +397,13 @@ Wichtige LMS-Dateien:
 | UDP Discovery | Player finden Server automatisch via Broadcast (Port 3483) |
 | `aude` für Power | Audio-Outputs werden bei Power on/off aktiviert/deaktiviert |
 | JiveLite Cover-URLs | `icon-id`, `icon` für Squeezebox Radio/Touch Kompatibilität |
+| Web-UI: Cadence-Style Smoothing | Slew-rate limiting + monotonic clamp für flüssige Progress-Bar |
+| Web-UI: pendingSeek | Verhindert Polling-Konflikte während Seek-Operationen |
+| `play` LMS-like bei STOP | Bei STOP + Queue startet `play` den aktuellen Playlist-Track (nicht nur Resume) |
+| Web-UI: Album Action Bar | Play/Shuffle/Add to Queue Buttons über Track-Liste |
+| Resonance Logo: Vinyl | Cyan/Blau, inline SVG, optimiert für kleine Größen |
+| Cadence Logo: Kassette | Mauve/Pink, CustomPainter, Multi-Size Icons |
+| Icon-Strategie | 16-32px vereinfacht (zwei Kreise), 48px+ voll (Kassette) |
 
 ---
 

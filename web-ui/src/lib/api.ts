@@ -374,6 +374,8 @@ class ResonanceAPI {
         album: string;
         duration: number;
         url: string;
+        coverArt?: string;
+        artwork_url?: string;
       }>;
       count: number;
     }>(playerId, ["status", start.toString(), count.toString(), "tags:aAdlt"]);
