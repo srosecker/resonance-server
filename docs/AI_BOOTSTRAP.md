@@ -28,7 +28,7 @@
 |--------|------|
 | **Phase** | 3 von 4 (LMS-Kompatibilität) ✅ |
 | **Tests** | 318/318 bestanden ✅ |
-| **Server (Python)** | ~18.500 LOC |
+| **Server (Python)** | ~18.600 LOC |
 | **Tests** | ~6.500 LOC |
 | **Web-UI (Svelte/TS)** | ~900 LOC |
 | **Cadence (Flutter)** | ~6.000 LOC |
@@ -61,6 +61,7 @@
 
 | Aufgabe | Projekt | Priorität |
 |---------|---------|-----------|
+| Cover-Placeholder Flash beheben | Cadence | 🟡 Mittel |
 | Keyboard-Shortcuts (Space=Play/Pause) | Cadence | 🟡 Mittel |
 | Search in Library | Cadence | 🟡 Mittel |
 | Fullscreen Now Playing View | Cadence | 🟢 Niedrig |
@@ -68,12 +69,20 @@
 | Multi-Room Sync | Server | 🟢 Niedrig |
 | UDP Discovery | Server | 🟢 Niedrig |
 
-### Zuletzt erledigt (ChatGPT Code Review)
+### Zuletzt erledigt (ChatGPT Deep Code Review)
 
+**Runde 1 (Erste Review):**
 - ✅ Byte-Offset-Seeks setzen jetzt `start_offset` für korrektes Elapsed-Reporting
 - ✅ Redundantes `cancel_stream()` in seeking.py entfernt
 - ✅ Alle STMd-Kommentare auf STMu korrigiert (Code war bereits korrekt)
 - ✅ Sticky-elapsed als "future safety net" dokumentiert
+
+**Runde 2 (Deep Analysis):**
+- ✅ `time ?` liefert jetzt korrektes elapsed (start_offset + raw)
+- ✅ Reader-Thread join im Transcoder (verhindert Thread-Leak auf Windows)
+- ✅ Lock-Timeout Log auf Warning hochgestuft (bessere Observability)
+- ✅ `start_offset` wird bei Player-Disconnect (BYE!) gecleared
+- ✅ `_coalesce_timers` als "reserved for future use" dokumentiert
 
 ---
 
@@ -322,6 +331,8 @@ Wichtige LMS-Dateien:
 | Sync Pipeline Cleanup | `_cleanup_popen_pipeline_sync()` - kein await im finally-Block |
 | Slider: onChangeEnd | Seek nur bei Release, nicht bei jeder Mausbewegung |
 | Byte-Offset + start_offset | Auch MP3/FLAC/OGG Seeks setzen start_offset für korrektes elapsed |
+| `time ?` korrigiert | Query-Mode liefert jetzt auch start_offset + raw_elapsed |
+| Thread-Leak Fix | reader_thread.join(timeout=0.1) im Transcoder-Finally |
 
 ---
 
