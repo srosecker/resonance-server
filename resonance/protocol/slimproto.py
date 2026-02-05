@@ -895,6 +895,15 @@ class SlimprotoServer:
         logger.info("Player %s sent BYE!", client.id)
         client.status.state = PlayerState.DISCONNECTED
 
+        # Clear start_offset to prevent stale elapsed after reconnect.
+        # Without this, a reconnecting player could show incorrect position
+        # if start_offset from a previous seek was still cached.
+        streaming_server = getattr(self, "streaming_server", None)
+        if streaming_server is not None:
+            clear_fn = getattr(streaming_server, "clear_start_offset", None)
+            if callable(clear_fn):
+                clear_fn(client.mac_address)
+
         # Publish disconnect event
         await event_bus.publish(PlayerDisconnectedEvent(player_id=client.mac_address))
 

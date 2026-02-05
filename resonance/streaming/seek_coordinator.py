@@ -101,7 +101,11 @@ class SeekCoordinator:
         # Per-player active seek tasks
         self._active_tasks: dict[str, asyncio.Task[bool]] = {}
 
-        # Per-player coalesce timers
+        # Per-player coalesce timers (currently used only for cancellation cleanup).
+        # NOTE: Current implementation uses sleep-based coalescing, not timer-based.
+        # This dict is reserved for a future optimization where we'd use a single
+        # TimerHandle per player instead of spawning multiple sleeping coroutines.
+        # For now it's only used to cancel any pending timer on new seek/cleanup.
         self._coalesce_timers: dict[str, asyncio.TimerHandle] = {}
 
     def _get_lock(self, player_mac: str) -> asyncio.Lock:
@@ -261,10 +265,15 @@ class SeekCoordinator:
         try:
             await asyncio.wait_for(lock.acquire(), timeout=0.5)
         except asyncio.TimeoutError:
-            logger.debug(
-                "Seek for player %s timed out waiting for lock (generation %d)",
+            # This can happen during rapid scrubbing when the previous seek is still
+            # executing (stop/flush/start_track). The seek is effectively "dropped".
+            # Log at warning level so it's visible in production logs.
+            logger.warning(
+                "Seek DROPPED for player %s: lock timeout (gen=%d, target=%.1fs). "
+                "Previous seek still executing - consider if this happens frequently.",
                 player_mac,
                 request.generation,
+                request.target_seconds,
             )
             return False
 

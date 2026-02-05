@@ -78,9 +78,21 @@ async def cmd_time(
     if player is None:
         return {"_time": 0}
 
-    # Query mode
+    # Query mode - return corrected elapsed (start_offset + raw)
     if len(params) < 2 or params[1] == "?":
-        elapsed = player.status.elapsed_seconds
+        raw_elapsed = player.status.elapsed_seconds
+
+        # Apply LMS-style start_offset correction (same as status.py/api.py)
+        # After seek, player reports elapsed relative to stream start (0,1,2...)
+        # Real position = start_offset + raw_elapsed
+        start_offset: float = 0.0
+        if ctx.streaming_server is not None:
+            try:
+                start_offset = ctx.streaming_server.get_start_offset(ctx.player_id)
+            except Exception:
+                start_offset = 0.0
+
+        elapsed = start_offset + raw_elapsed
         return {"_time": elapsed}
 
     # Parse seek target

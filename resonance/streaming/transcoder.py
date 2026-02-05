@@ -643,6 +643,15 @@ async def transcode_stream(
             # This MUST be fast and non-blocking for rapid seeks to work
             # Use SYNC cleanup - no await, no create_task - just close and kill
             _cleanup_popen_pipeline_sync(procs)
+
+            # Best-effort join the reader thread to prevent thread accumulation on Windows.
+            # The thread should exit quickly once we've closed the pipes above.
+            # Use a short timeout to avoid blocking rapid seeks.
+            if reader_thread is not None and reader_thread.is_alive():
+                reader_thread.join(timeout=0.1)
+                if reader_thread.is_alive():
+                    logger.debug("[TRANSCODE] Reader thread still alive after join timeout")
+
             logger.debug("[TRANSCODE] Pipeline cleanup complete")
 
         return
