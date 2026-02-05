@@ -27,9 +27,9 @@
 | Metrik | Wert |
 |--------|------|
 | **Phase** | 3 von 4 (LMS-Kompatibilität) ✅ |
-| **Tests** | 318/318 bestanden ✅ |
-| **Server (Python)** | ~18.600 LOC |
-| **Tests** | ~6.500 LOC |
+| **Tests** | 349/349 bestanden ✅ |
+| **Server (Python)** | ~19.000 LOC |
+| **Tests** | ~7.000 LOC |
 | **Web-UI (Svelte/TS)** | ~900 LOC |
 | **Cadence (Flutter)** | ~6.000 LOC |
 
@@ -45,6 +45,7 @@
 - ✅ Playlist/Queue mit Shuffle/Repeat
 - ✅ **Seeking mit LMS-konformer Elapsed-Berechnung** (stabil!)
 - ✅ Cover Art mit BlurHash Placeholders
+- ✅ **UDP Discovery** (Player finden Server automatisch)
 
 ### Cadence — Flutter Desktop App
 
@@ -61,13 +62,13 @@
 
 | Aufgabe | Projekt | Priorität |
 |---------|---------|-----------|
+| mDNS/Avahi Discovery (`_slimdevices._tcp`) | Server | 🟡 Mittel |
 | Cover-Placeholder Flash beheben | Cadence | 🟡 Mittel |
 | Keyboard-Shortcuts (Space=Play/Pause) | Cadence | 🟡 Mittel |
 | Search in Library | Cadence | 🟡 Mittel |
 | Fullscreen Now Playing View | Cadence | 🟢 Niedrig |
 | View Transitions API | Web-UI | 🟢 Niedrig |
 | Multi-Room Sync | Server | 🟢 Niedrig |
-| UDP Discovery | Server | 🟢 Niedrig |
 
 ### Zuletzt erledigt (ChatGPT Deep Code Review)
 
@@ -83,6 +84,12 @@
 - ✅ Lock-Timeout Log auf Warning hochgestuft (bessere Observability)
 - ✅ `start_offset` wird bei Player-Disconnect (BYE!) gecleared
 - ✅ `_coalesce_timers` als "reserved for future use" dokumentiert
+
+**UDP Discovery (neu):**
+- ✅ UDP Discovery Server auf Port 3483 implementiert
+- ✅ Old-style 'd' Protokoll (SLIMP3/Squeezebox)
+- ✅ TLV-style 'e' Protokoll (neuere Player)
+- ✅ 31 Tests für Discovery-Protokoll
 
 ---
 
@@ -333,6 +340,7 @@ Wichtige LMS-Dateien:
 | Byte-Offset + start_offset | Auch MP3/FLAC/OGG Seeks setzen start_offset für korrektes elapsed |
 | `time ?` korrigiert | Query-Mode liefert jetzt auch start_offset + raw_elapsed |
 | Thread-Leak Fix | reader_thread.join(timeout=0.1) im Transcoder-Finally |
+| UDP Discovery | Player finden Server automatisch via Broadcast (Port 3483) |
 
 ---
 
