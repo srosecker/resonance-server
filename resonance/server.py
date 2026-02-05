@@ -16,6 +16,7 @@ from resonance.core.library import MusicLibrary
 from resonance.core.library_db import LibraryDb
 from resonance.core.playlist import PlaylistManager
 from resonance.player.registry import PlayerRegistry
+from resonance.protocol.discovery import UDPDiscoveryServer
 from resonance.protocol.slimproto import SlimprotoServer
 from resonance.streaming.seek_coordinator import init_seek_coordinator
 from resonance.streaming.server import StreamingServer
@@ -119,6 +120,15 @@ class ResonanceServer:
         # SeekCoordinator for latest-wins seek semantics (initialized on start)
         self.seek_coordinator = None
 
+        # UDP Discovery server for player discovery on local network
+        self.discovery_server = UDPDiscoveryServer(
+            host=host,
+            port=port,  # Same port as Slimproto (3483)
+            server_name="Resonance",
+            http_port=web_port,
+            version="9.0.0",
+        )
+
     async def start(self) -> None:
         """Start all server components."""
         logger.info("Starting Resonance server on %s:%d", self.host, self.port)
@@ -135,6 +145,13 @@ class ResonanceServer:
 
         # Start Slimproto server
         await self.slimproto.start()
+
+        # Start UDP Discovery server (allows players to find us via broadcast)
+        try:
+            await self.discovery_server.start()
+        except Exception as e:
+            # Discovery is optional - don't fail startup if it doesn't work
+            logger.warning("UDP Discovery failed to start (players can still connect directly): %s", e)
 
         # Mark streaming server as ready (no longer binds its own port)
         # Streaming is now handled via FastAPI routes at /stream.mp3
@@ -176,6 +193,9 @@ class ResonanceServer:
         # Stop Web server first (clients get 503)
         if self.web_server:
             await self.web_server.stop()
+
+        # Stop UDP Discovery server
+        await self.discovery_server.stop()
 
         # Stop Streaming server (clears queue)
         await self.streaming_server.stop()
