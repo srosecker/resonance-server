@@ -83,17 +83,9 @@ class UDPDiscoveryProtocol(asyncio.DatagramProtocol):
 
         client_ip, client_port = addr
 
-        # Try to determine our local IP from the socket
-        if self._local_ip is None and self.transport is not None:
-            try:
-                sock = self.transport.get_extra_info('socket')
-                if sock:
-                    # Get local address - this may not work for broadcast
-                    local_addr = sock.getsockname()
-                    if local_addr and local_addr[0] and local_addr[0] != '0.0.0.0':
-                        self._local_ip = local_addr[0]
-            except Exception:
-                pass
+        # Determine our local IP that can reach this client
+        # We do this per-request because different clients may be on different subnets
+        local_ip = self._get_local_ip_for_client(client_ip)
 
         first_byte = data[0:1]
 
@@ -175,6 +167,9 @@ class UDPDiscoveryProtocol(asyncio.DatagramProtocol):
 
         logger.info("TLV Discovery request from %s:%d", client_ip, client_port)
 
+        # Determine our local IP that can reach this client
+        local_ip = self._get_local_ip_for_client(client_ip)
+
         # Parse request TLVs (skip leading 'e')
         request_tlvs = self._parse_tlvs(data[1:])
 
@@ -185,7 +180,7 @@ class UDPDiscoveryProtocol(asyncio.DatagramProtocol):
         response = b'E'
 
         for tag in request_tlvs:
-            value = self._get_tlv_value(tag, request_tlvs.get(tag))
+            value = self._get_tlv_value(tag, request_tlvs.get(tag), local_ip)
             if value is not None:
                 # Truncate if too long
                 if len(value) > 255:
@@ -237,13 +232,39 @@ class UDPDiscoveryProtocol(asyncio.DatagramProtocol):
 
         return tlvs
 
-    def _get_tlv_value(self, tag: str, request_value: bytes | None) -> bytes | None:
+    def _get_local_ip_for_client(self, client_ip: str) -> str | None:
+        """
+        Determine which local IP address can reach the given client.
+
+        This creates a temporary UDP socket and "connects" it to the client
+        (no actual packets sent), then checks which local IP was chosen.
+        """
+        # Use cached value if we have one
+        if self._local_ip:
+            return self._local_ip
+
+        try:
+            # Create a temporary UDP socket to determine routing
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as temp_sock:
+                # Connect to client (doesn't send anything, just sets up routing)
+                temp_sock.connect((client_ip, 80))
+                local_ip = temp_sock.getsockname()[0]
+                if local_ip and local_ip != '0.0.0.0':
+                    logger.debug("Detected local IP %s for client %s", local_ip, client_ip)
+                    return local_ip
+        except Exception as e:
+            logger.debug("Could not determine local IP for %s: %s", client_ip, e)
+
+        return None
+
+    def _get_tlv_value(self, tag: str, request_value: bytes | None, local_ip: str | None = None) -> bytes | None:
         """
         Get the response value for a TLV tag.
 
         Args:
             tag: 4-character TLV tag.
             request_value: Value from request (if any).
+            local_ip: Local IP address to use for IPAD response.
 
         Returns:
             Response value as bytes, or None if no response for this tag.
@@ -254,6 +275,8 @@ class UDPDiscoveryProtocol(asyncio.DatagramProtocol):
 
         elif tag == 'IPAD':
             # IP address as string
+            if local_ip:
+                return local_ip.encode('ascii')
             if self._local_ip:
                 return self._local_ip.encode('ascii')
             return None

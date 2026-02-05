@@ -27,7 +27,7 @@
 | Metrik | Wert |
 |--------|------|
 | **Phase** | 3 von 4 (LMS-Kompatibilität) ✅ |
-| **Tests** | 349/349 bestanden ✅ |
+| **Tests** | 355/355 bestanden ✅ |
 | **Server (Python)** | ~19.000 LOC |
 | **Tests** | ~7.000 LOC |
 | **Web-UI (Svelte/TS)** | ~900 LOC |
@@ -46,6 +46,8 @@
 - ✅ **Seeking mit LMS-konformer Elapsed-Berechnung** (stabil!)
 - ✅ Cover Art mit BlurHash Placeholders
 - ✅ **UDP Discovery** (Player finden Server automatisch)
+- ✅ **aude** Audio Enable/Disable (Power on/off für Hardware)
+- ✅ **JiveLite-kompatible Cover-URLs** (icon-id, icon für Radio/Touch)
 
 ### Cadence — Flutter Desktop App
 
@@ -62,33 +64,31 @@
 
 | Aufgabe | Projekt | Priorität |
 |---------|---------|-----------|
-| mDNS/Avahi Discovery (`_slimdevices._tcp`) | Server | 🟡 Mittel |
-| Cover-Placeholder Flash beheben | Cadence | 🟡 Mittel |
-| Keyboard-Shortcuts (Space=Play/Pause) | Cadence | 🟡 Mittel |
-| Search in Library | Cadence | 🟡 Mittel |
+| grfe/grfb Display-Grafiken (Cover auf Hardware-Display) | Server | 🟢 Niedrig |
+| IR-Fernbedienung Support | Server | 🟢 Niedrig |
+| mDNS/Avahi Discovery (`_slimdevices._tcp`) | Server | 🟢 Niedrig |
+| Cover-Placeholder Flash beheben | Cadence | 🟢 Niedrig |
+| Keyboard-Shortcuts (Space=Play/Pause) | Cadence | 🟢 Niedrig |
+| Search in Library | Cadence | 🟢 Niedrig |
 | Fullscreen Now Playing View | Cadence | 🟢 Niedrig |
 | View Transitions API | Web-UI | 🟢 Niedrig |
 | Multi-Room Sync | Server | 🟢 Niedrig |
 
-### Zuletzt erledigt (ChatGPT Deep Code Review)
+### Zuletzt erledigt
 
-**Runde 1 (Erste Review):**
+**Session: Hardware-Support & JiveLite-Kompatibilität**
+- ✅ UDP Discovery IPAD-Bug gefixt (Server meldet jetzt IP korrekt)
+- ✅ JiveLite-kompatible Cover-URLs (`icon-id`, `icon`, `artwork_track_id`)
+- ✅ `/music/{id}/cover` Route hinzugefügt (ohne .jpg Extension)
+- ✅ `aude` Audio Enable/Disable implementiert (Power on/off)
+- ✅ 6 neue Tests für `aude` (355 Tests gesamt)
+- ✅ "Playing:" SnackBars in Cadence entfernt
+
+**Vorherige Session (ChatGPT Deep Code Review):**
 - ✅ Byte-Offset-Seeks setzen jetzt `start_offset` für korrektes Elapsed-Reporting
-- ✅ Redundantes `cancel_stream()` in seeking.py entfernt
-- ✅ Alle STMd-Kommentare auf STMu korrigiert (Code war bereits korrekt)
-- ✅ Sticky-elapsed als "future safety net" dokumentiert
-
-**Runde 2 (Deep Analysis):**
 - ✅ `time ?` liefert jetzt korrektes elapsed (start_offset + raw)
 - ✅ Reader-Thread join im Transcoder (verhindert Thread-Leak auf Windows)
-- ✅ Lock-Timeout Log auf Warning hochgestuft (bessere Observability)
-- ✅ `start_offset` wird bei Player-Disconnect (BYE!) gecleared
-- ✅ `_coalesce_timers` als "reserved for future use" dokumentiert
-
-**UDP Discovery (neu):**
 - ✅ UDP Discovery Server auf Port 3483 implementiert
-- ✅ Old-style 'd' Protokoll (SLIMP3/Squeezebox)
-- ✅ TLV-style 'e' Protokoll (neuere Player)
 - ✅ 31 Tests für Discovery-Protokoll
 
 ---
@@ -341,6 +341,8 @@ Wichtige LMS-Dateien:
 | `time ?` korrigiert | Query-Mode liefert jetzt auch start_offset + raw_elapsed |
 | Thread-Leak Fix | reader_thread.join(timeout=0.1) im Transcoder-Finally |
 | UDP Discovery | Player finden Server automatisch via Broadcast (Port 3483) |
+| `aude` für Power | Audio-Outputs werden bei Power on/off aktiviert/deaktiviert |
+| JiveLite Cover-URLs | `icon-id`, `icon` für Squeezebox Radio/Touch Kompatibilität |
 
 ---
 

@@ -324,6 +324,52 @@ class TestBuildAudgFrame:
         assert right_fixed == 256 << 8
 
 
+class TestBuildAudeFrame:
+    """Tests for build_aude_frame function."""
+
+    def test_frame_structure(self) -> None:
+        """Frame should be 2 bytes."""
+        from resonance.protocol.commands import build_aude_frame
+
+        frame = build_aude_frame()
+        assert len(frame) == 2
+
+    def test_both_enabled(self) -> None:
+        """Both outputs enabled should be (1, 1)."""
+        from resonance.protocol.commands import build_aude_frame
+
+        frame = build_aude_frame(spdif_enable=True, dac_enable=True)
+        assert frame == b"\x01\x01"
+
+    def test_both_disabled(self) -> None:
+        """Both outputs disabled should be (0, 0)."""
+        from resonance.protocol.commands import build_aude_frame
+
+        frame = build_aude_frame(spdif_enable=False, dac_enable=False)
+        assert frame == b"\x00\x00"
+
+    def test_spdif_only(self) -> None:
+        """Only S/PDIF enabled should be (1, 0)."""
+        from resonance.protocol.commands import build_aude_frame
+
+        frame = build_aude_frame(spdif_enable=True, dac_enable=False)
+        assert frame == b"\x01\x00"
+
+    def test_dac_only(self) -> None:
+        """Only DAC enabled should be (0, 1)."""
+        from resonance.protocol.commands import build_aude_frame
+
+        frame = build_aude_frame(spdif_enable=False, dac_enable=True)
+        assert frame == b"\x00\x01"
+
+    def test_defaults_to_enabled(self) -> None:
+        """Default should enable both outputs."""
+        from resonance.protocol.commands import build_aude_frame
+
+        frame = build_aude_frame()
+        assert frame == b"\x01\x01"
+
+
 class TestBuildVolumeFrame:
     """Tests for build_volume_frame function."""
 

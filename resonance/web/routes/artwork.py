@@ -211,6 +211,19 @@ async def get_music_cover_legacy(
     return await get_track_artwork(track_id, request)
 
 
+@router.get("/music/{track_id}/cover")
+async def get_music_cover_no_ext(
+    track_id: int,
+    request: Request,
+) -> Response:
+    """
+    Cover endpoint without extension for JiveLite/SqueezePlay compatibility.
+
+    The path /music/{id}/cover is used by Squeezebox Radio, Touch, etc.
+    """
+    return await get_track_artwork(track_id, request)
+
+
 @router.get("/api/artwork/track/{track_id}/blurhash")
 async def get_track_blurhash(track_id: int) -> dict[str, Any]:
     """

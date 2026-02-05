@@ -370,6 +370,22 @@ class PlayerClient:
         self.status.volume = volume
         self.status.muted = muted
 
+    async def set_audio_enable(self, enabled: bool = True) -> None:
+        """
+        Enable or disable audio outputs (S/PDIF and DAC).
+
+        This is sent when powering the player on/off. Hardware players
+        use this to actually enable/disable their audio output circuits.
+
+        Args:
+            enabled: True to enable audio outputs, False to disable.
+        """
+        from resonance.protocol.commands import build_aude_frame
+
+        logger.info("Setting audio enable to %s on %s", enabled, self.name)
+        frame = build_aude_frame(spdif_enable=enabled, dac_enable=enabled)
+        await self.send_message(b"aude", frame)
+
     async def volume_up(self, step: int = 5) -> None:
         """Increase volume by step percent."""
         new_volume = min(100, self.status.volume + step)

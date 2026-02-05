@@ -173,9 +173,12 @@ async def cmd_power(
     try:
         power_val = int(params[1])
         if power_val == 0:
-            # Power off - stop playback
+            # Power off - stop playback and disable audio outputs
             await player.stop()
-        # Power on is a no-op for connected players
+            await player.set_audio_enable(False)
+        else:
+            # Power on - enable audio outputs
+            await player.set_audio_enable(True)
         return {"_power": power_val}
     except (ValueError, TypeError):
         return {"_power": 1}

@@ -457,6 +457,28 @@ def build_volume_frame(volume: int, muted: bool = False) -> bytes:
     return build_audg_frame(left_gain=gain, right_gain=gain)
 
 
+def build_aude_frame(spdif_enable: bool = True, dac_enable: bool = True) -> bytes:
+    """
+    Build an 'aude' frame to enable/disable audio outputs.
+
+    This command controls the audio output hardware on Squeezebox players.
+    Used when powering the player on/off.
+
+    Frame layout:
+        offset  size  field
+        0       1     S/PDIF (digital) output enable (0=off, 1=on)
+        1       1     DAC (analog) output enable (0=off, 1=on)
+
+    Args:
+        spdif_enable: Enable S/PDIF digital output.
+        dac_enable: Enable DAC analog output.
+
+    Returns:
+        Complete aude frame bytes (2 bytes).
+    """
+    return struct.pack("BB", 1 if spdif_enable else 0, 1 if dac_enable else 0)
+
+
 # ============================================================================
 # Display Command (grfe/grfb/grfd)
 # ============================================================================

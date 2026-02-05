@@ -8,8 +8,8 @@ Aktueller Implementierungsstand von Resonance gegenüber dem Original Logitech M
 
 | Metrik | LMS (Perl) | Resonance (Python) |
 |--------|------------|-------------------|
-| **Codebase** | ~200.000+ LOC | ~18.500 LOC |
-| **Tests** | — | 316 Tests |
+| **Codebase** | ~200.000+ LOC | ~19.000 LOC |
+| **Tests** | — | 355 Tests |
 | **Alter** | 2001-heute (24 Jahre) | 2025-heute |
 | **Plugins** | 48+ eingebaut | 0 (noch kein Plugin-System) |
 
@@ -25,10 +25,10 @@ Aktueller Implementierungsstand von Resonance gegenüber dem Original Logitech M
 | **Player-Status (STAT)** | ✅ | ✅ | Vollständig |
 | **Stream-Kontrolle (strm)** | ✅ | ✅ | Vollständig |
 | **Volume-Kontrolle (audg)** | ✅ | ✅ | Vollständig |
-| **Audio Enable (aude)** | ✅ | 📋 | Stub |
+| **Audio Enable (aude)** | ✅ | ✅ | Vollständig |
 | **Display-Befehle (grfe/grfb)** | ✅ | 📋 | Stub |
 | **IR-Fernbedienung** | ✅ | 📋 | Stub |
-| **UDP Discovery** | ✅ | ❌ | Nicht implementiert |
+| **UDP Discovery** | ✅ | ✅ | Vollständig |
 
 ---
 
@@ -183,15 +183,16 @@ Aktueller Implementierungsstand von Resonance gegenüber dem Original Logitech M
 - **Multi-Room Sync** — Das Killer-Feature von LMS
 - **Plugin-System** — Keine Erweiterbarkeit
 - **Internet Radio / Podcasts**
-- **UDP Discovery** — Player müssen Server-IP kennen
+- **Display-Grafiken (grfe/grfb)** — Cover auf Hardware-Display
+- **IR-Fernbedienung** — Hardware-Fernbedienungen
 
-### 🎯 Nächste Prioritäten
+### 🎯 Nächste Prioritäten (alle 🟢 Niedrig)
 
 1. **Multi-Room Sync** — DAS Squeezebox-Feature
-2. **UDP Discovery** — Automatische Player-Erkennung
+2. **Display-Grafiken** — Cover auf Squeezebox Radio/Touch Display
 3. **Persistente Playlists** — Save/Load
-4. **Konfigurationsdatei** — server.toml
+4. **mDNS Discovery** — Alternative Auto-Discovery
 
 ---
 
-*Stand: Februar 2026 — 316 Tests, ~18.500 LOC*
+*Stand: Januar 2025 — 355 Tests, ~19.000 LOC*

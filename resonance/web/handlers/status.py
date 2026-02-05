@@ -303,6 +303,12 @@ async def cmd_status(
                     "coverArt": f"{server_url}/artwork/{album_id}" if album_id else "",
                 }
 
+                # JiveLite/SqueezePlay compatibility (Squeezebox Radio, Touch, etc.)
+                if album_id:
+                    result["currentTrack"]["icon-id"] = f"/music/{album_id}/cover"
+                    result["currentTrack"]["icon"] = f"{server_url}/artwork/{album_id}"
+                    result["currentTrack"]["artwork_track_id"] = album_id
+
                 # Add BlurHash if available — MUST NOT BLOCK status polling.
                 #
                 # Important: get_blurhash() may extract artwork + decode images + compute hash.
@@ -361,6 +367,22 @@ async def cmd_status(
                         "coverArt": f"{server_url}/artwork/{album_id}" if album_id else "",
                         "playlist index": start + i,
                     }
+
+                    # JiveLite/SqueezePlay compatibility (Squeezebox Radio, Touch, etc.)
+                    # These players expect icon-id or icon for cover art display
+                    if album_id:
+                        track_dict["icon-id"] = f"/music/{album_id}/cover"
+                        track_dict["icon"] = f"{server_url}/artwork/{album_id}"
+                        track_dict["artwork_track_id"] = album_id
+
+                    # JiveLite expects track/album/artist as separate fields + text
+                    track_dict["track"] = getattr(track, "title", "")
+                    text_parts = [getattr(track, "title", "")]
+                    if artist:
+                        text_parts.append(artist)
+                    if album:
+                        text_parts.append(album)
+                    track_dict["text"] = "\n".join(text_parts)
 
                     # Add BlurHash for tracks in the loop
                     if ctx.artwork_manager and path:
