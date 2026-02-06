@@ -39,7 +39,11 @@ from resonance.web.jsonrpc_helpers import (
 
 logger = logging.getLogger(__name__)
 
-VERSION = "0.1.0"
+# Match LMS version to avoid "update required" messages on hardware players
+# NOTE: Must be 7.x for firmware compatibility - see Research_gold.md
+# SqueezePlay firmware 7.7.3 and earlier has a version comparison bug
+# that rejects servers reporting version 8.0.0 or higher.
+VERSION = "7.999.999"
 
 
 async def cmd_serverstatus(
@@ -67,8 +71,10 @@ async def cmd_serverstatus(
 
     return {
         "version": VERSION,
-        "uuid": "resonance-server",
+        "uuid": ctx.server_uuid,
         "mac": "00:00:00:00:00:00",
+        "ip": ctx.server_host,
+        "httpport": str(ctx.server_port),
         "info total albums": album_count,
         "info total artists": artist_count,
         "info total songs": track_count,

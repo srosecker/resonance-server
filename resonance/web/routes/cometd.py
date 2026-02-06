@@ -1,17 +1,26 @@
 """
 Cometd Routes for Resonance.
 
-Provides the /cometd endpoint for Bayeux protocol long-polling,
-used by LMS-compatible apps (iPeng, Squeezer, Material Skin) for
-real-time player status updates.
+Provides the /cometd endpoint for Bayeux protocol, supporting both:
+- Long-polling: Client makes request, waits for response, makes new request
+- Streaming: Client makes request, server keeps connection open and sends chunked events
+
+Streaming mode is required for Squeezebox Boom/Touch/Radio devices which use
+the embedded SqueezePlay/Jive UI.
+
+Reference: Slim/Web/Cometd.pm in LMS codebase
 """
 
 from __future__ import annotations
 
+import asyncio
+import json
 import logging
-from typing import TYPE_CHECKING, Any
+import time
+from typing import TYPE_CHECKING, Any, AsyncGenerator
 
 from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import StreamingResponse
 
 if TYPE_CHECKING:
     from resonance.web.cometd import CometdManager
@@ -24,6 +33,10 @@ router = APIRouter()
 # References set during route registration
 _cometd_manager: CometdManager | None = None
 _jsonrpc_handler: JsonRpcHandler | None = None
+
+# Streaming connection timeout (seconds)
+STREAMING_TIMEOUT = 300  # 5 minutes
+STREAMING_HEARTBEAT_INTERVAL = 30  # Send heartbeat every 30 seconds
 
 
 def register_cometd_routes(
@@ -50,18 +63,267 @@ def register_cometd_routes(
     app.include_router(router)
 
 
+async def _process_message(
+    manager: CometdManager,
+    msg: dict[str, Any],
+) -> tuple[list[dict[str, Any]], bool, str | None]:
+    """
+    Process a single Cometd message.
+
+    Returns:
+        Tuple of (responses, is_connect, connection_type)
+    """
+    responses: list[dict[str, Any]] = []
+    is_connect = False
+    connection_type = None
+
+    if not isinstance(msg, dict):
+        return [{"successful": False, "error": "Invalid message format"}], False, None
+
+    channel = msg.get("channel", "")
+    msg_id = msg.get("id")
+    client_id = msg.get("clientId", "")
+
+    try:
+        if channel == "/meta/handshake":
+            response = await manager.handshake(msg_id=msg_id)
+            responses.append(response)
+
+        elif channel in ("/meta/connect", "/meta/reconnect"):
+            is_connect = True
+            connection_type = msg.get("connectionType", "long-polling")
+
+            # For reconnect, auto-create client if it doesn't exist
+            # (Radio/Boom may reconnect with old clientId after server restart)
+            if channel == "/meta/reconnect" and client_id:
+                if not await manager.is_valid_client(client_id):
+                    import asyncio
+
+                    from resonance.web.cometd import CometdClient
+                    async with manager._lock:
+                        if client_id not in manager._clients:
+                            client = CometdClient(client_id=client_id)
+                            manager._clients[client_id] = client
+                            manager._connect_waiters[client_id] = asyncio.Event()
+                            logger.warning(
+                                "Auto-created client %s from /meta/reconnect",
+                                client_id,
+                            )
+
+            # For streaming, we'll handle the response differently
+            # Just return the connect response immediately
+            response: dict[str, Any] = {
+                "channel": channel,  # Reply on same channel (connect or reconnect)
+                "successful": True,
+                "clientId": client_id,
+                "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
+                "advice": {
+                    "interval": 0 if connection_type == "long-polling" else 5000,
+                },
+            }
+            if msg_id is not None:
+                response["id"] = msg_id
+            responses.append(response)
+
+        elif channel == "/meta/disconnect":
+            response = await manager.disconnect(
+                client_id=client_id,
+                msg_id=msg_id,
+            )
+            responses.append(response)
+
+        elif channel == "/meta/subscribe":
+            subscription = msg.get("subscription", [])
+            result = await manager.subscribe(
+                client_id=client_id,
+                subscription=subscription,
+                msg_id=msg_id,
+            )
+            responses.extend(result)
+
+        elif channel == "/meta/unsubscribe":
+            subscription = msg.get("subscription", [])
+            result = await manager.unsubscribe(
+                client_id=client_id,
+                subscription=subscription,
+                msg_id=msg_id,
+            )
+            responses.extend(result)
+
+        elif channel == "/slim/subscribe":
+            # Extract clientId from response channel if not provided directly
+            # LMS/Boom sends: {"data": {"response": "/25e894ff/slim/..."}, "channel": "/slim/subscribe"}
+            # The clientId is embedded in the response path: /<clientId>/slim/...
+            effective_client_id = client_id
+            if not effective_client_id:
+                data = msg.get("data", {})
+                resp_channel = data.get("response", "") if isinstance(data, dict) else ""
+                if resp_channel and resp_channel.startswith("/"):
+                    # Extract clientId from path like "/25e894ff/slim/serverstatus"
+                    parts = resp_channel.split("/")
+                    if len(parts) >= 2 and parts[1]:
+                        effective_client_id = parts[1]
+                        logger.debug(
+                            "Extracted clientId %s from response channel %s",
+                            effective_client_id,
+                            resp_channel,
+                        )
+
+            response = await manager.slim_subscribe(
+                client_id=effective_client_id,
+                request=msg,
+                msg_id=msg_id,
+            )
+            responses.append(response)
+
+        elif channel == "/slim/unsubscribe":
+            # Extract clientId from response channel if not provided directly (same as subscribe)
+            effective_client_id = client_id
+            if not effective_client_id:
+                data = msg.get("data", {})
+                resp_channel = data.get("response", "") if isinstance(data, dict) else ""
+                if resp_channel and resp_channel.startswith("/"):
+                    parts = resp_channel.split("/")
+                    if len(parts) >= 2 and parts[1]:
+                        effective_client_id = parts[1]
+
+            response = await manager.slim_unsubscribe(
+                client_id=effective_client_id,
+                request=msg,
+                msg_id=msg_id,
+            )
+            responses.append(response)
+
+        elif channel == "/slim/request":
+            # Extract clientId from response channel if not provided directly (same as subscribe)
+            effective_client_id = client_id
+            if not effective_client_id:
+                data = msg.get("data", {})
+                resp_channel = data.get("response", "") if isinstance(data, dict) else ""
+                if resp_channel and resp_channel.startswith("/"):
+                    parts = resp_channel.split("/")
+                    if len(parts) >= 2 and parts[1]:
+                        effective_client_id = parts[1]
+
+            response = await manager.slim_request(
+                client_id=effective_client_id,
+                request=msg,
+                msg_id=msg_id,
+            )
+            responses.append(response)
+
+        else:
+            logger.warning("Unknown cometd channel: %s", channel)
+            responses.append(
+                {
+                    "channel": channel,
+                    "successful": False,
+                    "error": f"Unknown channel: {channel}",
+                    **({"id": msg_id} if msg_id else {}),
+                }
+            )
+
+    except Exception as e:
+        logger.exception("Error handling cometd message on %s: %s", channel, e)
+        responses.append(
+            {
+                "channel": channel,
+                "successful": False,
+                "error": str(e),
+                **({"id": msg_id} if msg_id else {}),
+            }
+        )
+
+    return responses, is_connect, connection_type
+
+
+async def _streaming_event_generator(
+    manager: CometdManager,
+    client_id: str,
+    initial_responses: list[dict[str, Any]],
+) -> AsyncGenerator[bytes, None]:
+    """
+    Generate streaming Cometd events as chunked HTTP response.
+
+    This keeps the connection open and sends events as they arrive,
+    using chunked transfer encoding.
+    """
+    logger.info("Starting streaming connection for client %s", client_id)
+
+    # Send initial responses first
+    if initial_responses:
+        chunk = json.dumps(initial_responses) + "\r\n"
+        logger.debug("Streaming initial chunk to %s: %s", client_id, chunk[:200])
+        yield chunk.encode("utf-8")
+
+    # Keep connection open and stream events
+    start_time = time.time()
+    last_heartbeat = time.time()
+
+    try:
+        while time.time() - start_time < STREAMING_TIMEOUT:
+            # Check if client is still valid
+            if not await manager.is_valid_client(client_id):
+                logger.info("Client %s no longer valid, closing stream", client_id)
+                break
+
+            # Get waiter for this client
+            async with manager._lock:
+                waiter = manager._connect_waiters.get(client_id)
+                client = manager._clients.get(client_id)
+
+            if client is None:
+                break
+
+            # Wait for events with short timeout
+            if waiter:
+                try:
+                    await asyncio.wait_for(waiter.wait(), timeout=1.0)
+                    waiter.clear()
+                except asyncio.TimeoutError:
+                    pass
+
+            # Check for pending events
+            events = client.get_and_clear_events()
+            if events:
+                chunk = json.dumps(events) + "\r\n"
+                logger.debug("Streaming events to %s: %s", client_id, chunk[:200])
+                yield chunk.encode("utf-8")
+                last_heartbeat = time.time()
+
+            # Send heartbeat to keep connection alive
+            elif time.time() - last_heartbeat > STREAMING_HEARTBEAT_INTERVAL:
+                heartbeat = [{"channel": "/meta/ping", "successful": True}]
+                chunk = json.dumps(heartbeat) + "\r\n"
+                yield chunk.encode("utf-8")
+                last_heartbeat = time.time()
+
+            # Touch client to prevent timeout
+            client.touch()
+
+    except asyncio.CancelledError:
+        logger.info("Streaming connection cancelled for client %s", client_id)
+    except Exception as e:
+        logger.exception("Error in streaming connection for %s: %s", client_id, e)
+    finally:
+        logger.info("Streaming connection ended for client %s", client_id)
+
+
 @router.post("/cometd/")
 @router.post("/cometd")
-async def cometd_handler(request: Request) -> list[dict[str, Any]]:
+async def cometd_handler(request: Request):
     """
     Handle Cometd/Bayeux protocol requests.
 
     Accepts an array of Bayeux messages and returns responses.
     Each message has a 'channel' field indicating the operation.
 
+    For streaming connections (Squeezebox Boom/Touch/Radio), this returns
+    a StreamingResponse with chunked transfer encoding.
+
     Meta channels:
     - /meta/handshake: Start a new session, get clientId
-    - /meta/connect: Long-poll for events
+    - /meta/connect: Long-poll or streaming for events
     - /meta/disconnect: End session
     - /meta/subscribe: Subscribe to channels
     - /meta/unsubscribe: Unsubscribe from channels
@@ -91,105 +353,55 @@ async def cometd_handler(request: Request) -> list[dict[str, Any]]:
     if not messages:
         raise HTTPException(status_code=400, detail="Empty message list")
 
-    responses: list[dict[str, Any]] = []
+    all_responses: list[dict[str, Any]] = []
+    has_connect = False
+    connect_client_id = None
+    is_streaming = False
 
+    # Process all messages
     for msg in messages:
-        if not isinstance(msg, dict):
-            responses.append({"successful": False, "error": "Invalid message format"})
-            continue
+        responses, is_connect, connection_type = await _process_message(manager, msg)
+        all_responses.extend(responses)
 
-        channel = msg.get("channel", "")
-        msg_id = msg.get("id")
-        client_id = msg.get("clientId", "")
+        if is_connect:
+            has_connect = True
+            connect_client_id = msg.get("clientId", "")
+            is_streaming = connection_type == "streaming"
 
-        try:
-            if channel == "/meta/handshake":
-                response = await manager.handshake(msg_id=msg_id)
-                responses.append(response)
+    # If this is a streaming connect, return a StreamingResponse
+    if has_connect and is_streaming and connect_client_id:
+        logger.info(
+            "Client %s requested streaming connection, starting chunked response",
+            connect_client_id,
+        )
+        return StreamingResponse(
+            _streaming_event_generator(manager, connect_client_id, all_responses),
+            media_type="application/json",
+            headers={
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+                # Note: FastAPI/Starlette handles Transfer-Encoding: chunked automatically
+                # for StreamingResponse
+            },
+        )
 
-            elif channel == "/meta/connect":
-                result = await manager.connect(
-                    client_id=client_id,
-                    msg_id=msg_id,
-                    timeout_s=60.0,
-                )
-                # Connect returns a list of responses
-                if isinstance(result, list):
-                    responses.extend(result)
-                else:
-                    responses.append(result)
+    # For long-polling connect, wait for events
+    if has_connect and not is_streaming and connect_client_id:
+        # Wait for events or timeout
+        result = await manager.connect(
+            client_id=connect_client_id,
+            msg_id=None,
+            timeout_s=60.0,
+        )
+        # Replace the simple connect response with the full one that may include events
+        # Find and replace the connect response
+        for i, resp in enumerate(all_responses):
+            if resp.get("channel") == "/meta/connect":
+                all_responses = all_responses[:i] + all_responses[i + 1 :]
+                break
+        if isinstance(result, list):
+            all_responses.extend(result)
+        else:
+            all_responses.append(result)
 
-            elif channel == "/meta/disconnect":
-                response = await manager.disconnect(
-                    client_id=client_id,
-                    msg_id=msg_id,
-                )
-                responses.append(response)
-
-            elif channel == "/meta/subscribe":
-                subscription = msg.get("subscription", [])
-                result = await manager.subscribe(
-                    client_id=client_id,
-                    subscription=subscription,
-                    msg_id=msg_id,
-                )
-                # Subscribe returns a list of responses (one per channel)
-                responses.extend(result)
-
-            elif channel == "/meta/unsubscribe":
-                subscription = msg.get("subscription", [])
-                result = await manager.unsubscribe(
-                    client_id=client_id,
-                    subscription=subscription,
-                    msg_id=msg_id,
-                )
-                # Unsubscribe returns a list of responses (one per channel)
-                responses.extend(result)
-
-            elif channel == "/slim/subscribe":
-                response = await manager.slim_subscribe(
-                    client_id=client_id,
-                    request=msg,
-                    msg_id=msg_id,
-                )
-                responses.append(response)
-
-            elif channel == "/slim/unsubscribe":
-                response = await manager.slim_unsubscribe(
-                    client_id=client_id,
-                    request=msg,
-                    msg_id=msg_id,
-                )
-                responses.append(response)
-
-            elif channel == "/slim/request":
-                response = await manager.slim_request(
-                    client_id=client_id,
-                    request=msg,
-                    msg_id=msg_id,
-                )
-                responses.append(response)
-
-            else:
-                logger.warning("Unknown cometd channel: %s", channel)
-                responses.append(
-                    {
-                        "channel": channel,
-                        "successful": False,
-                        "error": f"Unknown channel: {channel}",
-                        **({"id": msg_id} if msg_id else {}),
-                    }
-                )
-
-        except Exception as e:
-            logger.exception("Error handling cometd message on %s: %s", channel, e)
-            responses.append(
-                {
-                    "channel": channel,
-                    "successful": False,
-                    "error": str(e),
-                    **({"id": msg_id} if msg_id else {}),
-                }
-            )
-
-    return responses
+    return all_responses

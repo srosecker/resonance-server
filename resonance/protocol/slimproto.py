@@ -549,29 +549,77 @@ class SlimprotoServer:
         return capabilities
 
     async def _send_server_capabilities(self, client: PlayerClient) -> None:
-        """Send server capabilities/acknowledgment to client after HELO."""
+        """
+        Send server capabilities/acknowledgment to client after HELO.
+
+        This sequence matches what LMS sends to SqueezePlay/Jive devices
+        (Radio, Boom, Touch) to properly initialize the connection:
+        1. vers - Server version string (required for SqueezePlay/Jive!)
+        2. strm q - Query status (not 't'!)
+        3. setd 0x00 - Player ID type
+        4. setd 0x04 - Firmware check
+        5. aude - Enable audio outputs
+        6. audg - Set initial volume/gain
+        """
         logger.debug("Sending server capabilities to %s", client.id)
 
-        # Send 'vers' frame with server version - this tells the player
-        # that it's connected to a real server
-        version = b"8.5.0"  # Pretend to be LMS 8.5.0
-        await self._send_message(client, "vers", version)
-        logger.debug("Sent vers frame to %s", client.id)
+        # 1. Send 'vers' - Server version (LMS sends this first!)
+        # This is critical for SqueezePlay/Jive devices (Radio, Boom, Touch)
+        # Without this, they show "Connection not possible"
+        # NOTE: Must be 7.x for firmware compatibility - see Research_gold.md
+        # LMS uses "7.999.999" (RADIO_COMPATIBLE_VERSION) to bypass this.
+        version = "7.999.999"
+        await self._send_message(client, "vers", version.encode("utf-8"))
+        logger.debug("Sent vers %s to %s", version, client.id)
 
-        # Also send 'setd' with player ID to confirm registration
-        # Format: 1 byte ID type (0 = player ID) + player name
-        setd_payload = b"\x00" + client.id.encode("ascii")
-        await self._send_message(client, "setd", setd_payload)
-        logger.debug("Sent setd frame to %s", client.id)
+        from resonance.protocol.commands import (
+            AudioFormat,
+            AutostartMode,
+            StreamCommand,
+            StreamParams,
+            build_aude_frame,
+            build_audg_frame,
+            build_strm_frame,
+        )
 
-        # Send strm 't' (status request) to trigger player heartbeats
-        # This is required for Squeezelite/Squeezebox2 to start sending STAT messages
-        from resonance.protocol.commands import build_stream_status
+        # 2. Send 'strm q' (query) - this is what LMS sends, NOT 'strm t'
+        # The 'q' command queries player status without the extra server IP/port info
+        strm_query = build_strm_frame(StreamParams(
+            command=StreamCommand.STOP,  # 'q' = stop/query
+            autostart=AutostartMode.OFF,
+            format=AudioFormat.MP3,
+            server_port=0,  # LMS sends 0 here (verified in Squeezebox.pm)
+            server_ip=0,
+        ))
+        await self._send_message(client, "strm", strm_query)
+        logger.debug("Sent strm query to %s", client.id)
 
-        advertise_ip = self.get_advertise_ip_for_player(client)
-        strm_status = build_stream_status(server_port=self.streaming_port, server_ip=advertise_ip)
-        await self._send_message(client, "strm", strm_status)
-        logger.debug("Sent strm status request to %s", client.id)
+        # 3. Send 'setd' with type 0x00 (player ID query)
+        await self._send_message(client, "setd", b"\x00")
+        logger.debug("Sent setd 0x00 to %s", client.id)
+
+        # 4. Send 'setd' with type 0x04 (firmware ID query)
+        await self._send_message(client, "setd", b"\x04")
+        logger.debug("Sent setd 0x04 to %s", client.id)
+
+        # 5. Send 'aude' to enable audio outputs (S/PDIF and DAC)
+        aude_frame = build_aude_frame(spdif_enable=True, dac_enable=True)
+        await self._send_message(client, "aude", aude_frame)
+        logger.debug("Sent aude (enable audio) to %s", client.id)
+
+        # 6. Send 'audg' to set initial volume/gain
+        # LMS sends: 00000000 00000000 01 ff 00000000 00000000 00000003
+        # Which is: old_left=0, old_right=0, dvc=1, preamp=255, left=0, right=0, seq=3
+        audg_frame = build_audg_frame(
+            left_gain=0,
+            right_gain=0,
+            preamp=255,
+            digital_volume=True,
+        )
+        # Add sequence byte (0x03) that LMS sends
+        audg_frame += b"\x00\x00\x00\x03"
+        await self._send_message(client, "audg", audg_frame)
+        logger.debug("Sent audg (volume) to %s", client.id)
 
     async def _message_loop(
         self,
@@ -669,9 +717,10 @@ class SlimprotoServer:
                     try:
                         from resonance.protocol.commands import build_stream_status
 
-                        advertise_ip = self.get_advertise_ip_for_player(player)
+                        # LMS sends 0/0 for 'strm t' (heartbeat/status query)
+                        # See Slim/Player/Squeezebox.pm stream() method for command 't'
                         strm_status = build_stream_status(
-                            server_port=self.streaming_port, server_ip=advertise_ip
+                            server_port=0, server_ip=0
                         )
                         await self._send_message(player, "strm", strm_status)
                         logger.debug("Sent heartbeat to %s", player.id)

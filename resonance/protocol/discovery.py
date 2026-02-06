@@ -45,7 +45,7 @@ class UDPDiscoveryProtocol(asyncio.DatagramProtocol):
         server_name: str,
         http_port: int,
         server_uuid: str | None = None,
-        version: str = "9.0.0",
+        version: str = "7.999.999",
     ) -> None:
         """
         Initialize the discovery protocol.
@@ -365,7 +365,7 @@ class UDPDiscoveryServer:
         server_name: str = "Resonance",
         http_port: int = 9000,
         server_uuid: str | None = None,
-        version: str = "9.0.0",
+        version: str = "7.999.999",
     ) -> None:
         """
         Initialize the UDP Discovery server.

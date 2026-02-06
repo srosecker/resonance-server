@@ -249,6 +249,17 @@ class MusicLibrary:
         # higher layers decide whether to also show artist/year from other endpoints.
         return tuple(Album(id=AlbumId(r.id), title=r.title) for r in rows)
 
+    async def get_years(self) -> list[int]:
+        """
+        Return a list of unique years from the library.
+
+        Returns:
+            List of years (integers), excluding None/0 values.
+        """
+        self._require_initialized()
+        rows = await self._db.get_distinct_years()
+        return [r for r in rows if r and r > 0]
+
     async def get_tracks(
         self,
         *,

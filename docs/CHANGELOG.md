@@ -8,6 +8,27 @@ Alle wesentlichen Änderungen am Projekt werden hier dokumentiert.
 
 **Stand:** 356/356 Tests bestanden | ~19.000 LOC Python | ~6.000 LOC Flutter
 
+### ✅ VERS Version Fix für Touch-UI Geräte (2026-02-07) 🎉
+
+**Problem:** Squeezebox Touch-UI Geräte (Boom, Radio, Touch) machten KEINE HTTP/Cometd-
+Verbindung zu Port 9000, obwohl Discovery und Slimproto funktionierten.
+
+**Root Cause:** SqueezePlay Firmware 7.7.3 und älter hat einen **Version-Vergleichs-Bug**,
+der Server mit Version >= 8.0.0 fälschlicherweise ablehnt. Resonance sendete "9.0.0".
+
+**Deep Research Erkenntnisse (`Research_gold.md`):**
+- HTTP/Cometd wird durch **Discovery TLV Parsing** getriggert, unabhängig von Slimproto
+- Kritische TLVs: NAME, JSON (Port als ASCII!), UUID (36 Zeichen), VERS (muss 7.x sein!)
+- LMS umgeht den Bug mit `getFakeVersion()` → "7.9.1"
+
+**Fix:**
+- `resonance/server.py`: Discovery VERS TLV → "7.9.1"
+- `resonance/protocol/slimproto.py`: Slimproto vers → "7.9.1"
+- `resonance/protocol/discovery.py`: Default version → "7.9.1"
+- `resonance/web/handlers/status.py`: serverstatus version → "7.9.1"
+
+**Status:** Alle 356 Tests bestanden ✅ — **Live-Test mit Hardware steht noch aus!**
+
 ### ✅ Branding Polish & Cleanup (2026-02-06)
 
 **Typografie:**

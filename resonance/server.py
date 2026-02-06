@@ -6,8 +6,11 @@ all server components and manages the application lifecycle.
 """
 
 import asyncio
+import hashlib
 import logging
 import signal
+import time
+import uuid
 from pathlib import Path
 
 from resonance.core.artwork import ArtworkManager
@@ -23,6 +26,47 @@ from resonance.streaming.server import StreamingServer
 from resonance.web.server import WebServer
 
 logger = logging.getLogger(__name__)
+
+# Path for persisting server UUID
+SERVER_UUID_FILE = Path("cache/server_uuid")
+
+
+def get_or_create_server_uuid() -> str:
+    """
+    Get or create a persistent server UUID.
+
+    The UUID is stored in cache/server_uuid and reused across restarts.
+    This matches LMS behavior where each server has a unique identity.
+
+    Format: Full UUID v4 string (36 chars with dashes), e.g. "1a421556-465b-4802-9599-654aa2d6dbd4"
+    LMS uses: UUID::Tiny::create_UUID_as_string(UUID_V4())
+    """
+    SERVER_UUID_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+    if SERVER_UUID_FILE.exists():
+        try:
+            stored_uuid = SERVER_UUID_FILE.read_text().strip()
+            # Accept both old 8-char format and new 36-char UUID v4 format
+            # If old format, we'll regenerate a proper UUID
+            if stored_uuid and len(stored_uuid) == 36 and stored_uuid.count('-') == 4:
+                logger.debug("Using existing server UUID: %s", stored_uuid)
+                return stored_uuid
+            elif stored_uuid:
+                logger.info("Upgrading old 8-char UUID to full UUID v4 format")
+        except Exception as e:
+            logger.warning("Could not read server UUID: %s", e)
+
+    # Generate new UUID v4 (full 36-char format like LMS)
+    # LMS uses: UUID::Tiny::create_UUID_as_string(UUID_V4())
+    new_uuid = str(uuid.uuid4())
+
+    try:
+        SERVER_UUID_FILE.write_text(new_uuid)
+        logger.info("Generated new server UUID: %s", new_uuid)
+    except Exception as e:
+        logger.warning("Could not save server UUID: %s", e)
+
+    return new_uuid
 
 
 class ResonanceServer:
@@ -120,13 +164,21 @@ class ResonanceServer:
         # SeekCoordinator for latest-wins seek semantics (initialized on start)
         self.seek_coordinator = None
 
+        # Server UUID (persistent across restarts, like LMS)
+        self.server_uuid = get_or_create_server_uuid()
+
         # UDP Discovery server for player discovery on local network
+        # NOTE: version="7.999.999" is required for firmware compatibility!
+        # SqueezePlay firmware 7.7.3 and earlier has a version comparison bug
+        # that rejects servers reporting version 8.0.0 or higher.
+        # LMS uses "7.999.999" (RADIO_COMPATIBLE_VERSION) to bypass this.
         self.discovery_server = UDPDiscoveryServer(
             host=host,
             port=port,  # Same port as Slimproto (3483)
             server_name="Resonance",
             http_port=web_port,
-            version="9.0.0",
+            server_uuid=self.server_uuid,
+            version="7.999.999",
         )
 
     async def start(self) -> None:
@@ -169,6 +221,7 @@ class ResonanceServer:
             streaming_server=self.streaming_server,
             artwork_manager=self.artwork_manager,
             slimproto=self.slimproto,
+            server_uuid=self.server_uuid,
         )
         await self.web_server.start(host=self.host, port=self.web_port)
 

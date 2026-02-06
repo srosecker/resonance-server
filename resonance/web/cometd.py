@@ -145,19 +145,18 @@ class CometdManager:
         logger.debug("Handshake: created client %s", client_id)
 
         response: dict[str, Any] = {
+            "id": msg_id if msg_id is not None else "",
             "channel": "/meta/handshake",
             "successful": True,
             "clientId": client_id,
             "version": "1.0",
-            "supportedConnectionTypes": ["long-polling"],
+            "supportedConnectionTypes": ["long-polling", "streaming"],
             "advice": {
+                "timeout": 60000,
                 "reconnect": "retry",
                 "interval": 0,
-                "timeout": 60000,
             },
         }
-        if msg_id is not None:
-            response["id"] = msg_id
 
         return response
 
@@ -391,43 +390,94 @@ class CometdManager:
         Handle /slim/subscribe - LMS-style subscription.
 
         The request contains response channels and commands to subscribe to.
+        Like LMS, we:
+        1. Execute the request immediately
+        2. Send the initial result to the client
+        3. Subscribe for future updates
 
         Args:
             client_id: The client ID
             request: Full request dict (Bayeux style)
             response_channel: Direct response channel (test-friendly)
             msg_id: Optional message ID
+
+        NOTE (Boom/Jive quirk):
+        Some devices embed the clientId only in data.response and may send requests/subscribes
+        that reference a clientId we haven't seen via /meta/handshake in this process lifetime.
+        To behave like LMS (tolerant), we auto-create the session.
         """
         async with self._lock:
             client = self._clients.get(client_id)
 
-        if client is None:
-            return {
-                "channel": "/slim/subscribe",
-                "successful": False,
-                "error": "Unknown client ID",
-                **({"id": msg_id} if msg_id else {}),
-            }
+            if client is None:
+                # Auto-create missing client session (tolerate embedded clientId usage)
+                client = CometdClient(client_id=client_id)
+                self._clients[client_id] = client
+                self._connect_waiters[client_id] = asyncio.Event()
+                logger.warning(
+                    "Auto-created missing Cometd client %s from embedded clientId in /slim/subscribe",
+                    client_id,
+                )
 
         client.touch()
 
-        # Extract response channel from request or direct parameter
-        if response_channel:
-            client.subscriptions.add(response_channel)
-            logger.debug("Client %s slim-subscribed to %s", client_id, response_channel)
-        elif request:
-            resp_ch = request.get("response")
-            if resp_ch:
-                client.subscriptions.add(resp_ch)
-                logger.debug("Client %s slim-subscribed to %s", client_id, resp_ch)
+        resp_ch = response_channel
+        req_data = None
 
-            # Extract and subscribe to data channels (player status etc.)
-            data = request.get("data", {})
-            if isinstance(data, dict):
-                for key in data.keys():
-                    # LMS uses patterns like "/aa:bb:cc:dd:ee:ff/status"
-                    client.subscriptions.add(key)
-                    logger.debug("Client %s slim-subscribed to data %s", client_id, key)
+        # Extract response channel and request data from request
+        # Support both dict format (Bayeux style) and list format (test-friendly)
+        if request:
+            if isinstance(request, dict):
+                data = request.get("data", {})
+                if isinstance(data, dict):
+                    resp_ch = resp_ch or data.get("response")
+                    req_data = data.get("request")
+            elif isinstance(request, list):
+                # Test-friendly format: [player_id, command_array]
+                req_data = request
+
+        # Subscribe to the response channel
+        if resp_ch:
+            client.subscriptions.add(resp_ch)
+            logger.debug("Client %s slim-subscribed to %s", client_id, resp_ch)
+
+        # Execute the request and deliver initial result (like LMS does)
+        if req_data is not None and self._jsonrpc_handler is not None:
+            try:
+                # req_data is [player_id, command_array] e.g. ["", ["serverstatus", 0, 50, "subscribe:60"]]
+                if isinstance(req_data, list) and len(req_data) >= 2:
+                    player_id = req_data[0] if req_data[0] else ""
+                    command = req_data[1]
+
+                    logger.debug(
+                        "Client %s slim_subscribe executing: player=%s cmd=%s",
+                        client_id, player_id, command
+                    )
+
+                    # Execute the JSON-RPC command
+                    result = await self._jsonrpc_handler(player_id, command)
+
+                    # Deliver the initial result to the client on the response channel
+                    if resp_ch and result:
+                        initial_event = {
+                            "channel": resp_ch,
+                            "id": msg_id,
+                            "data": result,
+                        }
+                        client.add_event(initial_event)
+                        logger.debug(
+                            "Client %s slim_subscribe delivered initial result on %s",
+                            client_id, resp_ch
+                        )
+
+                        # Wake up any waiters so they can deliver the event
+                        async with self._lock:
+                            waiter = self._connect_waiters.get(client_id)
+                            if waiter:
+                                waiter.set()
+
+            except Exception as e:
+                logger.exception("Error executing slim_subscribe request: %s", e)
 
         response_dict: dict[str, Any] = {
             "channel": "/slim/subscribe",
@@ -454,17 +504,23 @@ class CometdManager:
             request: Full request dict (Bayeux style)
             unsubscribe_channel: Direct channel to unsubscribe (test-friendly)
             msg_id: Optional message ID
+
+        NOTE (Boom/Jive quirk):
+        Unsubscribe may arrive referencing a clientId embedded in data.response without a
+        prior /meta/handshake in this process lifetime. Be tolerant and auto-create.
         """
         async with self._lock:
             client = self._clients.get(client_id)
 
-        if client is None:
-            return {
-                "channel": "/slim/unsubscribe",
-                "successful": False,
-                "error": "Unknown client ID",
-                **({"id": msg_id} if msg_id else {}),
-            }
+            if client is None:
+                # Auto-create missing client session (tolerate embedded clientId usage)
+                client = CometdClient(client_id=client_id)
+                self._clients[client_id] = client
+                self._connect_waiters[client_id] = asyncio.Event()
+                logger.warning(
+                    "Auto-created missing Cometd client %s from embedded clientId in /slim/unsubscribe",
+                    client_id,
+                )
 
         client.touch()
 
@@ -497,42 +553,93 @@ class CometdManager:
         """
         Handle /slim/request - execute a JSON-RPC command.
 
+        Like LMS, this:
+        1. Executes the request
+        2. Sends the result on the response channel (for streaming clients)
+        3. Returns a success/failure response
+
         This delegates to the JSON-RPC handler if set.
+
+        NOTE (Boom/Jive quirk):
+        Some devices embed the clientId only in data.response (e.g. "/7a6364c4/slim/request")
+        and may send /slim/request before we have seen a /meta/handshake for that id
+        (e.g. after a server restart). LMS is tolerant here, so we auto-create the session.
         """
         async with self._lock:
             client = self._clients.get(client_id)
 
-        if client is None:
-            return {
-                "channel": "/slim/request",
-                "successful": False,
-                "error": "Unknown client ID",
-                **({"id": msg_id} if msg_id else {}),
-            }
+            if client is None:
+                # Auto-create missing client session (tolerate embedded clientId usage)
+                client = CometdClient(client_id=client_id)
+                self._clients[client_id] = client
+                self._connect_waiters[client_id] = asyncio.Event()
+                logger.warning(
+                    "Auto-created missing Cometd client %s from embedded clientId in /slim/request",
+                    client_id,
+                )
 
         client.touch()
 
-        # Extract the request data
-        data = request.get("data", request.get("request"))
+        # Extract the request data and response channel
+        # Format: {"data": {"request": [player_id, command], "response": "/clientId/slim/request"}}
+        data = request.get("data", {})
+        req_data = None
+        resp_channel = None
+
+        if isinstance(data, dict):
+            req_data = data.get("request")
+            resp_channel = data.get("response")
+        elif isinstance(data, list):
+            req_data = data
 
         result: dict[str, Any] = {}
-        if self._jsonrpc_handler is not None and data is not None:
+        has_error = False
+
+        if self._jsonrpc_handler is not None and req_data is not None:
             try:
-                # Data is [player_id, command_array]
-                if isinstance(data, list) and len(data) >= 2:
-                    player_id = data[0]
-                    command = data[1]
+                # req_data is [player_id, command_array]
+                if isinstance(req_data, list) and len(req_data) >= 2:
+                    player_id = req_data[0] if req_data[0] else ""
+                    command = req_data[1]
+                    logger.debug(
+                        "slim_request executing: player=%s cmd=%s",
+                        player_id, command
+                    )
                     result = await self._jsonrpc_handler(player_id, command)
+
+                    # Like LMS: deliver the result on the response channel for streaming clients
+                    if resp_channel and result:
+                        event = {
+                            "channel": resp_channel,
+                            "id": msg_id,
+                            "data": result,
+                        }
+                        client.add_event(event)
+                        logger.debug(
+                            "slim_request delivered result on %s",
+                            resp_channel
+                        )
+
+                        # Wake up any waiters so they can deliver the event
+                        async with self._lock:
+                            waiter = self._connect_waiters.get(client_id)
+                            if waiter:
+                                waiter.set()
+
             except Exception as e:
                 logger.exception("Error in slim_request: %s", e)
                 result = {"error": str(e)}
+                has_error = True
 
+        # Return the acknowledgement (like LMS does)
+        # The actual data is delivered via the response channel
         response: dict[str, Any] = {
             "channel": "/slim/request",
-            "successful": True,
+            "successful": not has_error,
             "clientId": client_id,
-            "data": result,
         }
+        if has_error:
+            response["error"] = result.get("error", "Unknown error")
         if msg_id is not None:
             response["id"] = msg_id
 

@@ -255,7 +255,7 @@ class TestJsonRpc:
         assert data["id"] == 1
         assert data["method"] == "slim.request"
         assert "result" in data
-        assert data["result"]["version"] == "0.1.0"
+        assert data["result"]["version"] == "7.999.999"  # Required for firmware compatibility
 
     async def test_jsonrpc_players_empty(self, client: AsyncClient) -> None:
         """Test players command with no connected players."""

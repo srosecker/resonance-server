@@ -86,6 +86,7 @@ class WebServer:
         streaming_server: StreamingServer | None = None,
         artwork_manager: ArtworkManager | None = None,
         slimproto: SlimprotoServer | None = None,
+        server_uuid: str = "resonance",
     ) -> None:
         """
         Initialize the WebServer.
@@ -97,6 +98,7 @@ class WebServer:
             streaming_server: Optional streaming server for audio
             artwork_manager: Optional artwork extraction/caching
             slimproto: Optional Slimproto server for player control
+            server_uuid: Server UUID for identification (full UUID v4, 36 chars with dashes)
         """
         self.player_registry = player_registry
         self.music_library = music_library
@@ -132,6 +134,7 @@ class WebServer:
             streaming_server=streaming_server,
             slimproto=slimproto,
             artwork_manager=artwork_manager,
+            server_uuid=server_uuid,
         )
 
         # Server state

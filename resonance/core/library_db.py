@@ -1568,6 +1568,20 @@ class LibraryDb:
     async def count_genres(self) -> int:
         return await queries_meta.count_genres(self._require_conn())
 
+    # Years
+    async def get_distinct_years(self) -> list[int]:
+        """Return a list of distinct years from tracks, sorted descending."""
+        conn = self._require_conn()
+        cursor = await conn.execute(
+            """
+            SELECT DISTINCT year FROM tracks
+            WHERE year IS NOT NULL AND year > 0
+            ORDER BY year DESC
+            """
+        )
+        rows = await cursor.fetchall()
+        return [row[0] for row in rows]
+
     async def get_genre_by_id(self, genre_id: int) -> dict[str, Any] | None:
         return await queries_meta.get_genre_by_id(self._require_conn(), genre_id)
 

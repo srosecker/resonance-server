@@ -65,7 +65,8 @@
 
 | Aufgabe | Projekt | Priorität |
 |---------|---------|-----------|
-| JiveLite JSON-RPC Verbindung testen | Server | 🟡 Mittel |
+| **Live-Test: Touch-UI mit Version 7.9.1** — Boom/Radio/Touch einschalten und testen! | Server | 🔴 Hoch |
+| **Radio/Touch State-Reset** — "Bibliothek umschalten" oder Factory Reset durchführen | Server | 🔴 Hoch |
 | Shipping: pip/PyPI Setup | Server | 🟡 Mittel |
 | Shipping: Docker Image | Server | 🟡 Mittel |
 | grfe/grfb Display-Grafiken (Cover auf Hardware-Display) | Server | 🟢 Niedrig |
@@ -79,6 +80,137 @@
 | Multi-Room Sync | Server | 🟢 Niedrig |
 
 ### Zuletzt erledigt
+
+**Session: VERS Version Fix für Touch-UI Geräte** ✅ 🎉
+- 🔍 **Deep Research Ergebnisse analysiert** (`Research_gold.md`)
+- 🐛 **ROOT CAUSE GEFUNDEN**: Server-Version "9.0.0" wird von Firmware abgelehnt!
+  - SqueezePlay Firmware 7.7.3 und älter hat einen **Version-Vergleichs-Bug**
+  - Versionen >= 8.0.0 werden fälschlicherweise als "zu alt" abgelehnt
+  - LMS umgeht das mit `getFakeVersion()` → gibt "7.9.1" zurück
+- ✅ **Fix implementiert**:
+  - `resonance/server.py`: Discovery VERS TLV → "7.9.1"
+  - `resonance/protocol/slimproto.py`: Slimproto vers → "7.9.1"
+  - `resonance/protocol/discovery.py`: Default version → "7.9.1"
+  - `resonance/web/handlers/status.py`: serverstatus version → "7.9.1"
+- ✅ Tests aktualisiert und alle 356 Tests bestanden
+- 🧪 **NOCH NICHT LIVE GETESTET** — Server starten + Boom/Radio einschalten!
+
+**Session: Slimproto Port-Fix & Simulation (ws20/ws21 Analyse)** ✅
+- 🔍 **Wireshark-Analyse ws20/ws21**:
+  - Radio sendet KEINE HTTP-Pakete (weder zu 9000 noch 80/443)
+  - Radio sendet Slimproto `strm t` (Status) → TCP-Verbindung steht!
+  - Server sendet Discovery FLUT korrekt (VERS 7.9.1, JSON 9000)
+- 🐛 **Slimproto Diskrepanz gefunden**:
+  - Resonance sendete `strm q` an Port `0x3000` (LMS sendet `0`)
+  - Resonance sendete `strm t` an Port `9000` (LMS sendet `0`)
+  - **Fix:** Ports auf 0 gesetzt in `resonance/protocol/slimproto.py`, um LMS exakt zu matchen.
+- ✅ **Simulation erstellt (`debug_radio_simulation.py`)**:
+  - Simuliert kompletten SqueezePlay-Handshake gegen lokalen Server
+  - **Ergebnis:** Server antwortet PERFEKT auf Handshake, Streaming & Menü-Requests.
+- 💡 **Fazit:** Server ist unschuldig. Das Radio verweigert HTTP-Verbindungen aufgrund seines internen Zustands (connected to mysqueezebox.com?).
+- 👉 **Handlung:** "Bibliothek umschalten" am Radio oder Factory Reset nötig.
+
+**Erkenntnisse aus Research_gold.md:**
+- HTTP/Cometd wird durch **Discovery TLV Parsing** getriggert, NICHT durch Slimproto
+- Verbindungen sind **parallel**, nicht seriell (Discovery → HTTP unabhängig von Slimproto)
+- Kritische TLVs: NAME, JSON (Port als ASCII-String!), UUID (36 Zeichen), VERS (muss 7.x sein!)
+- SqueezePlay erwartet `supportedConnectionTypes: ["streaming"]` im Cometd-Handshake
+
+**Session: Squeezebox HTTP-Verbindungs-Debugging + Deep Research Vorbereitung** 🔍
+- 🔍 **Wireshark-Captures ws18.pcapng + ws19.pcapng analysiert**
+- ✅ UDP Discovery funktioniert — TLVs korrekt (IPAD, NAME, JSON, VERS, UUID)
+- ✅ Slimproto TCP funktioniert — HELO, vers, strm, setd, aude, audg
+- ❌ **PROBLEM: Squeezebox Radio/Boom machen KEINE HTTP-Verbindung zu Port 9000!**
+- 📝 JiveLite-Code analysiert: `SlimDiscoveryApplet.lua`, `SlimServer.lua`, `Comet.lua`
+- 📝 Vermutung: SqueezePlay's `state` muss `searching` sein für `server:connect()`
+- 📝 **Lyrion-Dokumentation abgerufen und gespeichert** in `docs/LYRION_PROTOCOL_DOCS.md`
+- 📝 **Deep Research Fragen erstellt** in `docs/DEEP_RESEARCH_QUESTIONS.md`
+- 📝 Dokumentation erklärt NICHT den HTTP-Trigger — das ist die Wissenslücke!
+
+**Neue Dokumentation erstellt:**
+- `docs/LYRION_PROTOCOL_DOCS.md` — SlimProto, SLIMP3, Graphics, Menus, Database
+- `docs/DEEP_RESEARCH_QUESTIONS.md` — 10 Forschungsfragen für Deep Research
+- `docs/findings.md` — Wireshark-Analyse Details (bereits vorhanden, erweitert)
+
+**Offene Frage:** Was triggert SqueezePlay/Jive, eine HTTP/Cometd-Verbindung aufzubauen?
+- Discovery allein reicht anscheinend nicht
+- Slimproto-Verbindung steht, aber HTTP wird nie initiiert
+- Braucht Deep Research in Foren oder tiefere JiveLite-Code-Analyse
+
+**Session: UUID v4 Format Fix (ws15.pcapng Analyse)** ✅
+- 🔍 **Wireshark-Capture ws15.pcapng analysiert** mit tshark CLI
+- 🐛 **Root Cause gefunden**: Boom macht Discovery, aber **KEINE TCP-Verbindung**!
+  - Discovery funktioniert: TLVs (IPAD, NAME, JSON, VERS, UUID) werden gesendet ✅
+  - Aber: Kein Slimproto (Port 3483 TCP), kein Cometd (Port 9000 HTTP)
+- 🔍 **Vergleich mit LMS-Capture (lms.pcap)**:
+  - LMS UUID: `1a421556-465b-4802-9599-654aa2d6dbd4` (36 Zeichen, vollständiges UUID v4)
+  - Resonance UUID: `db2d3683` (8 Zeichen, unser altes Format)
+- 🔍 **LMS-Code gefunden** in `slimserver.pl`:
+  ```perl
+  $prefs->set(server_uuid => UUID::Tiny::create_UUID_as_string(UUID_V4()));
+  ```
+- ✅ **Fix implementiert** in `server.py`:
+  - `get_or_create_server_uuid()` generiert jetzt vollständiges UUID v4 (36 Zeichen)
+  - Alte 8-Zeichen UUIDs werden automatisch auf neues Format aktualisiert
+  - `cache/server_uuid` gelöscht → neue UUID wird beim Start generiert
+- ✅ Alle 356 Tests bestanden
+- 🧪 **Noch nicht live getestet** - Server starten + Boom einschalten!
+
+**Session: /slim/subscribe clientId Fix (ws2.pcapng Analyse)** ✅
+- 🔍 **Wireshark-Capture ws2.pcapng analysiert** mit tshark CLI
+- 🐛 **Neues Problem gefunden**: `/slim/subscribe` → "Unknown client ID"
+  - Boom sendet `/slim/subscribe` **ohne clientId im JSON**!
+  - LMS-Konvention: clientId ist im `response` Channel eingebettet: `"/25e894ff/slim/serverstatus"`
+- ✅ **Fix implementiert** in `cometd.py`:
+  - `/slim/subscribe`, `/slim/unsubscribe`, `/slim/request` extrahieren jetzt clientId aus response-Channel
+  - Pattern: `response.split("/")[1]` wenn kein explizites `clientId` vorhanden
+- ✅ Alle 356 Tests bestanden
+- 🧪 **Noch nicht live getestet** - Server starten + Boom einschalten!
+
+**Session: Wireshark-Analyse + Streaming-Cometd Fix für Boom** ✅
+- 🔍 **Wireshark-Capture analysiert** - Boom MACHT HTTP-Requests!
+  - Handshake: `POST /cometd` mit `/meta/handshake` → Server antwortet `200 OK` ✅
+  - Connect: `POST /cometd` mit `/meta/connect` + `connectionType: "streaming"` → **PROBLEM!**
+- 🐛 **Root Cause gefunden:**
+  - Boom sendet: `"supportedConnectionTypes": ["streaming"]`
+  - Wir antworteten: `"supportedConnectionTypes": ["long-polling"]` ← FALSCH!
+  - Boom ignoriert uns und sendet trotzdem `connectionType: "streaming"` → dann Stille
+- ✅ **Streaming-Cometd implementiert** (`resonance/web/routes/cometd.py`):
+  - `StreamingResponse` mit chunked transfer encoding
+  - Connection bleibt offen, Events werden als JSON-Chunks gesendet
+  - Heartbeat alle 30s um Connection am Leben zu halten
+  - `supportedConnectionTypes: ["streaming", "long-polling"]`
+- ✅ **Persistente Server-UUID** (8 char hex wie LMS):
+  - `get_or_create_server_uuid()` in `server.py`
+  - Gespeichert in `cache/server_uuid`
+  - Durchgereicht: Server → Discovery → WebServer → JSON-RPC
+- ✅ Alle 356 Tests bestanden
+- 🧪 **Noch nicht live getestet** - Boom muss eingeschaltet werden!
+
+**Session: Boom HTTP-Debug Fortsetzung + Server UUID Fix**
+
+**Session: Squeezebox Boom HTTP-Verbindungs-Debugging**
+- 🔍 **Problem identifiziert**: Boom verbindet sich via Slimproto ✅, pollt Discovery aggressiv (~2x/Sekunde), aber macht **nie HTTP/Cometd-Request** ❌
+- 🔍 Discovery funktioniert: TLVs (IPAD, NAME, JSON, VERS, UUID) werden korrekt gesendet und empfangen
+- 🔍 Boom meldet sich als `CONTROLLER` (device_id=9), nicht als `BOOM` (10) — das ist korrekt!
+- 📝 **JiveLite/SqueezePlay Flow analysiert**:
+  1. Discovery Response → `SlimServer:updateAddress(ip, port, name)` aufgerufen
+  2. `comet:setEndpoint(ip, port, '/cometd')` konfiguriert Cometd-Client
+  3. `server:connect()` → `comet:connect()` → `_handshake()` initiiert Bayeux-Handshake
+- 📝 **Hypothese**: Boom-Firmware (eingebettetes SqueezePlay) wartet evtl. auf etwas Spezielles im Discovery oder nach HELO
+- 📝 Relevante LMS-Dateien: `Slim/Networking/Discovery/Server.pm`, `Slim/Web/Cometd.pm`
+- 📝 Relevante JiveLite-Dateien: `jive/slim/SlimServer.lua`, `jive/net/Comet.lua`
+
+**Session: Jive Menu System für Squeezebox Boom/Touch/Radio**
+- ✅ `menu` Query implementiert — Hauptmenü für Touch-UI-Geräte
+- ✅ `browselibrary` Command — Artists, Albums, Genres, Years, Tracks, Search
+- ✅ `playlistcontrol` Command — Play/Add von Jive-Menüs
+- ✅ `sleepsettings`, `alarmsettings`, `syncsettings` — Settings-Menüs (Stubs)
+- ✅ `firmwareupgrade`, `date`, `playerinfo` — Hilfsbefehle
+- ✅ `get_years()` in MusicLibrary hinzugefügt
+- ✅ Alle 356 Tests bestanden
+- 📝 Squeezebox Boom meldet sich als `CONTROLLER` (device_id=9), nicht als `BOOM` (10)
+- 📝 Touch-UI-Geräte (Boom, Touch, Radio, Controller) brauchen das Jive-Menüsystem
 
 **Session: JiveLite Discovery Investigation**
 - ✅ Debug-Logging für TLV Discovery Response hinzugefügt
@@ -398,6 +530,8 @@ Wichtige LMS-Dateien:
 
 | Entscheidung | Begründung |
 |--------------|------------|
+| **VERS = "7.9.1"** | Firmware-Bug in SqueezePlay 7.7.3: Versionen >= 8.0.0 werden abgelehnt |
+| **strm Port = 0** | LMS sendet Port 0 für `strm q` und `strm t`. Wir matchen das jetzt. |
 | LMS-kompatible Elapsed | `elapsed = start_offset + raw_elapsed` — Siehe `SEEK_ELAPSED_FINDINGS.md` |
 | SeekCoordinator | Latest-Wins, 50ms Coalescing, saubere Subprocess-Termination |
 | STMu für Track-Finished | Nur STMu triggert Auto-Advance (wie LMS `playerStopped()`) |
@@ -421,6 +555,8 @@ Wichtige LMS-Dateien:
 | Web-UI: pendingSeek | Verhindert Polling-Konflikte während Seek-Operationen |
 | `play` LMS-like bei STOP | Bei STOP + Queue startet `play` den aktuellen Playlist-Track (nicht nur Resume) |
 | Web-UI: Album Action Bar | Play/Shuffle/Add to Queue Buttons über Track-Liste |
+| **UUID v4 vollständig** | Server-UUID jetzt 36 Zeichen wie LMS (war 8 Zeichen) |
+| **Lyrion-Docs gesammelt** | SlimProto, SLIMP3, Graphics, Menus, DB in `LYRION_PROTOCOL_DOCS.md` |
 | Resonance Logo: Vinyl | Cyan/Blau, inline SVG, optimiert für kleine Größen |
 | Cadence Logo: Kassette | Mauve/Pink, CustomPainter, Multi-Size Icons |
 | Icon-Strategie | 16-32px vereinfacht (zwei Kreise), 48px+ voll (Kassette) |
@@ -428,6 +564,7 @@ Wichtige LMS-Dateien:
 | Self-hosted Fonts | DSGVO-konform, keine Google-Server-Anfragen |
 | JiveLite Assets entfernt | Ungenutzte hdskin/toolbar/nowplaying PNGs gelöscht |
 | Kein ffmpeg nötig | Nur faad, lame, flac, sox (~3MB vs ~100MB) |
+| Jive Menu System | `menu`, `browselibrary`, `playlistcontrol` für Touch-UI-Geräte |
 
 ---
 

@@ -63,6 +63,9 @@ class CommandContext:
     server_port: int = 9000
     """Server port for generating URLs."""
 
+    server_uuid: str = "resonance"
+    """Server UUID for identification (full UUID v4, 36 chars with dashes)."""
+
     def __post_init__(self) -> None:
         if self.server_host == "0.0.0.0":
             self.server_host = "127.0.0.1"

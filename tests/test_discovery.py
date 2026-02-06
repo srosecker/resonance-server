@@ -29,7 +29,7 @@ class TestUDPDiscoveryProtocol:
         )
         assert protocol.server_name == "Test Server"
         assert protocol.http_port == 9000
-        assert protocol.version == "9.0.0"
+        assert protocol.version == "7.999.999"  # Required for firmware compatibility
         assert protocol.transport is None
 
     def test_creation_with_all_params(self) -> None:

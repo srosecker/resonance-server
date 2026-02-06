@@ -22,6 +22,18 @@ from resonance.web.handlers.library import (
     cmd_search,
     cmd_titles,
 )
+from resonance.web.handlers.menu import (
+    cmd_alarm_settings,
+    cmd_browselibrary,
+    cmd_date,
+    cmd_firmwareupgrade,
+    cmd_menu,
+    cmd_menustatus,
+    cmd_playerinfo,
+    cmd_playlistcontrol,
+    cmd_sleep_settings,
+    cmd_sync_settings,
+)
 from resonance.web.handlers.playback import (
     cmd_button,
     cmd_mixer,
@@ -91,6 +103,17 @@ COMMAND_HANDLERS: dict[str, CommandHandler] = {
     "playlist": cmd_playlist,
     # Seeking
     "time": cmd_time,
+    # Jive menu system (for Squeezebox Controller/Touch/Boom/Radio)
+    "menu": cmd_menu,
+    "menustatus": cmd_menustatus,
+    "browselibrary": cmd_browselibrary,
+    "playlistcontrol": cmd_playlistcontrol,
+    "date": cmd_date,
+    "alarmsettings": cmd_alarm_settings,
+    "sleepsettings": cmd_sleep_settings,
+    "syncsettings": cmd_sync_settings,
+    "firmwareupgrade": cmd_firmwareupgrade,
+    "playerinfo": cmd_playerinfo,
 }
 
 
@@ -112,6 +135,7 @@ class JsonRpcHandler:
         artwork_manager: ArtworkManager | None = None,
         server_host: str = "127.0.0.1",
         server_port: int = 9000,
+        server_uuid: str = "resonance",
     ) -> None:
         self.music_library = music_library
         self.player_registry = player_registry
@@ -121,6 +145,7 @@ class JsonRpcHandler:
         self.artwork_manager = artwork_manager
         self.server_host = server_host
         self.server_port = server_port
+        self.server_uuid = server_uuid
 
     async def handle_request(
         self,
@@ -219,6 +244,7 @@ class JsonRpcHandler:
             artwork_manager=self.artwork_manager,
             server_host=self.server_host,
             server_port=self.server_port,
+            server_uuid=self.server_uuid,
         )
 
         # Execute handler
