@@ -266,6 +266,11 @@ async def cmd_status(
     result["mixer volume"] = status.volume
     result["rate"] = 1 if result["mode"] == "play" else 0
 
+    # Include seq_no for volume sync (LMS/SqueezePlay compatibility)
+    # This allows the player to track which volume updates are current
+    if hasattr(player, "_seq_no") and player._seq_no is not None:
+        result["seq_no"] = player._seq_no
+
     # Playlist info
     playlist_loop: list[dict[str, Any]] = []
 
@@ -284,7 +289,7 @@ async def cmd_status(
             current = playlist.current_track
             if current is not None:
                 result["duration"] = (current.duration_ms or 0) / 1000.0
-                server_url = f"http://{ctx.server_host}:{ctx.server_port}"
+                current_server_url = f"http://{ctx.server_host}:{ctx.server_port}"
 
                 # Expose current track in a stable shape so the UI can highlight correctly.
                 # Note: keep keys aligned with the Track shape used by the web-ui.
@@ -306,13 +311,13 @@ async def cmd_status(
                     "album": album or "",
                     "duration": (duration_ms or 0) / 1000.0,
                     "path": path,
-                    "coverArt": f"{server_url}/artwork/{album_id}" if album_id else "",
+                    "coverArt": f"{current_server_url}/artwork/{album_id}" if album_id else "",
                 }
 
                 # JiveLite/SqueezePlay compatibility (Squeezebox Radio, Touch, etc.)
                 if album_id:
                     result["currentTrack"]["icon-id"] = f"/music/{album_id}/cover"
-                    result["currentTrack"]["icon"] = f"{server_url}/artwork/{album_id}"
+                    result["currentTrack"]["icon"] = f"{current_server_url}/artwork/{album_id}"
                     result["currentTrack"]["artwork_track_id"] = album_id
 
                 # Add BlurHash if available — MUST NOT BLOCK status polling.
@@ -338,77 +343,82 @@ async def cmd_status(
                     except Exception:
                         pass
 
-                # Build track info for playlist_loop
-                # Get the first N tracks based on params
-                start = 0
-                items = 1  # Default to just current track
+            # Build track info for playlist_loop
+            # This is OUTSIDE the "if current is not None" block so that
+            # playlist_loop is populated even if no track is currently playing
+            # (e.g., right after adding tracks but before playback starts)
+            server_url = f"http://{ctx.server_host}:{ctx.server_port}"
 
-                # Check for "-" which means current track only
-                if len(params) >= 2:
-                    if params[1] == "-":
-                        # "-" means start from current track
-                        start = playlist.current_index
-                        items = 1
-                    else:
-                        start, items = parse_start_items(["status", params[1]] + list(params[2:]))
+            # Get the first N tracks based on params
+            start = 0
+            items = 1  # Default to just current track
 
-                # Get tracks for playlist_loop
-                tracks = list(playlist.tracks)[start : start + items]
+            # Check for "-" which means current track only
+            if len(params) >= 2:
+                if params[1] == "-":
+                    # "-" means start from current track
+                    start = playlist.current_index
+                    items = 1
+                else:
+                    start, items = parse_start_items(["status", params[1]] + list(params[2:]))
 
-                for i, track in enumerate(tracks):
-                    track_id = getattr(track, "id", getattr(track, "track_id", None))
-                    album_id = getattr(track, "album_id", None)
-                    artist = getattr(track, "artist_name", getattr(track, "artist", ""))
-                    album = getattr(track, "album_title", getattr(track, "album", ""))
-                    duration_ms = getattr(track, "duration_ms", 0)
-                    path = getattr(track, "path", "")
+            # Get tracks for playlist_loop
+            tracks = list(playlist.tracks)[start : start + items]
 
-                    track_dict = {
-                        "id": track_id,
-                        "title": getattr(track, "title", ""),
-                        "artist": artist or "",
-                        "album": album or "",
-                        "duration": (duration_ms or 0) / 1000.0,
-                        "url": f"{server_url}/stream.mp3?track_id={track_id}",
-                        "coverArt": f"{server_url}/artwork/{album_id}" if album_id else "",
-                        "playlist index": start + i,
-                    }
+            for i, track in enumerate(tracks):
+                track_id = getattr(track, "id", getattr(track, "track_id", None))
+                album_id = getattr(track, "album_id", None)
+                artist = getattr(track, "artist_name", getattr(track, "artist", ""))
+                album = getattr(track, "album_title", getattr(track, "album", ""))
+                duration_ms = getattr(track, "duration_ms", 0)
+                path = getattr(track, "path", "")
 
-                    # JiveLite/SqueezePlay compatibility (Squeezebox Radio, Touch, etc.)
-                    # These players expect icon-id or icon for cover art display
-                    if album_id:
-                        track_dict["icon-id"] = f"/music/{album_id}/cover"
-                        track_dict["icon"] = f"{server_url}/artwork/{album_id}"
-                        track_dict["artwork_track_id"] = album_id
+                track_dict = {
+                    "id": track_id,
+                    "title": getattr(track, "title", ""),
+                    "artist": artist or "",
+                    "album": album or "",
+                    "duration": (duration_ms or 0) / 1000.0,
+                    "url": f"{server_url}/stream.mp3?track_id={track_id}",
+                    "coverArt": f"{server_url}/artwork/{album_id}" if album_id else "",
+                    "playlist index": start + i,
+                }
 
-                    # JiveLite expects track/album/artist as separate fields + text
-                    track_dict["track"] = getattr(track, "title", "")
-                    text_parts = [getattr(track, "title", "")]
-                    if artist:
-                        text_parts.append(artist)
-                    if album:
-                        text_parts.append(album)
-                    track_dict["text"] = "\n".join(text_parts)
+                # JiveLite/SqueezePlay compatibility (Squeezebox Radio, Touch, etc.)
+                # These players expect icon-id or icon for cover art display
+                if album_id:
+                    track_dict["icon-id"] = f"/music/{album_id}/cover"
+                    track_dict["icon"] = f"{server_url}/artwork/{album_id}"
+                    track_dict["artwork_track_id"] = album_id
 
-                    # Add BlurHash for tracks in the loop
-                    if ctx.artwork_manager and path:
-                        try:
-                            track_dict["blurhash"] = await ctx.artwork_manager.get_blurhash(path)
-                        except Exception:
-                            pass
+                # JiveLite expects track/album/artist as separate fields + text
+                track_dict["track"] = getattr(track, "title", "")
+                text_parts = [getattr(track, "title", "")]
+                if artist:
+                    text_parts.append(artist)
+                if album:
+                    text_parts.append(album)
+                track_dict["text"] = "\n".join(text_parts)
 
-                    # Add optional fields based on tags
-                    if tags is None or "n" in tags:
-                        if track.track_no:
-                            track_dict["tracknum"] = track.track_no
-                    if tags is None or "i" in tags:
-                        if track.disc_no:
-                            track_dict["disc"] = track.disc_no
-                    if tags is None or "y" in tags:
-                        if track.year:
-                            track_dict["year"] = track.year
+                # Add BlurHash for tracks in the loop
+                if ctx.artwork_manager and path:
+                    try:
+                        track_dict["blurhash"] = await ctx.artwork_manager.get_blurhash(path)
+                    except Exception:
+                        pass
 
-                    playlist_loop.append(track_dict)
+                # Add optional fields based on tags
+                if tags is None or "n" in tags:
+                    if track.track_no:
+                        track_dict["tracknum"] = track.track_no
+                if tags is None or "i" in tags:
+                    if track.disc_no:
+                        track_dict["disc"] = track.disc_no
+                if tags is None or "y" in tags:
+                    if track.year:
+                        track_dict["year"] = track.year
+
+                playlist_loop.append(track_dict)
         else:
             result["playlist_tracks"] = 0
             result["playlist_cur_index"] = 0

@@ -727,7 +727,18 @@ async def _browse_tracks(
             "id": f"track_{track_id}",
             "type": "audio",
             "playAction": "play",
+            "goAction": "play",
+            "nextWindow": "nowPlaying",
             "actions": {
+                "go": {
+                    "player": 0,
+                    "cmd": ["playlistcontrol"],
+                    "params": {
+                        "cmd": "load",
+                        "track_id": track_id,
+                    },
+                    "nextWindow": "nowPlaying",
+                },
                 "play": {
                     "player": 0,
                     "cmd": ["playlistcontrol"],
@@ -735,6 +746,7 @@ async def _browse_tracks(
                         "cmd": "load",
                         "track_id": track_id,
                     },
+                    "nextWindow": "nowPlaying",
                 },
                 "add": {
                     "player": 0,
@@ -1026,11 +1038,11 @@ async def cmd_playlistcontrol(
     if params.get("track_id"):
         track_id = params["track_id"]
         if cmd_action == "load":
-            playlist_cmd = ["playlist", "loadtracks", f"track.id={track_id}"]
+            playlist_cmd = ["playlist", "loadtracks", f"track_id:{track_id}"]
         elif cmd_action == "add":
-            playlist_cmd = ["playlist", "addtracks", f"track.id={track_id}"]
+            playlist_cmd = ["playlist", "addtracks", f"track_id:{track_id}"]
         elif cmd_action == "insert":
-            playlist_cmd = ["playlist", "inserttracks", f"track.id={track_id}"]
+            playlist_cmd = ["playlist", "inserttracks", f"track_id:{track_id}"]
         else:
             return {}
     elif params.get("album_id"):

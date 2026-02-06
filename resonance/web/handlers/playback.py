@@ -232,9 +232,14 @@ async def cmd_mixer(
     - mixer volume <n> : Set absolute volume (0-100)
     - mixer volume +<n> : Increase volume
     - mixer volume -<n> : Decrease volume
+    - mixer volume <n> seq_no:<n> : Set volume with sequence number (LMS compat)
     - mixer muting ? : Query mute state
     - mixer muting 0/1 : Set mute state
     - mixer muting toggle : Toggle mute
+
+    The seq_no parameter is used by SqueezePlay/Jive devices (Radio, Touch, etc.)
+    to synchronize volume changes. We echo it back in the audg frame so the
+    player can discard stale volume updates.
     """
     if ctx.player_id == "-":
         return {"error": "No player specified"}
@@ -245,6 +250,16 @@ async def cmd_mixer(
 
     if len(params) < 2:
         return {"error": "Missing mixer subcommand"}
+
+    # Parse seq_no from params (can be "seq_no:123" anywhere in params)
+    seq_no: int | None = None
+    for param in params:
+        if isinstance(param, str) and param.startswith("seq_no:"):
+            try:
+                seq_no = int(param.split(":", 1)[1])
+            except (ValueError, IndexError):
+                pass
+            break
 
     subcommand = params[1].lower()
 
@@ -272,7 +287,8 @@ async def cmd_mixer(
                 new_volume = int(volume_str)
                 new_volume = max(0, min(100, new_volume))
 
-            await player.set_volume(new_volume)
+            # Pass seq_no to set_volume for LMS compatibility
+            await player.set_volume(new_volume, seq_no=seq_no)
             return {"_volume": new_volume}
         except (ValueError, TypeError):
             return {"error": f"Invalid volume value: {volume_str}"}
@@ -345,37 +361,23 @@ async def cmd_button(
     elif button == "stop":
         await player.stop()
     elif button in ("fwd", "jump_fwd", "fwd.single"):
-        # Skip forward
+        # Skip forward - use _start_track_stream for proper transcoding
         if ctx.playlist_manager is not None:
             playlist = ctx.playlist_manager.get(ctx.player_id)
             if playlist is not None:
                 next_track = playlist.next()
-                if next_track is not None and ctx.streaming_server is not None:
-                    from pathlib import Path
-
-                    ctx.streaming_server.queue_file(ctx.player_id, Path(next_track.path))
-                    server_ip = ctx.server_host
-                    await player.start_track(
-                        next_track,
-                        server_port=ctx.server_port,
-                        server_ip=server_ip,
-                    )
+                if next_track is not None:
+                    from resonance.web.handlers.playlist import _start_track_stream
+                    await _start_track_stream(ctx, player, next_track)
     elif button in ("rew", "jump_rew", "rew.single"):
-        # Skip backward
+        # Skip backward - use _start_track_stream for proper transcoding
         if ctx.playlist_manager is not None:
             playlist = ctx.playlist_manager.get(ctx.player_id)
             if playlist is not None:
                 prev_track = playlist.previous()
-                if prev_track is not None and ctx.streaming_server is not None:
-                    from pathlib import Path
-
-                    ctx.streaming_server.queue_file(ctx.player_id, Path(prev_track.path))
-                    server_ip = ctx.server_host
-                    await player.start_track(
-                        prev_track,
-                        server_port=ctx.server_port,
-                        server_ip=server_ip,
-                    )
+                if prev_track is not None:
+                    from resonance.web.handlers.playlist import _start_track_stream
+                    await _start_track_stream(ctx, player, prev_track)
     elif button == "volup":
         current = player.status.volume
         await player.set_volume(min(100, current + 5))

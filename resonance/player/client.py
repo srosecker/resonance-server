@@ -142,6 +142,9 @@ class PlayerClient:
         self.info = PlayerInfo()
         self.status = PlayerStatus()
 
+        # Sequence number for volume sync (LMS/SqueezePlay compatibility)
+        self._seq_no: int | None = None
+
         # Connection metadata
         peername = writer.get_extra_info("peername")
         self._remote_ip = peername[0] if peername else "unknown"
@@ -353,22 +356,28 @@ class PlayerClient:
             # If stopped or other state, try to play
             await self.play()
 
-    async def set_volume(self, volume: int, muted: bool = False) -> None:
+    async def set_volume(self, volume: int, muted: bool = False, seq_no: int | None = None) -> None:
         """
         Set the player volume.
 
         Args:
             volume: Volume level 0-100.
             muted: Whether to mute the player.
+            seq_no: Sequence number from client (for LMS/SqueezePlay volume sync).
+                   When provided, it's echoed back in the audg frame so the
+                   player can discard stale volume updates.
         """
         from resonance.protocol.commands import build_volume_frame
 
         volume = max(0, min(100, volume))  # Clamp to 0-100
         logger.info("Setting volume to %d%s on %s", volume, " (muted)" if muted else "", self.name)
-        frame = build_volume_frame(volume, muted)
+        frame = build_volume_frame(volume, muted, seq_no=seq_no)
         await self.send_message(b"audg", frame)
         self.status.volume = volume
         self.status.muted = muted
+        # Store seq_no for status responses (LMS compatibility)
+        if seq_no is not None:
+            self._seq_no = seq_no
 
     async def set_audio_enable(self, enabled: bool = True) -> None:
         """

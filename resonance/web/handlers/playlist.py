@@ -492,12 +492,18 @@ async def _playlist_loadtracks(
     album_id = get_filter_int(tagged_params, "album_id")
     artist_id = get_filter_int(tagged_params, "artist_id")
     genre_id = get_filter_int(tagged_params, "genre_id")
+    # Support both "track_id" and "track.id" formats (Jive uses track.id=X)
+    track_id = get_filter_int(tagged_params, "track_id") or get_filter_int(tagged_params, "track.id")
 
     db = ctx.music_library._db
 
     # Load tracks based on criteria
     # Use "album" order (disc_no, track_no) for proper album playback order
-    if album_id is not None:
+    if track_id is not None:
+        # Single track by ID
+        row = await db.get_track_by_id(track_id)
+        rows = [row] if row else []
+    elif album_id is not None:
         rows = await db.list_tracks_by_album(album_id=album_id, offset=0, limit=1000, order_by="album")
     elif artist_id is not None:
         rows = await db.list_tracks_by_artist(artist_id=artist_id, offset=0, limit=1000, order_by="album")

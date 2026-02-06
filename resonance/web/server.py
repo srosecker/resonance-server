@@ -15,6 +15,7 @@ The WebServer integrates:
 from __future__ import annotations
 
 import logging
+import socket
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
@@ -207,9 +208,12 @@ class WebServer:
         self._port = port
 
         # Update JSON-RPC handler with server info
-        # If binding to all interfaces (0.0.0.0), advertise localhost to clients
-        # so they can construct valid URLs.
-        self.jsonrpc_handler.server_host = "127.0.0.1" if host == "0.0.0.0" else host
+        # If binding to all interfaces (0.0.0.0), detect the actual LAN IP
+        # so Squeezebox devices can construct valid URLs for artwork/streaming
+        if host == "0.0.0.0":
+            self.jsonrpc_handler.server_host = self._detect_lan_ip()
+        else:
+            self.jsonrpc_handler.server_host = host
         self.jsonrpc_handler.server_port = port
 
         # Start Cometd manager
@@ -253,3 +257,19 @@ class WebServer:
     def host(self) -> str:
         """Get the server host."""
         return self._host
+
+    @staticmethod
+    def _detect_lan_ip() -> str:
+        """
+        Detect the primary LAN IP address of this machine.
+
+        Uses the UDP socket trick: connect to a public DNS server
+        (no packet is actually sent) to determine which local
+        interface would be used for outbound traffic.
+        """
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                s.connect(("8.8.8.8", 80))
+                return s.getsockname()[0]
+        except Exception:
+            return "127.0.0.1"

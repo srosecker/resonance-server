@@ -394,6 +394,7 @@ def build_audg_frame(
     right_gain: int = 128,
     preamp: int = 255,
     digital_volume: bool = True,
+    seq_no: int | None = None,
 ) -> bytes:
     """
     Build an 'audg' frame to set player volume/gain.
@@ -406,13 +407,18 @@ def build_audg_frame(
         9       1     preamp (0-255)
         10-13   4     left_gain (32-bit, 16.16 fixed point)
         14-17   4     right_gain (32-bit, 16.16 fixed point)
-        18      1     sequence_id (optional)
+        18-21   4     sequence_number (optional, for volume sync)
+
+    The sequence number is used by SqueezePlay/Jive devices to track
+    volume changes. When the player sends a volume change with seq_no,
+    we echo it back so the player can discard stale updates.
 
     Args:
         left_gain: Left channel gain (0-256, 128 = unity).
         right_gain: Right channel gain (0-256, 128 = unity).
         preamp: Preamp gain (0-255).
         digital_volume: Whether to use digital volume control.
+        seq_no: Sequence number from client (for volume sync).
 
     Returns:
         Complete audg frame bytes.
@@ -432,10 +438,15 @@ def build_audg_frame(
         right_fixed,
     )
 
+    # Append sequence number if provided (LMS compatibility)
+    # This allows the player to track which volume updates are current
+    if seq_no is not None:
+        frame += struct.pack(">I", seq_no)
+
     return frame
 
 
-def build_volume_frame(volume: int, muted: bool = False) -> bytes:
+def build_volume_frame(volume: int, muted: bool = False, seq_no: int | None = None) -> bytes:
     """
     Build an audg frame to set volume.
 
@@ -444,6 +455,7 @@ def build_volume_frame(volume: int, muted: bool = False) -> bytes:
     Args:
         volume: Volume level 0-100.
         muted: Whether volume should be muted.
+        seq_no: Sequence number from client (for volume sync with SqueezePlay).
 
     Returns:
         Complete audg frame bytes.
@@ -454,7 +466,7 @@ def build_volume_frame(volume: int, muted: bool = False) -> bytes:
         # Convert 0-100 to 0-256 gain
         gain = int((volume / 100) * 256)
 
-    return build_audg_frame(left_gain=gain, right_gain=gain)
+    return build_audg_frame(left_gain=gain, right_gain=gain, seq_no=seq_no)
 
 
 def build_aude_frame(spdif_enable: bool = True, dac_enable: bool = True) -> bytes:
