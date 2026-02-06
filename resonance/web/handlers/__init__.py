@@ -14,8 +14,9 @@ Modules:
 
 from __future__ import annotations
 
+import socket
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from resonance.core.artwork import ArtworkManager
@@ -68,7 +69,17 @@ class CommandContext:
 
     def __post_init__(self) -> None:
         if self.server_host == "0.0.0.0":
-            self.server_host = "127.0.0.1"
+            self.server_host = self._detect_lan_ip()
+
+    @staticmethod
+    def _detect_lan_ip() -> str:
+        """Detect the primary LAN IP address of this machine."""
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+                s.connect(("8.8.8.8", 80))
+                return s.getsockname()[0]
+        except Exception:
+            return "127.0.0.1"
 
     def get_player_url(self, path: str) -> str:
         """Generate a URL for player-accessible resources."""

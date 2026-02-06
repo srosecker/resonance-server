@@ -385,6 +385,16 @@ class SlimprotoServer:
 
         logger.info("New connection from %s", remote_addr)
 
+        # Enable TCP keepalive to prevent Windows timeout (WinError 121)
+        sock = writer.get_extra_info("socket")
+        if sock is not None:
+            try:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                if hasattr(socket, "SIO_KEEPALIVE_VALS"):
+                    sock.ioctl(socket.SIO_KEEPALIVE_VALS, (1, 10000, 5000))
+            except Exception as e:
+                logger.debug("Could not set TCP keepalive for %s: %s", remote_addr, e)
+
         # Create a temporary client object for the connection
         client = PlayerClient(reader, writer)
 
@@ -639,6 +649,9 @@ class SlimprotoServer:
                 break
             except ConnectionResetError:
                 logger.debug("Client %s connection reset", client.id)
+                break
+            except OSError as e:
+                logger.warning("Client %s socket error: %s", client.id, e)
                 break
 
             client.update_last_seen()
