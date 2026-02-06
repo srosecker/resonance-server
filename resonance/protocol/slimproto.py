@@ -385,6 +385,23 @@ class SlimprotoServer:
 
         logger.info("New connection from %s", remote_addr)
 
+        # Enable TCP keepalive to prevent WinError 121 (semaphore timeout)
+        # This is critical for Windows which aggressively closes idle connections
+        sock = writer.get_extra_info("socket")
+        if sock is not None:
+            try:
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                # Windows-specific: set keepalive parameters
+                # (onoff=1, keepalive_time=10000ms, keepalive_interval=5000ms)
+                if hasattr(socket, "SIO_KEEPALIVE_VALS"):
+                    sock.ioctl(
+                        socket.SIO_KEEPALIVE_VALS,
+                        (1, 10000, 5000),
+                    )
+                logger.debug("TCP keepalive enabled for %s", remote_addr)
+            except Exception as e:
+                logger.debug("Could not set TCP keepalive for %s: %s", remote_addr, e)
+
         # Create a temporary client object for the connection
         client = PlayerClient(reader, writer)
 
@@ -639,6 +656,10 @@ class SlimprotoServer:
                 break
             except ConnectionResetError:
                 logger.debug("Client %s connection reset", client.id)
+                break
+            except OSError as e:
+                # Catch WinError 121 (semaphore timeout) and other socket errors
+                logger.warning("Client %s socket error: %s", client.id, e)
                 break
 
             client.update_last_seen()

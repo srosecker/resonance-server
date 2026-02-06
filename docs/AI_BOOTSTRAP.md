@@ -65,7 +65,7 @@
 
 | Aufgabe | Projekt | Priorität |
 |---------|---------|-----------|
-| **Live-Test: Touch-UI mit Version 7.9.1** — Boom/Radio/Touch einschalten und testen! | Server | 🔴 Hoch |
+| **Live-Test: Touch-UI mit Version 7.999.999** — Boom/Radio/Touch einschalten und testen! | Server | 🔴 Hoch |
 | **Radio/Touch State-Reset** — "Bibliothek umschalten" oder Factory Reset durchführen | Server | 🔴 Hoch |
 | Shipping: pip/PyPI Setup | Server | 🟡 Mittel |
 | Shipping: Docker Image | Server | 🟡 Mittel |
@@ -86,12 +86,12 @@
 - 🐛 **ROOT CAUSE GEFUNDEN**: Server-Version "9.0.0" wird von Firmware abgelehnt!
   - SqueezePlay Firmware 7.7.3 und älter hat einen **Version-Vergleichs-Bug**
   - Versionen >= 8.0.0 werden fälschlicherweise als "zu alt" abgelehnt
-  - LMS umgeht das mit `getFakeVersion()` → gibt "7.9.1" zurück
+  - LMS umgeht das mit `getFakeVersion()` → gibt "7.999.999" zurück (RADIO_COMPATIBLE_VERSION)
 - ✅ **Fix implementiert**:
-  - `resonance/server.py`: Discovery VERS TLV → "7.9.1"
-  - `resonance/protocol/slimproto.py`: Slimproto vers → "7.9.1"
-  - `resonance/protocol/discovery.py`: Default version → "7.9.1"
-  - `resonance/web/handlers/status.py`: serverstatus version → "7.9.1"
+  - `resonance/server.py`: Discovery VERS TLV → "7.999.999"
+  - `resonance/protocol/slimproto.py`: Slimproto vers → "7.999.999"
+  - `resonance/protocol/discovery.py`: Default version → "7.999.999"
+  - `resonance/web/handlers/status.py`: serverstatus version → "7.999.999"
 - ✅ Tests aktualisiert und alle 356 Tests bestanden
 - 🧪 **NOCH NICHT LIVE GETESTET** — Server starten + Boom/Radio einschalten!
 
@@ -99,7 +99,7 @@
 - 🔍 **Wireshark-Analyse ws20/ws21**:
   - Radio sendet KEINE HTTP-Pakete (weder zu 9000 noch 80/443)
   - Radio sendet Slimproto `strm t` (Status) → TCP-Verbindung steht!
-  - Server sendet Discovery FLUT korrekt (VERS 7.9.1, JSON 9000)
+  - Server sendet Discovery FLUT korrekt (VERS 7.999.999, JSON 9000)
 - 🐛 **Slimproto Diskrepanz gefunden**:
   - Resonance sendete `strm q` an Port `0x3000` (LMS sendet `0`)
   - Resonance sendete `strm t` an Port `9000` (LMS sendet `0`)
@@ -530,7 +530,7 @@ Wichtige LMS-Dateien:
 
 | Entscheidung | Begründung |
 |--------------|------------|
-| **VERS = "7.9.1"** | Firmware-Bug in SqueezePlay 7.7.3: Versionen >= 8.0.0 werden abgelehnt |
+| **VERS = "7.999.999"** | Firmware-Bug in SqueezePlay 7.7.3: Versionen >= 8.0.0 werden abgelehnt. LMS nutzt `RADIO_COMPATIBLE_VERSION = "7.999.999"` |
 | **strm Port = 0** | LMS sendet Port 0 für `strm q` und `strm t`. Wir matchen das jetzt. |
 | LMS-kompatible Elapsed | `elapsed = start_offset + raw_elapsed` — Siehe `SEEK_ELAPSED_FINDINGS.md` |
 | SeekCoordinator | Latest-Wins, 50ms Coalescing, saubere Subprocess-Termination |
