@@ -62,7 +62,8 @@
 | Aufgabe | Projekt | Priorität |
 |---------|---------|-----------|
 | ~~Live-Test: Streaming auf Squeezebox Radio~~ | Server | ✅ Erledigt |
-| **Live-Test: Alle Fixes verifizieren (Cover, Volume, Playlist)** | Server | 🔴 Hoch |
+| **Live-Test: Fixes vom 2026-02-06 verifizieren (Playlist-Nichts + Cometd)** | Server | 🔴 Hoch |
+| displaystatus-Befehl implementieren (WARNING im Log) | Server | 🟡 Mittel |
 | Shipping: pip/PyPI Setup | Server | 🟡 Mittel |
 | Shipping: Docker Image | Server | 🟡 Mittel |
 | grfe/grfb Display-Grafiken (Cover auf Hardware) | Server | 🟢 Niedrig |
@@ -208,6 +209,33 @@ git stash
 git add -A && git commit -m "WIP: checkpoint"
 ```
 
+### 10. faad.exe IST bereits LMS-gepatcht 🚨
+
+Das `faad.exe` in `third_party/bin/` ist die **LMS-gepatchte Version** von Ralph Irving
+mit ALAC-, Seeking- und Chapter-Support. NICHT durch ffmpeg ersetzen!
+
+```powershell
+# Beweis:
+./third_party/bin/faad.exe 2>&1 | Select-String "Patched"
+# → "Patched for Squeezebox Server"
+# → Source: https://github.com/ralph-irving/faad2
+```
+
+### 11. Server-Log Zeilen sind oft ABGESCHNITTEN 🚨
+
+Das `--verbose` Terminal-Log kürzt lange Zeilen. Der Transcode-Counter loggt nur
+Chunks 1-3 und jeden 100. — dazwischen fehlen Logs. Die finale "Transcode complete"
+Zeile kann abgeschnitten sein und falsche Byte-Zahlen suggerieren.
+
+**IMMER pcapng/Wireshark zur Verifikation der tatsächlich gesendeten Bytes nutzen!**
+
+```powershell
+# TCP-Daten auf Stream-Port verifizieren:
+& "C:/Program Files/Wireshark/tshark.exe" -r capture.pcapng `
+  -Y "tcp.port==51299 && tcp.srcport==9000 && tcp.len > 0" `
+  -T fields -e tcp.len | awk '{sum += $1} END {print sum}'
+```
+
 ---
 
 ## 📂 Wichtige Pfade
@@ -247,6 +275,8 @@ Wichtige LMS-Dateien:
 | TCP Keepalive 10s/5s | Verhindert WinError 121 auf Windows |
 | UUID v4 (36 Zeichen) | LMS-kompatibles Format |
 | Streaming Cometd | Squeezebox erwartet `connectionType: "streaming"` |
+| faad statt ffmpeg | LMS-gepatchtes faad2 in third_party/bin/ funktioniert korrekt |
+| Cometd Timeout 1h | 300s war zu kurz, Radio verlor Push-Verbindung |
 
 ---
 
@@ -289,3 +319,47 @@ Wenn der Mensch sagt **"whktm"** oder **"wir haben keine tokens mehr"**:
 | [SLIMPROTO.md](./SLIMPROTO.md) | Binärprotokoll Details |
 
 > **Tipp:** Für schnellen Session-Start: `Lies COLDSTART.md`
+
+---
+
+## 📝 Session-Log: 2026-02-06 — Squeezebox Radio Live-Test Analyse
+
+### Angewandte Fixes (Tests: 356/356 ✅)
+
+**Fix 1: Playlist zeigt "Nichts" statt Track-Info** — `resonance/web/handlers/playlist.py`
+```python
+# In _playlist_loadtracks(): Dict-Keys korrigiert (TrackRow-Feldnamen)
+artist_name=row_dict.get("artist"),   # war: "artist_name" → None
+album_title=row_dict.get("album"),    # war: "album_title" → None
+```
+
+**Fix 2: Cometd Streaming Timeout** — `resonance/web/routes/cometd.py`
+- `STREAMING_TIMEOUT`: 300 → 3600 (1 Stunde statt 5 Minuten)
+- Reconnect-Advice am Stream-Ende hinzugefügt (`"reconnect": "retry"`)
+
+**Fix 3: build_command() ffmpeg-kompatibel** — `resonance/streaming/transcoder.py`
+- `$START$`/`$END$` Substitution ist jetzt binary-aware: `-ss`/`-to` für ffmpeg, `-j`/`-e` für faad
+- Zukunftssicher, aktuell nicht gebraucht (faad funktioniert)
+
+### Korrigierte Fehldiagnose: "12KB Transcode Bug"
+
+Die Session-Findings-Analyse vom Coding Agent behauptete, faad liefere nur 12KB.
+**pcapng-Analyse beweist: Das war FALSCH!**
+
+| Quelle | Bytes | Erklärung |
+|--------|-------|-----------|
+| Server-Log (abgeschnitten) | "12288" | Nur Chunks 1-3 geloggt, Finalzeile abgeschnitten |
+| **pcapng (Ground Truth)** | **201.038** | TCP Seq-Analyse: vollständige ~12s MP3 |
+| Player STMu elapsed | 12s | Track lief korrekt bis zum Ende |
+
+**Das LMS-gepatchte faad2 funktioniert einwandfrei.** NICHT durch ffmpeg ersetzen!
+
+### Was "System unbenutzbar" verursachte
+
+Nach Track-Ende (STMu) + Cometd-Timeout (5min) hatte die Radio keine Push-Verbindung
+mehr zum Server → keine Events, keine Navigation möglich. Fix: Timeout auf 1h erhöht.
+
+### Referenz-Dateien
+
+- `docs/ws32.pcapng` — Wireshark-Capture des Live-Tests
+- `docs/ws32_server.txt` — Server-Log (1545 Zeilen, Zeilen ABGESCHNITTEN)
