@@ -1,0 +1,1546 @@
+PS C:\Users\stephan\Desktop\resonance-server> micromamba run -p ".build/mamba/envs/resonance-env" python -m resonance --verbose
+2026-02-06 15:42:16 [INFO] __main__: Starting Resonance Music Server...
+2026-02-06 15:42:16 [DEBUG] resonance.server: Using existing server UUID: 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:42:16 [INFO] resonance.server: Starting Resonance server on 0.0.0.0:3483
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing <function connect.<locals>.connector at 0x000001579AE1AC40>
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation <function connect.<locals>.connector at 0x000001579AE1AC40> completed
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method commit of sqlite3.Connection object)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method commit of sqlite3.Connection objectd
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method commit of sqlite3.Connection object)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method commit of sqlite3.Connection objectd
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:16 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:42:16 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:42:16 [INFO] resonance.protocol.slimproto: Slimproto server listening on 0.0.0.0:3483
+2026-02-06 15:42:16 [INFO] resonance.protocol.discovery: UDP Discovery listening on port 3483
+2026-02-06 15:42:16 [INFO] resonance.protocol.discovery: UDP Discovery server started on 0.0.0.0:3483 (advertising 'Res)
+2026-02-06 15:42:16 [INFO] resonance.streaming.server: Streaming server ready (via FastAPI on port 9000)
+2026-02-06 15:42:16 [DEBUG] resonance.core.events: Subscribed to player.*: <bound method CometdManager.handle_event of >
+2026-02-06 15:42:16 [INFO] resonance.web.cometd: CometdManager started
+2026-02-06 15:42:16 [INFO] resonance.web.server: Web server started on http://0.0.0.0:9000
+2026-02-06 15:42:16 [DEBUG] resonance.core.events: Subscribed to player.track_finished: <function ResonanceServer.start>
+2026-02-06 15:42:16 [INFO] resonance.server: Resonance server started successfully
+2026-02-06 15:42:16 [INFO] resonance.server: Slimproto: port 3483 | Web/Streaming: port 9000
+2026-02-06 15:42:17 [INFO] resonance.protocol.slimproto: New connection from 192.168.1.69:59937
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Could not set TCP keepalive for 192.168.1.69:59937: 'Transpor'
+2026-02-06 15:42:17 [DEBUG] resonance.player.client: PlayerClient created for connection from 192.168.1.69:59937
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Received HELO from client (221 bytes)
+2026-02-06 15:42:17 [INFO] resonance.protocol.slimproto: Player connected: 00:04:20:26:84:ae (CONTROLLER, rev 0)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Sending server capabilities to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=vers payload_len=9 payload_hex=37 2e 39 39 39 2e 39 39 39
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=vers payload_len=9 payload_hex=379
+2026-02-06 15:42:17 [DEBUG] resonance.player.client: Sent b'vers' to 00:04:20:26:84:ae (9 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Sent vers 7.999.999 to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=71 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=q autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=q autostart=0 format=m server_port=0 0
+2026-02-06 15:42:17 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=q autostart=0 format=m pcm_sz0
+2026-02-06 15:42:17 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Sent strm query to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=setd payload_len=1 payload_hex=00
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=setd payload_len=1 payload_hex=00
+2026-02-06 15:42:17 [DEBUG] resonance.player.client: Sent b'setd' to 00:04:20:26:84:ae (1 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Sent setd 0x00 to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=setd payload_len=1 payload_hex=04
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=setd payload_len=1 payload_hex=04
+2026-02-06 15:42:17 [DEBUG] resonance.player.client: Sent b'setd' to 00:04:20:26:84:ae (1 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Sent setd 0x04 to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=aude payload_len=2 payload_hex=01 01
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=aude payload_len=2 payload_hex=011
+2026-02-06 15:42:17 [DEBUG] resonance.player.client: Sent b'aude' to 00:04:20:26:84:ae (2 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Sent aude (enable audio) to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=audg payload_len=22 payload_hex=00 00 00 00 00 00 00 00 01 ff 00 00 00 00 00 00 00 00 00 3
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=audg payload_len=22 payload_hex=03
+2026-02-06 15:42:17 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Sent audg (volume) to 00:04:20:26:84:ae
+2026-02-06 15:42:17 [INFO] resonance.player.registry: Player registered: 00:04:20:26:84:ae (00:04:20:26:84:ae)
+2026-02-06 15:42:17 [DEBUG] resonance.web.cometd: Delivered event on /players to 0 clients
+2026-02-06 15:42:17 [DEBUG] resonance.core.events: Published player.connected to 1 handlers
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: STAT vers from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: STAT STMf from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Received SETD from client (4 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: SETD from 00:04:20:26:84:ae: 4 bytes
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: STAT setd from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: STAT setd from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: STAT aude from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:17 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:42:21 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:42:21 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:42:21 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:42:21 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:42:21 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:42:21 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:21 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:42:26 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:42:26 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:42:26 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:42:26 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:42:26 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:42:26 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:26 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:42:31 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:42:31 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:42:31 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:42:31 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:42:31 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:42:31 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:31 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:42:36 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:42:36 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:42:36 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:42:36 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:42:36 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:42:36 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:36 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:42:41 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:42:41 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:42:41 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:42:41 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:42:41 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:42:41 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:41 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:42:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:42:44 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.69:48553
+2026-02-06 15:42:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:42:44 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'VERS', 'UUID', 'JVI]
+2026-02-06 15:42:44 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:42:44 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:42:44 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:42:44 [INFO] resonance.protocol.discovery:   TLV VERS = 7.999.999
+2026-02-06 15:42:44 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:42:44 [INFO] resonance.protocol.discovery: Jive device: 12:34:56:78:12:34
+2026-02-06 15:42:44 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.69: sent IPAD, NAME, JSON, VERS, UUID
+2026-02-06 15:42:44 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.69:48553
+2026-02-06 15:42:45 [WARNING] resonance.web.cometd: Auto-created missing Cometd client 79cafb1f from embedded clientId t
+2026-02-06 15:42:45 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['browselibrary']
+2026-02-06 15:42:45 [DEBUG] resonance.web.handlers.menu: browselibrary: mode=albums, start=0, items=200
+2026-02-06 15:42:45 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:45 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:45 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:42:45 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:42:45 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:45 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:45 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchall of sqlite3.Cursor object a)
+2026-02-06 15:42:45 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchall of sqlite3.Cursor object ad
+2026-02-06 15:42:45 [DEBUG] resonance.web.cometd: slim_request delivered result on /79cafb1f/slim/request
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:42:46 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:42:46 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:42:46 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:42:46 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:42:46 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:42:46 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:46 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:42:47 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['power', '0', F]
+2026-02-06 15:42:47 [INFO] resonance.player.client: Stopping playback on 00:04:20:26:84:ae
+2026-02-06 15:42:47 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=q autostart=0 format=m pcm_sz0
+2026-02-06 15:42:47 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:42:47 [INFO] resonance.player.client: Setting audio enable to False on 00:04:20:26:84:ae
+2026-02-06 15:42:47 [DEBUG] resonance.player.client: Sent b'aude' to 00:04:20:26:84:ae (2 bytes)
+2026-02-06 15:42:47 [DEBUG] resonance.web.cometd: slim_request delivered result on /79cafb1f/slim/request
+2026-02-06 15:42:48 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:48 [DEBUG] resonance.protocol.slimproto: STAT STMf from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:42:48 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:48 [DEBUG] resonance.protocol.slimproto: STAT aude from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:42:50 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['power', '1', F]
+2026-02-06 15:42:50 [INFO] resonance.player.client: Setting audio enable to True on 00:04:20:26:84:ae
+2026-02-06 15:42:50 [DEBUG] resonance.player.client: Sent b'aude' to 00:04:20:26:84:ae (2 bytes)
+2026-02-06 15:42:50 [DEBUG] resonance.web.cometd: slim_request delivered result on /79cafb1f/slim/request
+2026-02-06 15:42:50 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:50 [DEBUG] resonance.protocol.slimproto: STAT aude from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:42:51 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:42:51 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:42:51 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:42:51 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:42:51 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:42:51 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:42:51 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:42:52 [DEBUG] resonance.protocol.slimproto: Client 00:04:20:26:84:ae disconnected (incomplete read)
+2026-02-06 15:42:52 [INFO] resonance.player.registry: Player unregistered: 00:04:20:26:84:ae
+2026-02-06 15:42:52 [DEBUG] resonance.web.cometd: Delivered event on /players to 0 clients
+2026-02-06 15:42:52 [DEBUG] resonance.core.events: Published player.disconnected to 1 handlers
+2026-02-06 15:42:52 [INFO] resonance.player.client: Disconnecting player 00:04:20:26:84:ae
+2026-02-06 15:42:52 [INFO] resonance.protocol.slimproto: Connection closed: 192.168.1.69:59937
+2026-02-06 15:42:52 [DEBUG] resonance.web.cometd: Disconnect: removed client 79cafb1f
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Handshake: created client 4d3e4f2b
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b subscribed to /4d3e4f2b/**
+2026-02-06 15:42:53 [INFO] resonance.web.routes.cometd: Client 4d3e4f2b requested streaming connection, starting chunkee
+2026-02-06 15:42:53 [INFO] resonance.web.routes.cometd: Starting streaming connection for client 4d3e4f2b
+2026-02-06 15:42:53 [DEBUG] resonance.web.routes.cometd: Streaming initial chunk to 4d3e4f2b: [{"channel": "/meta/conneI
+2026-02-06 15:42:53 [DEBUG] resonance.web.routes.cometd: Extracted clientId 4d3e4f2b from response channel /4d3e4f2b/sls
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim-subscribed to /4d3e4f2b/slim/serverstatus
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe executing: player= cmd=['serverstatus']
+2026-02-06 15:42:53 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:53 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:53 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:42:53 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:42:53 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:53 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:53 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:42:53 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:42:53 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:42:53 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:42:53 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:42:53 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe delivered initial result on /4d3e4f2b/s
+2026-02-06 15:42:53 [DEBUG] resonance.web.routes.cometd: Extracted clientId 4d3e4f2b from response channel /4d3e4f2b/sls
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim-subscribed to /4d3e4f2b/slim/firmwarestatus
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe executing: player= cmd=['firmwareupgra]
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe delivered initial result on /4d3e4f2b/s
+2026-02-06 15:42:53 [DEBUG] resonance.web.routes.cometd: Extracted clientId 4d3e4f2b from response channel /4d3e4f2b/sle
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim-subscribed to /4d3e4f2b/slim/menustatus/00:04:20e
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe executing: player=00:04:20:26:84:ae cm]
+2026-02-06 15:42:53 [DEBUG] resonance.web.handlers.menu: menustatus query (stub): ['menustatus']
+2026-02-06 15:42:53 [DEBUG] resonance.web.routes.cometd: Extracted clientId 4d3e4f2b from response channel /4d3e4f2b/sle
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim-subscribed to /4d3e4f2b/slim/datestatus/00:04:20e
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe executing: player=00:04:20:26:84:ae cm]
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe delivered initial result on /4d3e4f2b/e
+2026-02-06 15:42:53 [DEBUG] resonance.web.routes.cometd: Extracted clientId 4d3e4f2b from response channel /4d3e4f2b/sle
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim-subscribed to /4d3e4f2b/slim/playerstatus/00:04:e
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe executing: player=00:04:20:26:84:ae cm]
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe delivered initial result on /4d3e4f2b/e
+2026-02-06 15:42:53 [DEBUG] resonance.web.routes.cometd: Extracted clientId 4d3e4f2b from response channel /4d3e4f2b/sle
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim-subscribed to /4d3e4f2b/slim/displaystatus/00:04e
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe executing: player=00:04:20:26:84:ae cm]
+2026-02-06 15:42:53 [WARNING] resonance.web.jsonrpc: Unknown command: displaystatus
+2026-02-06 15:42:53 [DEBUG] resonance.web.cometd: Client 4d3e4f2b slim_subscribe delivered initial result on /4d3e4f2b/e
+2026-02-06 15:42:53 [DEBUG] resonance.web.routes.cometd: Streaming events to 4d3e4f2b: [{"channel": "/4d3e4f2b/slim/ser0
+2026-02-06 15:42:53 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:42:53 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.69:48553
+2026-02-06 15:42:53 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:42:53 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'VERS', 'UUID', 'JVI]
+2026-02-06 15:42:53 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:42:53 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:42:53 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:42:53 [INFO] resonance.protocol.discovery:   TLV VERS = 7.999.999
+2026-02-06 15:42:53 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:42:53 [INFO] resonance.protocol.discovery: Jive device: 12:34:56:78:12:34
+2026-02-06 15:42:53 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.69: sent IPAD, NAME, JSON, VERS, UUID
+2026-02-06 15:42:53 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.69:48553
+2026-02-06 15:42:54 [WARNING] resonance.web.cometd: Auto-created missing Cometd client  from embedded clientId in /slime
+2026-02-06 15:42:54 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:42:54 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.69:48553
+2026-02-06 15:42:54 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:42:54 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'VERS', 'UUID', 'JVI]
+2026-02-06 15:42:54 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:42:54 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:42:54 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:42:54 [INFO] resonance.protocol.discovery:   TLV VERS = 7.999.999
+2026-02-06 15:42:54 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:42:54 [INFO] resonance.protocol.discovery: Jive device: 12:34:56:78:12:34
+2026-02-06 15:42:54 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.69: sent IPAD, NAME, JSON, VERS, UUID
+2026-02-06 15:42:54 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.69:48553
+2026-02-06 15:43:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:43:03 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.15:57827
+2026-02-06 15:43:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:43:03 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'UUID']
+2026-02-06 15:43:03 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:43:03 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:43:03 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:43:03 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:43:03 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.15: sent IPAD, NAME, JSON, UUID
+2026-02-06 15:43:03 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.15:57827
+2026-02-06 15:43:28 [INFO] resonance.web.routes.cometd: Streaming connection cancelled for client 4d3e4f2b
+2026-02-06 15:43:28 [INFO] resonance.web.routes.cometd: Streaming connection ended for client 4d3e4f2b
+2026-02-06 15:43:44 [INFO] resonance.protocol.slimproto: New connection from 192.168.1.69:36717
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Could not set TCP keepalive for 192.168.1.69:36717: 'Transpor'
+2026-02-06 15:43:44 [DEBUG] resonance.player.client: PlayerClient created for connection from 192.168.1.69:36717
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.69:38985
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'VERS', 'UUID', 'JVI]
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery:   TLV VERS = 7.999.999
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery: Jive device: 12:34:56:78:12:34
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.69: sent IPAD, NAME, JSON, VERS, UUID
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.69:38985
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Received HELO from client (221 bytes)
+2026-02-06 15:43:44 [INFO] resonance.protocol.slimproto: Player connected: 00:04:20:26:84:ae (CONTROLLER, rev 0)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Sending server capabilities to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=vers payload_len=9 payload_hex=37 2e 39 39 39 2e 39 39 39
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=vers payload_len=9 payload_hex=379
+2026-02-06 15:43:44 [DEBUG] resonance.player.client: Sent b'vers' to 00:04:20:26:84:ae (9 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Sent vers 7.999.999 to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=71 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=q autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=q autostart=0 format=m server_port=0 0
+2026-02-06 15:43:44 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=q autostart=0 format=m pcm_sz0
+2026-02-06 15:43:44 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Sent strm query to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=setd payload_len=1 payload_hex=00
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=setd payload_len=1 payload_hex=00
+2026-02-06 15:43:44 [DEBUG] resonance.player.client: Sent b'setd' to 00:04:20:26:84:ae (1 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Sent setd 0x00 to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=setd payload_len=1 payload_hex=04
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=setd payload_len=1 payload_hex=04
+2026-02-06 15:43:44 [DEBUG] resonance.player.client: Sent b'setd' to 00:04:20:26:84:ae (1 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Sent setd 0x04 to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=aude payload_len=2 payload_hex=01 01
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=aude payload_len=2 payload_hex=011
+2026-02-06 15:43:44 [DEBUG] resonance.player.client: Sent b'aude' to 00:04:20:26:84:ae (2 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Sent aude (enable audio) to 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=audg payload_len=22 payload_hex=00 00 00 00 00 00 00 00 01 ff 00 00 00 00 00 00 00 00 00 3
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=audg payload_len=22 payload_hex=03
+2026-02-06 15:43:44 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Sent audg (volume) to 00:04:20:26:84:ae
+2026-02-06 15:43:44 [INFO] resonance.player.registry: Player registered: 00:04:20:26:84:ae (00:04:20:26:84:ae)
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Delivered event on /players to 0 clients
+2026-02-06 15:43:44 [DEBUG] resonance.core.events: Published player.connected to 1 handlers
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Handshake: created client 681dcc10
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: STAT vers from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 subscribed to /681dcc10/**
+2026-02-06 15:43:44 [INFO] resonance.web.routes.cometd: Client 681dcc10 requested streaming connection, starting chunkee
+2026-02-06 15:43:44 [INFO] resonance.web.routes.cometd: Starting streaming connection for client 681dcc10
+2026-02-06 15:43:44 [DEBUG] resonance.web.routes.cometd: Streaming initial chunk to 681dcc10: [{"channel": "/meta/conneI
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: STAT STMf from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Received SETD from client (4 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: SETD from 00:04:20:26:84:ae: 4 bytes
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: STAT setd from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: STAT setd from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: STAT aude from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:44 [DEBUG] resonance.web.routes.cometd: Extracted clientId 681dcc10 from response channel /681dcc10/sls
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim-subscribed to /681dcc10/slim/serverstatus
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe executing: player= cmd=['serverstatus']
+2026-02-06 15:43:44 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:43:44 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:43:44 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:43:44 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:43:44 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:43:44 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:43:44 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:43:44 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:43:44 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:43:44 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:43:44 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:43:44 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe delivered initial result on /681dcc10/s
+2026-02-06 15:43:44 [DEBUG] resonance.web.routes.cometd: Extracted clientId 681dcc10 from response channel /681dcc10/sls
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim-subscribed to /681dcc10/slim/firmwarestatus
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe executing: player= cmd=['firmwareupgra]
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe delivered initial result on /681dcc10/s
+2026-02-06 15:43:44 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/ser0
+2026-02-06 15:43:44 [DEBUG] resonance.web.routes.cometd: Extracted clientId 681dcc10 from response channel /681dcc10/sle
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim-subscribed to /681dcc10/slim/datestatus/00:04:20e
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe executing: player=00:04:20:26:84:ae cm]
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe delivered initial result on /681dcc10/e
+2026-02-06 15:43:44 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/dato
+2026-02-06 15:43:44 [DEBUG] resonance.web.routes.cometd: Extracted clientId 681dcc10 from response channel /681dcc10/sle
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim-subscribed to /681dcc10/slim/menustatus/00:04:20e
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe executing: player=00:04:20:26:84:ae cm]
+2026-02-06 15:43:44 [DEBUG] resonance.web.handlers.menu: menustatus query (stub): ['menustatus']
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.69:38985
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'VERS', 'UUID', 'JVI]
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery:   TLV VERS = 7.999.999
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery: Jive device: 12:34:56:78:12:34
+2026-02-06 15:43:44 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.69: sent IPAD, NAME, JSON, VERS, UUID
+2026-02-06 15:43:44 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.69:38985
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['menu', 0, 100,]
+2026-02-06 15:43:44 [DEBUG] resonance.web.handlers.menu: menu query: start=0, items=100, direct=True
+2026-02-06 15:43:44 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:43:44 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req
+2026-02-06 15:43:45 [DEBUG] resonance.web.routes.cometd: Extracted clientId 681dcc10 from response channel /681dcc10/sle
+2026-02-06 15:43:45 [DEBUG] resonance.web.cometd: Client 681dcc10 slim-subscribed to /681dcc10/slim/playerstatus/00:04:e
+2026-02-06 15:43:45 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe executing: player=00:04:20:26:84:ae cm]
+2026-02-06 15:43:45 [DEBUG] resonance.core.playlist: Created new playlist for player 00:04:20:26:84:ae
+2026-02-06 15:43:45 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe delivered initial result on /681dcc10/e
+2026-02-06 15:43:45 [DEBUG] resonance.web.routes.cometd: Extracted clientId 681dcc10 from response channel /681dcc10/sle
+2026-02-06 15:43:45 [DEBUG] resonance.web.cometd: Client 681dcc10 slim-subscribed to /681dcc10/slim/displaystatus/00:04e
+2026-02-06 15:43:45 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe executing: player=00:04:20:26:84:ae cm]
+2026-02-06 15:43:45 [WARNING] resonance.web.jsonrpc: Unknown command: displaystatus
+2026-02-06 15:43:45 [DEBUG] resonance.web.cometd: Client 681dcc10 slim_subscribe delivered initial result on /681dcc10/e
+2026-02-06 15:43:45 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['status', 0, 20]
+2026-02-06 15:43:45 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:43:45 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/pla_
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:43:46 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:43:46 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:43:46 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:43:46 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:43:46 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:43:46 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:46 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:43:51 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:43:51 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:43:51 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:43:51 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:43:51 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:43:51 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:51 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:55 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['browselibrary']
+2026-02-06 15:43:55 [DEBUG] resonance.web.handlers.menu: browselibrary: mode=albums, start=0, items=200
+2026-02-06 15:43:55 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:43:55 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:43:55 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:43:55 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:43:55 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:43:55 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:43:55 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchall of sqlite3.Cursor object a)
+2026-02-06 15:43:55 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchall of sqlite3.Cursor object ad
+2026-02-06 15:43:55 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:43:55 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/reqa
+2026-02-06 15:43:56 [DEBUG] resonance.web.routes.artwork: Cover request: artwork_id=3, spec=41x41_m -> 41x41 mode=m
+2026-02-06 15:43:56 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:43:56 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:43:56 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchall of sqlite3.Cursor object a)
+2026-02-06 15:43:56 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchall of sqlite3.Cursor object ad
+2026-02-06 15:43:56 [DEBUG] resonance.web.routes.artwork: Cover: found track via album_id=3: C:\Users\stephan\Desktop\Fb
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:43:56 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:43:56 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:43:56 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:43:56 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:43:56 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:43:56 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:56 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:57 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['browselibrary']
+2026-02-06 15:43:57 [DEBUG] resonance.web.handlers.menu: browselibrary: mode=tracks, start=0, items=200
+2026-02-06 15:43:57 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:43:57 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:43:57 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:43:57 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:43:57 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:43:57 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:43:57 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchall of sqlite3.Cursor object a)
+2026-02-06 15:43:57 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchall of sqlite3.Cursor object ad
+2026-02-06 15:43:57 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:43:57 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/reqo
+2026-02-06 15:43:59 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['playlistcontro]
+2026-02-06 15:43:59 [DEBUG] resonance.web.handlers.menu: playlistcontrol: cmd=load, params={'cmd': 'load', 'track_id': }
+2026-02-06 15:43:59 [INFO] resonance.core.playlist: playlist.clear: cleared 0 tracks, current_index reset to 0
+2026-02-06 15:43:59 [INFO] resonance.player.client: Stopping playback on 00:04:20:26:84:ae
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=q autostart=0 format=m pcm_sz0
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:43:59 [INFO] resonance.player.client: Flushing buffer on 00:04:20:26:84:ae
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=f autostart=0 format=m pcm_sz0
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:43:59 [DEBUG] aiosqlite: executing functools.partial(<built-in method execute of sqlite3.Connection objec)
+2026-02-06 15:43:59 [DEBUG] aiosqlite: operation functools.partial(<built-in method execute of sqlite3.Connection objecd
+2026-02-06 15:43:59 [DEBUG] aiosqlite: executing functools.partial(<built-in method fetchone of sqlite3.Cursor object a)
+2026-02-06 15:43:59 [INFO] resonance.core.playlist: playlist.add: track=Vorspann - Der stille Freund, position=None, id1
+2026-02-06 15:43:59 [INFO] resonance.core.playlist: playlist.play: index=0 (requested), current_index: 0 -> 0, track=Vod
+2026-02-06 15:43:59 [INFO] resonance.player.client: Stopping playback on 00:04:20:26:84:ae
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=q autostart=0 format=m pcm_sz0
+2026-02-06 15:43:59 [DEBUG] aiosqlite: operation functools.partial(<built-in method fetchone of sqlite3.Cursor object ad
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:43:59 [INFO] resonance.player.client: Flushing buffer on 00:04:20:26:84:ae
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=f autostart=0 format=m pcm_sz0
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:43:59 [INFO] resonance.player.client: Setting volume to 50 on 00:04:20:26:84:ae
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (18 bytes)
+2026-02-06 15:43:59 [INFO] resonance.streaming.server: Queued Vorspann - Der stille Freund - Ferdinand von Schirach.m4b)
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: Resolving format for hint: m4b
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: start_stream logic: hint='m4b' -> format=MP3 (val='m'), autostart=]
+2026-02-06 15:43:59 [INFO] resonance.player.client: Starting stream for C:\Users\stephan\Desktop\Final\Ferdinand von Sc)
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=s autostart=1 format=m pcm_sze
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: PlayerClient TX strm request_preview='GET /stream.mp3?player=00:04'
+2026-02-06 15:43:59 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (77 bytes)
+2026-02-06 15:43:59 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:43:59 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:43:59 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:59 [DEBUG] resonance.protocol.slimproto: STAT STMf from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:59 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:59 [DEBUG] resonance.protocol.slimproto: STAT STMf from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:59 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:59 [DEBUG] resonance.protocol.slimproto: STAT STMf from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:59 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:59 [DEBUG] resonance.protocol.slimproto: STAT STMf from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:59 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:43:59 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:43:59 [INFO] resonance.streaming.server: resolve_file: player=00:04:20:26:84:ae -> FROM QUEUE: Vorspann -b
+2026-02-06 15:43:59 [DEBUG] resonance.streaming.transcoder: Loading transcode config from C:\Users\stephan\Desktop\resof
+2026-02-06 15:43:59 [INFO] resonance.streaming.transcoder: Loaded 30 transcoding rules from legacy.conf
+2026-02-06 15:43:59 [DEBUG] resonance.web.routes.streaming: [STREAM] player=00:04:20:26:84:ae gen=1 starting transcode )
+2026-02-06 15:43:59 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] transcode_stream() called for Vorspann - Der stb
+2026-02-06 15:43:59 [INFO] resonance.streaming.transcoder: [TRANSCODE] Starting: Vorspann - Der stille Freund - Ferdina)
+2026-02-06 15:43:59 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Starting Popen stage 0: C:\Users\stephan\Desktob
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Popen stage 0 started, pid=6612
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Starting Popen stage 1: C:\Users\stephan\Deskto-
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Popen stage 1 started, pid=20556
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] All Popen stages started, starting reader thread
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Reader thread started, entering yield loop
+2026-02-06 15:44:00 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:00 [DEBUG] resonance.protocol.slimproto: STAT STMf from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:00 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:00 [DEBUG] resonance.protocol.slimproto: STAT STMc from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:00 [DEBUG] resonance.protocol.slimproto: Received RESP from client (172 bytes)
+2026-02-06 15:44:00 [DEBUG] resonance.protocol.slimproto: RESP from 00:04:20:26:84:ae: 172 bytes
+2026-02-06 15:44:00 [DEBUG] resonance.protocol.slimproto: RESP headers:
+HTTP/1.1 200 OK
+date: Fri, 06 Feb 2026 14:43:58 GMT
+server: uvicorn
+accept-ranges: none
+x-content-type-options: nosniff
+content-type: audio/mpeg
+Connection: close
+
+
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Yielded chunk 1, 4096 bytes total
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Yielded chunk 2, 8192 bytes total
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Yielded chunk 3, 12288 bytes total
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Received None from queue, EOF
+2026-02-06 15:44:00 [INFO] resonance.streaming.transcoder: Transcode complete: Vorspann - Der stille Freund - Ferdinands
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Entering finally block, cleaning up pipeline
+2026-02-06 15:44:00 [DEBUG] resonance.streaming.transcoder: [TRANSCODE] Pipeline cleanup complete
+2026-02-06 15:44:00 [INFO] resonance.web.routes.streaming: Transcoded stream finished player=00:04:20:26:84:ae gen=1 reb
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=117871, elapsed=0s
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: Received DSCO from client (1 bytes)
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: DSCO from 00:04:20:26:84:ae
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:01 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:01 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=165548, elapsed=0s
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:01 [DEBUG] resonance.protocol.slimproto: STAT STMs from 00:04:20:26:84:ae: buffer=163040, elapsed=0s
+2026-02-06 15:44:01 [DEBUG] resonance.web.cometd: Delivered event on /00:04:20:26:84:ae/status to 0 clients
+2026-02-06 15:44:01 [DEBUG] resonance.core.events: Published player.status to 1 handlers
+2026-02-06 15:44:02 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:02 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=75268, elapsed=1s
+2026-02-06 15:44:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:44:03 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.15:57827
+2026-02-06 15:44:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:44:03 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'UUID']
+2026-02-06 15:44:03 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:44:03 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:44:03 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:44:03 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:44:03 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.15: sent IPAD, NAME, JSON, UUID
+2026-02-06 15:44:03 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.15:57827
+2026-02-06 15:44:03 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:03 [INFO] resonance.player.client: Setting volume to 28 on 00:04:20:26:84:ae
+2026-02-06 15:44:03 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:03 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:03 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:04 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:04 [INFO] resonance.player.client: Setting volume to 26 on 00:04:20:26:84:ae
+2026-02-06 15:44:04 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:04 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:04 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:04 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:04 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=36, elapsed=2s
+2026-02-06 15:44:04 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:04 [DEBUG] resonance.protocol.slimproto: STAT STMd from 00:04:20:26:84:ae: buffer=0, elapsed=2s
+2026-02-06 15:44:04 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:04 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=2s
+2026-02-06 15:44:04 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:04 [INFO] resonance.player.client: Setting volume to 27 on 00:04:20:26:84:ae
+2026-02-06 15:44:04 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:04 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:04 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:04 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:04 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=2s
+2026-02-06 15:44:04 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:04 [INFO] resonance.player.client: Setting volume to 26 on 00:04:20:26:84:ae
+2026-02-06 15:44:04 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:04 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:04 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:04 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:04 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=3s
+2026-02-06 15:44:05 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:05 [INFO] resonance.player.client: Setting volume to 25 on 00:04:20:26:84:ae
+2026-02-06 15:44:05 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:05 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:05 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:05 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:05 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=3s
+2026-02-06 15:44:05 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:05 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=3s
+2026-02-06 15:44:05 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:05 [INFO] resonance.player.client: Setting volume to 24 on 00:04:20:26:84:ae
+2026-02-06 15:44:05 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:05 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:05 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:05 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:05 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=3s
+2026-02-06 15:44:05 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:05 [INFO] resonance.player.client: Setting volume to 23 on 00:04:20:26:84:ae
+2026-02-06 15:44:05 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:05 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:05 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:05 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:05 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=3s
+2026-02-06 15:44:06 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:06 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=4s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:06 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:06 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:06 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:06 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:06 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:06 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:06 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=5s
+2026-02-06 15:44:06 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:06 [INFO] resonance.player.client: Setting volume to 22 on 00:04:20:26:84:ae
+2026-02-06 15:44:06 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:06 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:06 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:06 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:06 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=5s
+2026-02-06 15:44:06 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:06 [INFO] resonance.player.client: Setting volume to 19 on 00:04:20:26:84:ae
+2026-02-06 15:44:06 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:06 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:06 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:07 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:07 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=5s
+2026-02-06 15:44:07 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:07 [INFO] resonance.player.client: Setting volume to 18 on 00:04:20:26:84:ae
+2026-02-06 15:44:07 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:07 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:07 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:07 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:07 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=5s
+2026-02-06 15:44:07 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:07 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=5s
+2026-02-06 15:44:08 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:08 [INFO] resonance.player.client: Setting volume to 17 on 00:04:20:26:84:ae
+2026-02-06 15:44:08 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:08 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:08 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:08 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:08 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=6s
+2026-02-06 15:44:08 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:08 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=6s
+2026-02-06 15:44:08 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:08 [INFO] resonance.player.client: Setting volume to 12 on 00:04:20:26:84:ae
+2026-02-06 15:44:08 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:08 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:08 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:08 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:08 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=6s
+2026-02-06 15:44:08 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:08 [INFO] resonance.player.client: Setting volume to 11 on 00:04:20:26:84:ae
+2026-02-06 15:44:08 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:08 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:08 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:08 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:08 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=7s
+2026-02-06 15:44:09 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:09 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=7s
+2026-02-06 15:44:10 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:10 [INFO] resonance.player.client: Setting volume to 10 on 00:04:20:26:84:ae
+2026-02-06 15:44:10 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:10 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:10 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:10 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:10 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=8s
+2026-02-06 15:44:10 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:10 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=8s
+2026-02-06 15:44:11 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:11 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=9s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:11 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:11 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:11 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:11 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:11 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:11 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:11 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=10s
+2026-02-06 15:44:12 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:12 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=10s
+2026-02-06 15:44:12 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:12 [INFO] resonance.player.client: Setting volume to 11 on 00:04:20:26:84:ae
+2026-02-06 15:44:12 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:12 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:12 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:12 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:12 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=11s
+2026-02-06 15:44:12 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:12 [INFO] resonance.player.client: Setting volume to 11 on 00:04:20:26:84:ae
+2026-02-06 15:44:12 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:12 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:12 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:13 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:13 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=11s
+2026-02-06 15:44:13 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:13 [INFO] resonance.player.client: Setting volume to 11 on 00:04:20:26:84:ae
+2026-02-06 15:44:13 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:13 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:13 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:13 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:13 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=11s
+2026-02-06 15:44:13 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:13 [INFO] resonance.player.client: Setting volume to 12 on 00:04:20:26:84:ae
+2026-02-06 15:44:13 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:13 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:13 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:13 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:13 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=11s
+2026-02-06 15:44:13 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:13 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=12s
+2026-02-06 15:44:13 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:13 [INFO] resonance.player.client: Setting volume to 13 on 00:04:20:26:84:ae
+2026-02-06 15:44:13 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:13 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:13 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:13 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:13 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=12s
+2026-02-06 15:44:13 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:13 [INFO] resonance.player.client: Setting volume to 13 on 00:04:20:26:84:ae
+2026-02-06 15:44:13 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:13 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:13 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=12s
+2026-02-06 15:44:14 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:14 [INFO] resonance.player.client: Setting volume to 17 on 00:04:20:26:84:ae
+2026-02-06 15:44:14 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:14 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:14 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: STAT STMu from 00:04:20:26:84:ae: buffer=0, elapsed=12s
+2026-02-06 15:44:14 [INFO] resonance.protocol.slimproto: Track finished (STMu/UNDERRUN) from player 00:04:20:26:84:ae -t
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:14 [INFO] resonance.server: Playlist finished for player 00:04:20:26:84:ae
+2026-02-06 15:44:14 [DEBUG] resonance.core.events: Published player.track_finished to 2 handlers
+2026-02-06 15:44:14 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:14 [INFO] resonance.player.client: Setting volume to 18 on 00:04:20:26:84:ae
+2026-02-06 15:44:14 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:14 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:14 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:14 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:14 [INFO] resonance.player.client: Setting volume to 19 on 00:04:20:26:84:ae
+2026-02-06 15:44:14 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:14 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:14 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:14 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:14 [INFO] resonance.player.client: Setting volume to 24 on 00:04:20:26:84:ae
+2026-02-06 15:44:14 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:14 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:14 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:14 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:15 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:15 [INFO] resonance.player.client: Setting volume to 25 on 00:04:20:26:84:ae
+2026-02-06 15:44:15 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:15 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:15 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:15 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:15 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:15 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:15 [INFO] resonance.player.client: Setting volume to 15 on 00:04:20:26:84:ae
+2026-02-06 15:44:15 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:15 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:15 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:15 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:15 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:15 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:15 [INFO] resonance.player.client: Setting volume to 14 on 00:04:20:26:84:ae
+2026-02-06 15:44:15 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:15 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:15 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:15 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:15 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:15 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:15 [INFO] resonance.player.client: Setting volume to 9 on 00:04:20:26:84:ae
+2026-02-06 15:44:15 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:15 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:15 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:16 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:16 [INFO] resonance.player.client: Setting volume to 6 on 00:04:20:26:84:ae
+2026-02-06 15:44:16 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:16 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:16 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:16 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:16 [INFO] resonance.player.client: Setting volume to 7 on 00:04:20:26:84:ae
+2026-02-06 15:44:16 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:16 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:16 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:16 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:16 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:16 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:16 [INFO] resonance.player.client: Setting volume to 10 on 00:04:20:26:84:ae
+2026-02-06 15:44:16 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:16 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:16 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:16 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:17 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:17 [INFO] resonance.player.client: Setting volume to 11 on 00:04:20:26:84:ae
+2026-02-06 15:44:17 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:17 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:17 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:17 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:17 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:17 [INFO] resonance.player.client: Setting volume to 16 on 00:04:20:26:84:ae
+2026-02-06 15:44:17 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:17 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:17 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:17 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:17 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:17 [INFO] resonance.player.client: Setting volume to 15 on 00:04:20:26:84:ae
+2026-02-06 15:44:17 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:17 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:17 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:17 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:18 [DEBUG] resonance.web.cometd: slim_request executing: player=00:04:20:26:84:ae cmd=['mixer', 'volum]
+2026-02-06 15:44:18 [INFO] resonance.player.client: Setting volume to 13 on 00:04:20:26:84:ae
+2026-02-06 15:44:18 [DEBUG] resonance.player.client: Sent b'audg' to 00:04:20:26:84:ae (22 bytes)
+2026-02-06 15:44:18 [DEBUG] resonance.web.cometd: slim_request delivered result on /681dcc10/slim/request
+2026-02-06 15:44:18 [DEBUG] resonance.web.routes.cometd: Streaming events to 681dcc10: [{"channel": "/681dcc10/slim/req]
+
+2026-02-06 15:44:18 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:18 [DEBUG] resonance.protocol.slimproto: STAT audg from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:21 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:21 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:21 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:21 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:21 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:21 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:21 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:26 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:26 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:26 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:26 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:26 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:26 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:26 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:31 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:31 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:31 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:31 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:31 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:31 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:31 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:36 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:36 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:36 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:36 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:36 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:36 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:36 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:41 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:41 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:41 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:41 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:41 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:41 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:41 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:44:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:44:44 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.69:38985
+2026-02-06 15:44:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:44:44 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'VERS', 'UUID', 'JVI]
+2026-02-06 15:44:44 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:44:44 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:44:44 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:44:44 [INFO] resonance.protocol.discovery:   TLV VERS = 7.999.999
+2026-02-06 15:44:44 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:44:44 [INFO] resonance.protocol.discovery: Jive device: 12:34:56:78:12:34
+2026-02-06 15:44:44 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.69: sent IPAD, NAME, JSON, VERS, UUID
+2026-02-06 15:44:44 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.69:38985
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:46 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:46 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:46 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:46 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:46 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:46 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:46 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:51 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:51 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:51 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:51 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:51 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:51 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:51 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:44:56 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:44:56 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:44:56 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:44:56 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:44:56 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:44:56 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:44:56 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:01 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:01 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:01 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:01 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:01 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:01 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:01 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:45:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:45:03 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.15:57827
+2026-02-06 15:45:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:45:03 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'UUID']
+2026-02-06 15:45:03 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:45:03 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:45:03 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:45:03 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:45:03 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.15: sent IPAD, NAME, JSON, UUID
+2026-02-06 15:45:03 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.15:57827
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:06 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:06 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:06 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:06 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:06 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:06 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:06 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:11 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:11 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:11 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:11 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:11 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:11 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:11 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:16 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:16 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:16 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:16 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:16 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:16 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:16 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:21 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:21 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:21 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:21 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:21 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:21 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:21 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:26 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:26 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:26 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:26 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:26 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:26 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:26 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:31 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:31 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:31 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:31 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:31 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:31 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:31 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:36 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:36 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:36 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:36 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:36 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:36 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:36 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:41 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:41 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:41 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:41 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:41 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:41 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:41 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:45:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:45:44 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.69:38985
+2026-02-06 15:45:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:45:44 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'VERS', 'UUID', 'JVI]
+2026-02-06 15:45:44 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:45:44 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:45:44 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:45:44 [INFO] resonance.protocol.discovery:   TLV VERS = 7.999.999
+2026-02-06 15:45:44 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:45:44 [INFO] resonance.protocol.discovery: Jive device: 12:34:56:78:12:34
+2026-02-06 15:45:44 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.69: sent IPAD, NAME, JSON, VERS, UUID
+2026-02-06 15:45:44 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.69:38985
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:46 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:46 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:46 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:46 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:46 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:47 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:47 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:51 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:51 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:51 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:51 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:51 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:52 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:52 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:45:56 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:45:56 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:45:56 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:45:56 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:45:56 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:45:57 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:45:57 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:01 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:01 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:01 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:01 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:01 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:02 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:02 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:46:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:46:03 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.15:57827
+2026-02-06 15:46:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:46:03 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'UUID']
+2026-02-06 15:46:03 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:46:03 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:46:03 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:46:03 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:46:03 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.15: sent IPAD, NAME, JSON, UUID
+2026-02-06 15:46:03 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.15:57827
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:06 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:06 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:06 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:06 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:06 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:07 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:07 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:11 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:11 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:11 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:11 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:11 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:12 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:12 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:16 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:16 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:16 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:16 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:16 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:17 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:21 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:21 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:21 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:21 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:21 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:22 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:22 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:26 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:26 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:26 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:26 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:26 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:27 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:27 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:32 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:32 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:32 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:32 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:32 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:32 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:32 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:37 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:37 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:37 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:37 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:37 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:37 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:37 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:42 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:42 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:42 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:42 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:42 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:42 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:42 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:46:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:46:44 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.69:38985
+2026-02-06 15:46:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:46:44 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'VERS', 'UUID', 'JVI]
+2026-02-06 15:46:44 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:46:44 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:46:44 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:46:44 [INFO] resonance.protocol.discovery:   TLV VERS = 7.999.999
+2026-02-06 15:46:44 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:46:44 [INFO] resonance.protocol.discovery: Jive device: 12:34:56:78:12:34
+2026-02-06 15:46:44 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.69: sent IPAD, NAME, JSON, VERS, UUID
+2026-02-06 15:46:44 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.69:38985
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:47 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:47 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:47 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:47 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:47 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:47 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:47 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:52 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:52 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:52 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:52 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:52 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:52 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:52 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:46:57 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:46:57 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:46:57 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:46:57 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:46:57 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:46:57 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:46:57 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:02 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:02 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:02 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:02 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:02 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:02 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:02 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:47:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:47:03 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.15:57827
+2026-02-06 15:47:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:47:03 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'UUID']
+2026-02-06 15:47:03 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:47:03 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:47:03 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:47:03 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:47:03 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.15: sent IPAD, NAME, JSON, UUID
+2026-02-06 15:47:03 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.15:57827
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:07 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:07 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:07 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:07 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:07 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:07 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:07 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:12 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:12 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:12 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:12 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:12 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:12 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:12 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:17 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:17 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:17 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:17 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:17 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:17 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:22 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:22 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:22 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:22 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:22 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:22 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:22 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:27 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:27 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:27 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:27 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:27 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:27 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:27 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:32 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:32 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:32 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:32 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:32 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:32 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:32 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:37 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:37 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:37 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:37 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:37 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:37 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:37 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:42 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:42 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:42 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:42 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:42 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:42 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:42 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:47:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:47:44 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.69:38985
+2026-02-06 15:47:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:47:44 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'VERS', 'UUID', 'JVI]
+2026-02-06 15:47:44 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:47:44 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:47:44 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:47:44 [INFO] resonance.protocol.discovery:   TLV VERS = 7.999.999
+2026-02-06 15:47:44 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:47:44 [INFO] resonance.protocol.discovery: Jive device: 12:34:56:78:12:34
+2026-02-06 15:47:44 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.69: sent IPAD, NAME, JSON, VERS, UUID
+2026-02-06 15:47:44 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.69:38985
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:47 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:47 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:47 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:47 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:47 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:47 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:47 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:52 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:52 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:52 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:52 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:52 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:52 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:52 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:47:57 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:47:57 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:47:57 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:47:57 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:47:57 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:47:57 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:47:57 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:02 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:02 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:02 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:02 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:02 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:02 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:02 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:48:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:48:03 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.15:57827
+2026-02-06 15:48:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:48:03 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'UUID']
+2026-02-06 15:48:03 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:48:03 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:48:03 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:48:03 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:48:03 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.15: sent IPAD, NAME, JSON, UUID
+2026-02-06 15:48:03 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.15:57827
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:07 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:07 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:07 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:07 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:07 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:07 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:07 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:12 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:12 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:12 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:12 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:12 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:12 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:12 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:17 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:17 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:17 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:17 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:17 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:17 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:17 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:22 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:22 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:22 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:22 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:22 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:22 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:22 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:27 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:27 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:27 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:27 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:27 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:27 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:27 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:32 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:32 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:32 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:32 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:32 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:32 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:32 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:37 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:37 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:37 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:37 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:37 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:37 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:37 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:42 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:42 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:42 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:42 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:42 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:42 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:42 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:48:44 [INFO] resonance.web.routes.cometd: Streaming connection ended for client 681dcc10
+2026-02-06 15:48:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:48:44 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.69:38985
+2026-02-06 15:48:44 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.69
+2026-02-06 15:48:44 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'VERS', 'UUID', 'JVI]
+2026-02-06 15:48:44 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:48:44 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:48:44 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:48:44 [INFO] resonance.protocol.discovery:   TLV VERS = 7.999.999
+2026-02-06 15:48:44 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:48:44 [INFO] resonance.protocol.discovery: Jive device: 12:34:56:78:12:34
+2026-02-06 15:48:44 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.69: sent IPAD, NAME, JSON, VERS, UUID
+2026-02-06 15:48:44 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.69:38985
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:47 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:47 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:47 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:47 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:47 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:47 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:47 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:52 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:52 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:52 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:52 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:52 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:52 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:52 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:48:57 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:48:57 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:48:57 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:48:57 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:48:57 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:48:57 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:48:57 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:49:02 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:49:02 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:49:02 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:49:02 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:49:02 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:49:02 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:49:02 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+2026-02-06 15:49:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:49:03 [INFO] resonance.protocol.discovery: TLV Discovery request from 192.168.1.15:57827
+2026-02-06 15:49:03 [DEBUG] resonance.protocol.discovery: Detected local IP 192.168.1.30 for client 192.168.1.15
+2026-02-06 15:49:03 [DEBUG] resonance.protocol.discovery: Requested TLVs: ['IPAD', 'NAME', 'JSON', 'UUID']
+2026-02-06 15:49:03 [INFO] resonance.protocol.discovery:   TLV IPAD = 192.168.1.30
+2026-02-06 15:49:03 [INFO] resonance.protocol.discovery:   TLV NAME = Resonance
+2026-02-06 15:49:03 [INFO] resonance.protocol.discovery:   TLV JSON = 9000
+2026-02-06 15:49:03 [INFO] resonance.protocol.discovery:   TLV UUID = 6bab33eb-01ca-4ceb-9553-8285ddc9b2e9
+2026-02-06 15:49:03 [INFO] resonance.protocol.discovery: TLV Response to 192.168.1.15: sent IPAD, NAME, JSON, UUID
+2026-02-06 15:49:03 [DEBUG] resonance.protocol.discovery: Sent TLV response to 192.168.1.15:57827
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:49:07 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:49:07 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:49:07 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:49:07 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:49:07 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:49:07 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:49:07 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
+[TX] to=00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=74 30 6d 3f 3f 3f 3f ff 00 00 30 00 00 00 00 00 00 00 00 0
+[TX] strm parsed: command=t autostart=0 format=m server_port=0 server_ip=0x00000000
+2026-02-06 15:49:12 [DEBUG] resonance.protocol.slimproto: TX to 00:04:20:26:84:ae cmd=strm payload_len=24 payload_hex=70
+2026-02-06 15:49:12 [DEBUG] resonance.protocol.slimproto: TX strm parsed: command=t autostart=0 format=m server_port=0 0
+2026-02-06 15:49:12 [DEBUG] resonance.player.client: PlayerClient TX strm parsed: command=t autostart=0 format=m pcm_sz0
+2026-02-06 15:49:12 [DEBUG] resonance.player.client: Sent b'strm' to 00:04:20:26:84:ae (24 bytes)
+2026-02-06 15:49:12 [DEBUG] resonance.protocol.slimproto: Sent heartbeat to 00:04:20:26:84:ae
+2026-02-06 15:49:12 [DEBUG] resonance.protocol.slimproto: Received STAT from client (51 bytes)
+2026-02-06 15:49:12 [DEBUG] resonance.protocol.slimproto: STAT STMt from 00:04:20:26:84:ae: buffer=0, elapsed=0s
