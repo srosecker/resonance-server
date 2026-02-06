@@ -35,7 +35,11 @@ _cometd_manager: CometdManager | None = None
 _jsonrpc_handler: JsonRpcHandler | None = None
 
 # Streaming connection timeout (seconds)
-STREAMING_TIMEOUT = 300  # 5 minutes
+# Use a long timeout – LMS keeps Cometd streaming connections open for the
+# entire duration of a player session.  A short timeout (like 5 min) causes
+# Squeezebox Radio / Boom / Touch to silently lose the push channel, and the
+# devices rarely reconnect on their own afterward.
+STREAMING_TIMEOUT = 3600  # 1 hour
 STREAMING_HEARTBEAT_INTERVAL = 30  # Send heartbeat every 30 seconds
 
 
@@ -305,8 +309,25 @@ async def _streaming_event_generator(
         logger.info("Streaming connection cancelled for client %s", client_id)
     except Exception as e:
         logger.exception("Error in streaming connection for %s: %s", client_id, e)
-    finally:
-        logger.info("Streaming connection ended for client %s", client_id)
+
+    # Send a final advice telling the client to reconnect immediately.
+    # Without this, devices like Squeezebox Radio silently drop the connection
+    # after the streaming timeout and never re-establish it, making the UI
+    # unresponsive.
+    try:
+        reconnect_advice = [
+            {
+                "channel": "/meta/connect",
+                "successful": True,
+                "advice": {"reconnect": "retry", "interval": 0},
+            }
+        ]
+        chunk = json.dumps(reconnect_advice) + "\r\n"
+        yield chunk.encode("utf-8")
+    except Exception:
+        pass  # Connection may already be closed
+
+    logger.info("Streaming connection ended for client %s", client_id)
 
 
 @router.post("/cometd/")

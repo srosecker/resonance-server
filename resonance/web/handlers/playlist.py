@@ -523,8 +523,8 @@ async def _playlist_loadtracks(
             title=row_dict.get("title", ""),
             artist_id=row_dict.get("artist_id"),
             album_id=row_dict.get("album_id"),
-            artist_name=row_dict.get("artist_name"),
-            album_title=row_dict.get("album_title"),
+            artist_name=row_dict.get("artist"),
+            album_title=row_dict.get("album"),
             year=row_dict.get("year"),
             duration_ms=row_dict.get("duration_ms"),
             disc_no=row_dict.get("disc_no"),
@@ -625,9 +625,13 @@ async def _start_track_stream(
     # CRITICAL: Set volume before stream start!
     # The player needs an audg command before strm, otherwise audio may be silent.
     # Use current volume from player status, default to 100 if not set.
+    # Pass the stored seq_no so the Radio can correlate this with its own
+    # volume state and won't treat it as an unsolicited volume reset (which
+    # causes the volume-bounce / stutter when the user turns the knob).
     current_volume = getattr(player.status, "volume", 100)
     current_muted = getattr(player.status, "muted", False)
-    await player.set_volume(current_volume, current_muted)
+    current_seq_no = getattr(player, "_seq_no", None)
+    await player.set_volume(current_volume, current_muted, seq_no=current_seq_no)
 
     # Queue the new file
     ctx.streaming_server.queue_file(ctx.player_id, Path(track.path))
