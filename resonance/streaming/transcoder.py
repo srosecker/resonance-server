@@ -285,8 +285,10 @@ def build_command(
     Args:
         rule: The TranscodeRule to use.
         file_path: Path to the source audio file.
-        start_seconds: Optional seek start position in seconds (for faad -j).
-        end_seconds: Optional seek end position in seconds (for faad -e).
+        start_seconds: Optional seek start position in seconds.
+            Flag is binary-aware: ``-ss`` for ffmpeg, ``-j`` for faad.
+        end_seconds: Optional seek end position in seconds.
+            Flag is binary-aware: ``-to`` for ffmpeg, ``-e`` for faad.
 
     Returns:
         List of command lists (for piping). Each inner list is a command + args.
@@ -313,17 +315,25 @@ def build_command(
 
         # Check for [binary] syntax in the first argument
         binary_match = re.match(r"\[(\w+)\]", args[0])
+        segment_binary = None  # Track binary name for context-aware substitution
         if binary_match:
-            binary_name = binary_match.group(1)
-            binary_path = resolve_binary(binary_name)
+            segment_binary = binary_match.group(1).lower()
+            binary_path = resolve_binary(segment_binary)
             if binary_path is None:
-                raise ValueError(f"Binary not found: {binary_name}")
+                raise ValueError(f"Binary not found: {segment_binary}")
 
             # Replace the [binary] placeholder with the full path
             cmd_args = [str(binary_path)] + args[1:]
         else:
             # Plain command - use as is (system path resolution happens in subprocess)
             cmd_args = args
+
+        # Choose seek flags based on binary.
+        # ffmpeg uses -ss (start) / -to (end); faad uses -j / -e.
+        if segment_binary == "ffmpeg":
+            start_flag, end_flag = "-ss", "-to"
+        else:
+            start_flag, end_flag = "-j", "-e"
 
         # Perform placeholder substitution on arguments
         final_args = []
@@ -335,19 +345,16 @@ def build_command(
             # Replace $START$
             if "$START$" in arg:
                 if start_seconds is not None and start_seconds > 0:
-                    # Special handling if $START$ is the whole argument or part of it
-                    # In legacy.conf: [faad] ... $START$ ...
-                    # This usually expands to "-j 123.456".
-                    # If it's a separate token in shlex.split, we might need to split it again
-                    # or returning multiple args.
-                    replacement = f"-j {start_seconds:.3f}"
+                    # Expand to "<flag> <seconds>" (two args).
+                    # e.g. ffmpeg: "-ss 123.456", faad: "-j 123.456"
+                    replacement = f"{start_flag} {start_seconds:.3f}"
                     if arg == "$START$":
                         final_args.extend(replacement.split())
                         continue
                     else:
                         arg = arg.replace("$START$", replacement)
                 else:
-                    # Remove the placeholder
+                    # Remove the placeholder (no seeking requested)
                     if arg == "$START$":
                         continue
                     arg = arg.replace("$START$", "")
@@ -355,7 +362,7 @@ def build_command(
             # Replace $END$
             if "$END$" in arg:
                 if end_seconds is not None and end_seconds > 0:
-                    replacement = f"-e {end_seconds:.3f}"
+                    replacement = f"{end_flag} {end_seconds:.3f}"
                     if arg == "$END$":
                         final_args.extend(replacement.split())
                         continue

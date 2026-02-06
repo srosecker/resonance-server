@@ -35,7 +35,7 @@ _cometd_manager: CometdManager | None = None
 _jsonrpc_handler: JsonRpcHandler | None = None
 
 # Streaming connection timeout (seconds)
-STREAMING_TIMEOUT = 300  # 5 minutes
+STREAMING_TIMEOUT = 3600  # 1 hour — Squeezebox Radio stays connected for long sessions
 STREAMING_HEARTBEAT_INTERVAL = 30  # Send heartbeat every 30 seconds
 
 
@@ -306,6 +306,18 @@ async def _streaming_event_generator(
     except Exception as e:
         logger.exception("Error in streaming connection for %s: %s", client_id, e)
     finally:
+        # Send reconnect advice so Squeezebox Radio reconnects automatically
+        # instead of silently losing the push connection.
+        try:
+            reconnect_advice = [{
+                "channel": "/meta/connect",
+                "successful": True,
+                "advice": {"reconnect": "retry", "interval": 0, "timeout": 0},
+            }]
+            chunk = json.dumps(reconnect_advice) + "\r\n"
+            yield chunk.encode("utf-8")
+        except Exception:
+            pass  # Best-effort — connection may already be closed
         logger.info("Streaming connection ended for client %s", client_id)
 
 
